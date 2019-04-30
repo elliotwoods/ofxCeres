@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxBaseGui.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxButton.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxColorPicker.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxGuiGroup.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxInputField.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxLabel.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxPanel.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxSlider.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxSliderGroup.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGui\src\ofxToggle.cpp">
+      <Filter>addons\ofxGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxGrabcam\src\ofxGrabCam.cpp">
+      <Filter>addons\ofxGrabCam\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{ed21f078-c663-41cf-9349-9f5b5b93c06a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGui">
+      <UniqueIdentifier>{2038ed70-fcb8-40d7-a8cc-34c5ed55bdb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabCam">
+      <UniqueIdentifier>{fd650175-3bf3-41aa-bf88-d8f3d9397c3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabCam\src">
+      <UniqueIdentifier>{039a3b51-e9e4-44a0-ba50-7317c32a9b8b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxBaseGui.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxButton.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxColorPicker.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxGui.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxGuiGroup.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxInputField.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxLabel.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxPanel.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxSlider.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxSliderGroup.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGui\src\ofxToggle.h">
+      <Filter>addons\ofxGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxGrabcam\src\ofxGrabCam.h">
+      <Filter>addons\ofxGrabCam\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{212255e0-df04-4747-8bc3-f00de9c45829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxCeres">
+      <UniqueIdentifier>{90f666f3-c375-4f7a-b18c-e3d40198b963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxCeres\Models">
+      <UniqueIdentifier>{1cf11376-12c0-49a1-9dfe-ea99294c1bb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxCeres\VectorMath">
+      <UniqueIdentifier>{c0733185-5c5b-4c20-8597-5fd2898205a6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ofxCeres.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\MovingHead.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\Base.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\RigidBodyTransform.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Result.h">
+      <Filter>src\ofxCeres</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\VectorMath\VectorMath.h">
+      <Filter>src\ofxCeres\VectorMath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Exception.h">
+      <Filter>src\ofxCeres</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Exception.cpp">
+      <Filter>src\ofxCeres</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\MovingHead.cpp">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
