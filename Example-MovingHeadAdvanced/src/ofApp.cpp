@@ -3,17 +3,20 @@
 #include "ofApp.h"
 #include "ofxCeres.h"
 
-#define COUNT 100
-#define NOISE 0.01
-
 //--------------------------------------------------------------
 void ofApp::setup() {
-	this->gui.init();
+    
+    // Initialise the moving heads
+    {
+        this->movingHeads.emplace("1", make_shared<MovingHead>());
+        this->movingHeads.emplace("2", make_shared<MovingHead>());
+    }
+    
 
-	this->movingHeads.emplace("1", make_shared<MovingHead>());
-	this->movingHeads.emplace("2", make_shared<MovingHead>());
-
+    // Initialise the gui
 	{
+        this->gui.init();
+        
 		auto strip = ofxCvGui::Panels::Groups::makeStrip();
 		{
 			strip->setCellSizes({ -1, 500 });
@@ -36,12 +39,13 @@ void ofApp::setup() {
 		}
 	}
 
+    // Load for json file
 	this->load();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	this->solvedTransform = ofxCeres::VectorMath::createTransform(this->parameters.translation.get(), this->parameters.rotation.get());
+	
 }
 
 //--------------------------------------------------------------
@@ -51,7 +55,9 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::drawWorld() {
-	if (this->parameters.drawGrid) {
+    
+    // Draw a floor grid
+	if (this->drawGrid) {
 		ofPushStyle();
 		{
 			ofSetColor(150);
@@ -67,6 +73,7 @@ void ofApp::drawWorld() {
 		ofPopStyle();
 	}
 
+    // Draw the moving heads
 	for (auto & movingHead : this->movingHeads) {
 		movingHead.second->drawWorld(movingHead.first == this->selection);
 	}
@@ -102,6 +109,10 @@ void ofApp::repopulateWidgets() {
 	this->widgetsPanel->addSpacer();
 	
 	this->movingHeads[this->selection]->populateWidgets(this->widgetsPanel);
+    
+    this->widgetsPanel->addSpacer();
+    
+    this->widgetsPanel->addToggle(this->drawGrid);
 }
 
 //--------------------------------------------------------------

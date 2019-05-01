@@ -81,8 +81,7 @@ void serializeSimple(nlohmann::json & json, const ofParameter<DataType> & parame
 template<typename DataType>
 void deserializeSimple(const nlohmann::json & json, ofParameter<DataType> & parameter) {
 	if (json.count(parameter.getName()) != 0) {
-		DataType value;
-		json[parameter.getName()].get_to(value);
+		auto value = json[parameter.getName()].template get<DataType>();
 		parameter.set(value);
 	}
 }
@@ -98,9 +97,8 @@ void serializeStream(nlohmann::json & json, const ofParameter<DataType> & parame
 template<typename DataType>
 void deserializeStream(const nlohmann::json & json, ofParameter<DataType> & parameter) {
 	if (json.count(parameter.getName()) != 0) {
-		string parameterValueString;
-		json[parameter.getName()].get_to(parameterValueString);
-
+        auto parameterValueString = json[parameter.getName()].template get<string>();
+        
 		stringstream ss(parameterValueString);
 
 		DataType value;

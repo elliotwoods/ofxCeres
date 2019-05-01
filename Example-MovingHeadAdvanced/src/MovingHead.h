@@ -18,6 +18,8 @@ public:
 	void addTestData();
 
 	glm::mat4 getTransform() const;
+    
+    glm::vec2 getPanTiltForWorldPosition(const glm::vec3 &) const;
 
 	void setWorldCursorPosition(const glm::vec3 &);
 protected:

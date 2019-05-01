@@ -313,6 +313,15 @@ glm::mat4 MovingHead::getTransform() const {
 }
 
 //---------
+glm::vec2 MovingHead::getPanTiltForWorldPosition(const glm::vec3 & world) const {
+    auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
+    auto objectSpacePosition = (glm::vec3) (objectSpacePosition4 / objectSpacePosition4.w);
+    auto panTiltAngles = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(objectSpacePosition
+                                                                               , this->tiltOffset.get());
+    return panTiltAngles;
+}
+
+//---------
 void MovingHead::setWorldCursorPosition(const glm::vec3 & position) {
 	auto minDistance = numeric_limits<float>::max();
 	auto dataPoints = this->calibrationPoints.getAllCaptures();
