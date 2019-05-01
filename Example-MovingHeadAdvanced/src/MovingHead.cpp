@@ -153,7 +153,8 @@ void MovingHead::deserialize(const nlohmann::json & json) {
 
 //---------
 void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) {
-
+	
+	// make the trackpad and set it up
 	{
 		auto trackpadWidget = make_shared<Widgets::PanTiltTrackpad>(this->currentPanTilt);
 		auto trackpadWidgetWeak = weak_ptr<Widgets::PanTiltTrackpad>(trackpadWidget);
@@ -207,7 +208,7 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 
 	widgets->addTitle("Calibration", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		this->calibrationPoints.populateWidgets(widgets);
+		this->calibrationPoints.populateWidgets(widgets, false);
 
 		widgets->addButton("Toggle selection", [this]() {
 			auto focusedDataPoint = this->focusedDataPoint.lock();
@@ -244,6 +245,12 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 		}
 	}
 }
+
+//---------
+shared_ptr<ofxCvGui::Panels::Widgets> MovingHead::getListPanel() {
+	return this->calibrationPoints.getListPanel();
+}
+
 
 //---------
 void MovingHead::solve() {

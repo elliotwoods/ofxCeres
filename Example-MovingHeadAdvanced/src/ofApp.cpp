@@ -17,12 +17,13 @@ void ofApp::setup() {
 	{
         this->gui.init();
         
-		auto strip = ofxCvGui::Panels::Groups::makeStrip();
+		this->stripPanel = ofxCvGui::Panels::Groups::makeStrip();
 		{
-			strip->setCellSizes({ -1, 500 });
-			this->gui.add(strip);
+			this->stripPanel->setCellSizes({ -1, 400, 350 });
+			this->gui.add(this->stripPanel);
 		}
 
+		// Add the panel for drawing 3D world
 		{
 			this->worldPanel = ofxCvGui::Panels::makeWorld();
 			this->worldPanel->onDrawWorld += [this](ofCamera &) {
@@ -30,17 +31,26 @@ void ofApp::setup() {
 			};
 			this->worldPanel->setGridEnabled(false);
 			this->worldPanel->getCamera().setCursorDrawEnabled(true);
-			strip->add(this->worldPanel);
+			this->stripPanel->add(this->worldPanel);
+
 		}
 
+		// Add the widgets panel
 		{
 			this->widgetsPanel = ofxCvGui::Panels::makeWidgets();
-			this->repopulateWidgets();
-			strip->add(widgetsPanel);
+			this->stripPanel->add(widgetsPanel);
 		}
+
+		// Add a blank panel in this slot for now (this will become the list panel)
+		{
+			this->stripPanel->add(make_shared<ofxCvGui::Panels::Base>());
+		}
+
+		// Popualte the widgets
+		this->repopulateWidgets();
 	}
 
-    // Load for json file
+	// Load for json file
 	this->load();
 }
 
@@ -98,9 +108,13 @@ void ofApp::repopulateWidgets() {
 		selector->onValueChange += [this](int) {
 			this->selection = selector->getSelection();
 			this->repopulateWidgets();
+
+			// bring up the list in that panel slot
+			this->stripPanel->getElements()[2] = this->movingHeads[selection]->getListPanel();
 		};
 
-		this->selection = selector->getSelection();
+		// simulate a selection to trigger relevant actions
+		selector->onValueChange.notifyListeners(0);
 	}
 
 	this->widgetsPanel->addFps();
@@ -155,7 +169,7 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-	this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
+
 }
 
 //--------------------------------------------------------------
@@ -170,7 +184,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+	this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
 }
 
 //--------------------------------------------------------------

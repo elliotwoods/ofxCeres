@@ -95,7 +95,7 @@ namespace Data {
 		auto addButton = [element, &y](string caption, function<void()> action) {
 			auto button = make_shared<ofxCvGui::Widgets::Button>(caption, action);
 
-			button->setBounds({ 2, y, 120.0f, 30.0f });
+			button->setBounds({ 2, y, 110.0f, 30.0f });
 			element->addChild(button);
 
 			y += 35.0f;

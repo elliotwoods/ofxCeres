@@ -15,6 +15,7 @@ public:
 	void serialize(nlohmann::json &);
 	void deserialize(const nlohmann::json &);
 	void populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets);
+	shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
 
 	void solve();
 	void addTestData();

@@ -57,9 +57,11 @@ namespace ofxCeres {
 
 			auto pan = atan2(objectSpacePoint.x, objectSpacePoint.z) * (T) RAD_TO_DEG;
 
-			T distance = objectSpacePoint.x * objectSpacePoint.x
+			T distance2 = objectSpacePoint.x * objectSpacePoint.x
 				+ objectSpacePoint.y * objectSpacePoint.y
 				+ objectSpacePoint.z * objectSpacePoint.z;
+
+			T distance = sqrt(distance2);
 
 			auto actualTilt = acos(objectSpacePoint.y / distance) * (T)RAD_TO_DEG;
 

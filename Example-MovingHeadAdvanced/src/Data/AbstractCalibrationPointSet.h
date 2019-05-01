@@ -16,7 +16,9 @@ namespace Data {
 		void selectAll();
 		void selectNone();
 
-		void populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets>);
+		void populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets>, bool addListPanel = true);
+		shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
+
 		void serialize(nlohmann::json &);
 		void deserialize(const nlohmann::json &);
 
@@ -33,7 +35,7 @@ namespace Data {
 		virtual bool getIsMultipleSelectionAllowed() = 0;
 		vector<shared_ptr<AbstractCalibrationPoint>> captures;
 
-		shared_ptr<ofxCvGui::Panels::Widgets> listView;
+		shared_ptr<ofxCvGui::Panels::Widgets> listPanel;
 
 		bool viewDirty = true;
 	};

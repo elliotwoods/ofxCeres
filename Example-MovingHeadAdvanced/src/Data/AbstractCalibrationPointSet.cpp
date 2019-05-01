@@ -11,18 +11,18 @@ namespace Data {
 	AbstractCalibrationPointSet::AbstractCalibrationPointSet() {
 		RULR_SERIALIZE_LISTENERS;
 
-		this->listView = Panels::makeWidgets();
-		this->listView->setHeight(400.0f);
-		this->listView->onUpdate += [this](ofxCvGui::UpdateArguments &) {
+		this->listPanel = Panels::makeWidgets();
+		this->listPanel->setHeight(400.0f);
+		this->listPanel->onUpdate += [this](ofxCvGui::UpdateArguments &) {
 			if (this->viewDirty) {
-				this->listView->clear();
+				this->listPanel->clear();
 				for (auto capture : this->captures) {
-					this->listView->add(capture->getGuiElement());
+					this->listPanel->add(capture->getGuiElement());
 				}
 				this->viewDirty = false;
 			}
 		};
-		this->listView->onDraw += [this](DrawArguments & args) {
+		this->listPanel->onDraw += [this](DrawArguments & args) {
 			ofPushStyle();
 			{
 				ofNoFill();
@@ -31,7 +31,7 @@ namespace Data {
 			}
 			ofPopStyle();
 		};
-		this->listView->setScissorEnabled(true);
+		this->listPanel->setScissorEnabled(true);
 	}
 
 	//----------
@@ -47,7 +47,7 @@ namespace Data {
 
 		auto captureWeak = weak_ptr<AbstractCalibrationPoint>(capture);
 		capture->onDeletePressed += [captureWeak, this]() {
-			this->listView->clear();
+			this->listPanel->clear();
 			this->viewDirty = true;
 			auto capture = captureWeak.lock();
 			if (capture) {
@@ -95,7 +95,7 @@ namespace Data {
 
 	//----------
 	void AbstractCalibrationPointSet::clear() {
-		this->listView->clear();
+		this->listPanel->clear();
 		while (!this->captures.empty()) {
 			this->remove(*this->captures.begin());
 		}
@@ -122,8 +122,10 @@ namespace Data {
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel) {
-		widgetsPanel->add(this->listView);
+	void AbstractCalibrationPointSet::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel, bool addListPanel) {
+		if (addListPanel) {
+			widgetsPanel->add(this->listPanel);
+		}
 
 		widgetsPanel->addLiveValue<int>("Count", [this]() {
 			return this->captures.size();
@@ -179,6 +181,11 @@ namespace Data {
 		}
 
 		widgetsPanel->addSpacer();
+	}
+
+	//----------
+	shared_ptr<ofxCvGui::Panels::Widgets> AbstractCalibrationPointSet::getListPanel() {
+		return this->listPanel;
 	}
 
 	//----------

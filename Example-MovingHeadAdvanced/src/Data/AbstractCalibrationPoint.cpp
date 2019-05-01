@@ -46,7 +46,7 @@ namespace Data {
 			if (this->isSelected()) {
 				ofPushStyle();
 				{
-					ofSetColor(50);
+					ofSetColor(40);
 					ofDrawRectangle(args.localBounds);
 				}
 				ofPopStyle();

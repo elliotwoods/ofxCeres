@@ -35,6 +35,7 @@ public:
 	string selection;
 
 	ofxCvGui::Builder gui;
+	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
 	shared_ptr<ofxCvGui::Panels::World> worldPanel;
 	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
 };
