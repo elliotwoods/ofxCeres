@@ -21,12 +21,14 @@ public:
 	void addTestData();
 
 	glm::mat4 getTransform() const;
-    
-    glm::vec2 getPanTiltForWorldTarget(const glm::vec3 &
+
+	glm::vec2 getPanTiltForWorldTarget(const glm::vec3 &
 		, const glm::vec2 & currentPanTilt) const;
 	void navigateToWorldTarget(const glm::vec3 &);
 
 	void setWorldCursorPosition(const glm::vec3 &);
+
+	void renderDMX(vector<uint8_t> & dmxValues) const;
 protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
@@ -39,7 +41,7 @@ protected:
 	struct {
 		ofParameter<glm::vec2> panRange{ "Pan range", glm::vec2(-270, +270) };
 		ofParameter<glm::vec2> tiltRange{ "Tilt range", glm::vec2(-130, +130) };
-		
+
 		struct {
 			ofParameter<uint16_t> panCoarse{ "Pan coarse", 0 };
 			ofParameter<uint16_t> panFine{ "Pan fine", 1 };
@@ -52,4 +54,6 @@ protected:
 
 	ofParameter<glm::vec2> currentPanTilt{ "Current Pan Tilt", glm::vec2(0, 0) };
 	weak_ptr<Data::MovingHeadDataPoint> focusedDataPoint;
+
+	glm::vec3 lastWorldPosition;
 };

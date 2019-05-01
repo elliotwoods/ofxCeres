@@ -206,17 +206,78 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 
 	widgets->add(make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->currentPanTilt));
 
-	widgets->addTitle("Calibration", ofxCvGui::Widgets::Title::Level::H2);
+	widgets->addTitle("Data", ofxCvGui::Widgets::Title::Level::H2);
 	{
+		widgets->addButton("Add new data point...", [this]() {
+			auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
+			newDataPoint->name = ofSystemTextBoxDialog("Name");
+			newDataPoint->panTiltAngles = this->currentPanTilt.get();
+
+			auto targetPoint = this->lastWorldPosition;
+			{
+				auto response = ofSystemTextBoxDialog("Target point in world [" + ofToString(targetPoint) + "]", ofToString(targetPoint));
+
+				if (!response.empty()) {
+					stringstream ss(response);
+					ss >> targetPoint;
+				}
+			}
+
+			newDataPoint->targetPoint = targetPoint;
+
+			this->prepareDataPoint(newDataPoint);
+			this->calibrationPoints.add(newDataPoint);
+		});
+
 		this->calibrationPoints.populateWidgets(widgets, false);
 
-		widgets->addButton("Toggle selection", [this]() {
-			auto focusedDataPoint = this->focusedDataPoint.lock();
-			if (focusedDataPoint) {
-				focusedDataPoint->setSelected(!focusedDataPoint->isSelected());
-			}
-		}, ' ');
+		widgets->addButton("Add test data", [this]() {
+			this->addTestData();
+		});
 
+		widgets->addTitle("Focused", ofxCvGui::Widgets::Title::Level::H3);
+		{
+			widgets->addLiveValue<string>("Name", [this]() {
+				auto focusedDataPoint = this->focusedDataPoint.lock();
+				if (focusedDataPoint) {
+					return focusedDataPoint->name.get();
+				}
+				else {
+					return (string) "";
+				}
+			});
+
+			widgets->addToggle("Selected", [this]() {
+				auto focusedDataPoint = this->focusedDataPoint.lock();
+				if (focusedDataPoint) {
+					return focusedDataPoint->isSelected();
+				}
+				return false;
+			}, [this](bool value) {
+				auto focusedDataPoint = this->focusedDataPoint.lock();
+				if (focusedDataPoint) {
+					focusedDataPoint->setSelected(value);
+				}
+			})->setHotKey('s');
+
+			widgets->addButton("GO to value", [this]() {
+				auto focusedDataPoint = this->focusedDataPoint.lock();
+				if (focusedDataPoint) {
+					focusedDataPoint->onGoValue.notifyListeners();
+				}
+			})->setHotKey('g');
+
+			widgets->addButton("GO to prediction", [this]() {
+				auto focusedDataPoint = this->focusedDataPoint.lock();
+				if (focusedDataPoint) {
+					focusedDataPoint->onGoPrediction.notifyListeners();
+				}
+			})->setHotKey('p');
+		}
+	}
+
+	widgets->addTitle("Calibration", ofxCvGui::Widgets::Title::Level::H2);
+	{
 		widgets->addButton("Solve", [this]() {
 			this->solve();
 		}, OF_KEY_RETURN)->setHeight(100.0f);
@@ -224,10 +285,6 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 		widgets->addEditableValue<glm::vec3>(this->translation);
 		widgets->addEditableValue<glm::vec3>(this->rotationVector);
 		widgets->addSlider(this->tiltOffset);
-
-		widgets->addButton("Add test data", [this]() {
-			this->addTestData();
-		});
 	}
 
 	widgets->addTitle("Fixture settings", ofxCvGui::Widgets::Title::Level::H2);
@@ -515,6 +572,29 @@ void MovingHead::setWorldCursorPosition(const glm::vec3 & position) {
 			minDistance2 = distance2;
 		}
 	}
+}
+
+//---------
+void MovingHead::renderDMX(vector<uint8_t> & dmxValues) const {
+	auto panSignalValue = (uint16_t) ofMap(this->currentPanTilt.get().x
+		, this->currentPanTilt.getMin().x
+		, this->currentPanTilt.getMax().x
+		, 0
+		, std::numeric_limits<uint16_t>::max());
+
+	auto tiltSignalValue = (uint16_t) ofMap(this->currentPanTilt.get().y
+		, this->currentPanTilt.getMin().y
+		, this->currentPanTilt.getMax().y
+		, 0
+		, std::numeric_limits<uint16_t>::max());
+
+	dmxValues[this->fixtureSettings.dmxAddresses.panCoarse.get()] = panSignalValue >> 8;
+	dmxValues[this->fixtureSettings.dmxAddresses.panFine.get()] = panSignalValue & 255;
+
+	dmxValues[this->fixtureSettings.dmxAddresses.tiltCoarse.get()] = tiltSignalValue >> 8;
+	dmxValues[this->fixtureSettings.dmxAddresses.tiltFine.get()] = tiltSignalValue & 255;
+
+	dmxValues[this->fixtureSettings.dmxAddresses.brightness.get()] = 255;
 }
 
 //---------

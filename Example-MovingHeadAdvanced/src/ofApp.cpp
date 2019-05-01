@@ -5,18 +5,19 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    
-    // Initialise the moving heads
-    {
-        this->movingHeads.emplace("1", make_shared<MovingHead>());
-        this->movingHeads.emplace("2", make_shared<MovingHead>());
-    }
-    
 
-    // Initialise the gui
+	// Initialise the moving heads
 	{
-        this->gui.init();
-        
+		this->movingHeads.emplace("1", make_shared<MovingHead>());
+		this->movingHeads.emplace("2", make_shared<MovingHead>());
+	}
+	this->selection = this->movingHeads.begin()->first;
+
+
+	// Initialise the gui
+	{
+		this->gui.init();
+
 		this->stripPanel = ofxCvGui::Panels::Groups::makeStrip();
 		{
 			this->stripPanel->setCellSizes({ -1, 400, 350 });
@@ -43,7 +44,10 @@ void ofApp::setup() {
 
 		// Add a blank panel in this slot for now (this will become the list panel)
 		{
-			this->stripPanel->add(make_shared<ofxCvGui::Panels::Base>());
+			this->listPanelHolder = make_shared<ofxCvGui::Panels::Groups::Grid>();
+			this->listPanelHolder->add(this->movingHeads[selection]->getListPanel());
+
+			this->stripPanel->add(listPanelHolder);
 		}
 
 		// Popualte the widgets
@@ -55,21 +59,23 @@ void ofApp::setup() {
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
 	for (const auto & movingHead : this->movingHeads) {
 		movingHead.second->update();
 	}
+
+	this->renderDMX();
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
 
 }
 
 //--------------------------------------------------------------
 void ofApp::drawWorld() {
-    
-    // Draw a floor grid
+
+	// Draw a floor grid
 	if (this->drawGrid) {
 		ofPushStyle();
 		{
@@ -86,10 +92,31 @@ void ofApp::drawWorld() {
 		ofPopStyle();
 	}
 
-    // Draw the moving heads
+	// Draw the moving heads
 	for (auto & movingHead : this->movingHeads) {
 		movingHead.second->drawWorld(movingHead.first == this->selection);
 	}
+}
+
+//--------------------------------------------------------------
+void ofApp::renderDMX() {
+	vector<uint8_t> dmxValues(512, 0);
+	for (auto & movingHead : this->movingHeads) {
+		movingHead.second->renderDMX(dmxValues);
+	}
+
+	//--
+	// HERE YOU NEED TO SEND DMX OUT
+	// The dmx values are in the vector dmxValues which has length 512, with an 8 bit unsigned integer for each address
+	//--
+	//
+	//
+	for (int i = 0; i < 5; i++) {
+		cout << (int) dmxValues[i] << ", ";
+	}
+	cout << endl;
+	//
+	//--
 }
 
 //--------------------------------------------------------------
@@ -110,11 +137,9 @@ void ofApp::repopulateWidgets() {
 			this->repopulateWidgets();
 
 			// bring up the list in that panel slot
-			this->stripPanel->getElements()[2] = this->movingHeads[selection]->getListPanel();
+			this->listPanelHolder->clear();
+			this->listPanelHolder->add(this->movingHeads[selection]->getListPanel());
 		};
-
-		// simulate a selection to trigger relevant actions
-		selector->onValueChange.notifyListeners(0);
 	}
 
 	this->widgetsPanel->addFps();
@@ -124,12 +149,12 @@ void ofApp::repopulateWidgets() {
 	this->widgetsPanel->add(selector);
 
 	this->widgetsPanel->addSpacer();
-	
+
 	this->movingHeads[this->selection]->populateWidgets(this->widgetsPanel);
-    
-    this->widgetsPanel->addSpacer();
-    
-    this->widgetsPanel->addToggle(this->drawGrid);
+
+	this->widgetsPanel->addSpacer();
+
+	this->widgetsPanel->addToggle(this->drawGrid);
 }
 
 //--------------------------------------------------------------
@@ -158,56 +183,56 @@ void ofApp::save() {
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
+void ofApp::keyReleased(int key) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button) {
 	this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
+void ofApp::mouseEntered(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
+void ofApp::mouseExited(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }

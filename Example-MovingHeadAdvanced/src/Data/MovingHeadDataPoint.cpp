@@ -128,7 +128,7 @@ namespace Data {
 		};
 
 		element->onMouse += [this](ofxCvGui::MouseArguments & args) {
-			if (args.isLocal()) {
+			if (args.isLocal() && args.action == ofxCvGui::MouseArguments::Pressed) {
 				this->onRequestFocus.notifyListeners();
 			}
 		};

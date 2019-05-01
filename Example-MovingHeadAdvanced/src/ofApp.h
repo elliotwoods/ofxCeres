@@ -12,6 +12,8 @@ public:
 	void draw();
 	void drawWorld();
 
+	void renderDMX();
+
 	void repopulateWidgets();
 
 	void load();
@@ -38,4 +40,5 @@ public:
 	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
 	shared_ptr<ofxCvGui::Panels::World> worldPanel;
 	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
+	shared_ptr<ofxCvGui::Panels::Groups::Grid> listPanelHolder;
 };

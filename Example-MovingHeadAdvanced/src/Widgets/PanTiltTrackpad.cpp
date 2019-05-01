@@ -144,13 +144,13 @@ namespace Widgets {
 				delta.x = -1.0f;
 				break;
 			case OF_KEY_RIGHT:
-				delta.y = 1.0f;
+				delta.x = 1.0f;
 				break;
 			default:
 				break;
 			}
 
-			float speed = 0.1f;
+			float speed = 0.02f;
 			if (ofGetKeyPressed(OF_KEY_SHIFT)) {
 				speed *= 10.0f;
 			}
