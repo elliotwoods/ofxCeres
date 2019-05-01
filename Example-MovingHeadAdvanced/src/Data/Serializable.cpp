@@ -107,87 +107,43 @@ void deserializeStream(const nlohmann::json & json, ofParameter<DataType> & para
 	}
 }
 
+#define DEFINE_DS_SIMPLE(Type) \
+nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<Type> & parameter) { \
+	serializeSimple(json, parameter); \
+	return json; \
+} \
+\
+const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<Type> & parameter) { \
+	deserializeSimple(json, parameter); \
+	return json; \
+}
+
+#define DEFINE_DS_STREAM(Type) \
+nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<Type> & parameter) { \
+	serializeStream(json, parameter); \
+	return json; \
+} \
+\
+const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<Type> & parameter) { \
+	deserializeStream(json, parameter); \
+	return json; \
+}
 //--serialization
 
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<string> & parameter) {
-	serializeSimple(json, parameter);
-	return json;
-}
+DEFINE_DS_SIMPLE(string)
+DEFINE_DS_SIMPLE(bool)
+DEFINE_DS_SIMPLE(uint8_t)
+DEFINE_DS_SIMPLE(uint16_t)
+DEFINE_DS_SIMPLE(uint32_t)
+DEFINE_DS_SIMPLE(uint64_t)
+DEFINE_DS_SIMPLE(int8_t)
+DEFINE_DS_SIMPLE(int16_t)
+DEFINE_DS_SIMPLE(int32_t)
+DEFINE_DS_SIMPLE(int64_t)
+DEFINE_DS_SIMPLE(float)
+DEFINE_DS_SIMPLE(double)
 
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<bool> & parameter) {
-	serializeSimple(json, parameter);
-	return json;
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<int> & parameter) {
-	serializeSimple(json, parameter);
-	return json;
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<float> & parameter) {
-	serializeSimple(json, parameter);
-	return json;
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<glm::vec2> & parameter) {
-	serializeStream(json, parameter);
-	return json;
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<glm::vec3> & parameter) {
-	serializeStream(json, parameter);
-	return json;
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<glm::vec4> & parameter) {
-	serializeStream(json, parameter);
-	return json;
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const ofParameter<ofColor> & parameter) {
-	serializeStream(json, parameter);
-	return json;
-}
-
-//--deserialization
-
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<string> & parameter) {
-	deserializeSimple(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<bool> & parameter) {
-	deserializeSimple(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<int> & parameter) {
-	deserializeSimple(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<float> & parameter) {
-	deserializeSimple(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<glm::vec2> & parameter) {
-	deserializeStream(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<glm::vec3> & parameter) {
-	deserializeStream(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<glm::vec4> & parameter) {
-	deserializeStream(json, parameter);
-	return json;
-}
-
-const nlohmann::json & operator>>(const nlohmann::json & json, ofParameter<ofColor> & parameter) {
-	deserializeStream(json, parameter);
-	return json;
-}
+DEFINE_DS_STREAM(glm::vec2)
+DEFINE_DS_STREAM(glm::vec3)
+DEFINE_DS_STREAM(glm::vec4)
+DEFINE_DS_STREAM(ofColor)

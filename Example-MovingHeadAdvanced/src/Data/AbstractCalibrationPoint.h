@@ -19,6 +19,7 @@ namespace Data {
 		ofxLiquidEvent<bool> onSelectionChanged;
 	protected:
 		virtual ofxCvGui::ElementPtr getDataDisplay() = 0;
+		virtual void overlayMainDisplay(ofxCvGui::ElementPtr) { }
 
 		void rebuildDateStrings();
 		void callbackSelectedChanged(bool &);

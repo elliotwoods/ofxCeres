@@ -52,16 +52,20 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T> & objectSpacePoint, T tiltOffset) {
+		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T> & objectSpacePoint
+			, T tiltOffset = (T) 0.0) {
+
 			auto pan = atan2(objectSpacePoint.x, objectSpacePoint.z) * (T) RAD_TO_DEG;
 
 			T distance = objectSpacePoint.x * objectSpacePoint.x
 				+ objectSpacePoint.y * objectSpacePoint.y
 				+ objectSpacePoint.z * objectSpacePoint.z;
 
-			auto tilt = acos(objectSpacePoint.y / distance) * (T) RAD_TO_DEG - tiltOffset;
+			auto actualTilt = acos(objectSpacePoint.y / distance) * (T)RAD_TO_DEG;
 
-			return glm::tvec2<T>(pan, tilt);
+			auto tiltCommand = actualTilt - tiltOffset;
+
+			return glm::tvec2<T>(pan, tiltCommand);
 		}
 
 		//----------

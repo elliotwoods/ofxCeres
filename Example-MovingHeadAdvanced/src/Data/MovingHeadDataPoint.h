@@ -13,12 +13,19 @@ namespace Data {
 		void deserialize(const nlohmann::json &);
 
 		ofParameter<string> name{ "Name", "" };
-		ofParameter<glm::vec4> dmxValues{ "DMX Values", glm::vec4(127, 0, 127, 0) };
+		ofParameter<glm::vec2> panTiltAngles{ "Pan tilt angles", glm::vec2(0, 0) };
 		ofParameter<glm::vec3> targetPoint{ "Target point", glm::vec3() };
-		glm::vec2 getPanTiltAngles() const; // get the pan-tilt angles in degrees
 
 		function<float(MovingHeadDataPoint*)> getResidualFunction;
+
+		ofxLiquidEvent<void> onTakeCurrent;
+		ofxLiquidEvent<void> onGoValue;
+		ofxLiquidEvent<void> onGoPrediction;
+		ofxLiquidEvent<void> onRequestFocus;
+
+		function<bool()> isFocused;
 	protected:
 		ofxCvGui::ElementPtr getDataDisplay() override;
+		void overlayMainDisplay(ofxCvGui::ElementPtr) override;
 	};
 }

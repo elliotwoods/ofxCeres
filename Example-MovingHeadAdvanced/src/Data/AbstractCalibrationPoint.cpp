@@ -119,6 +119,9 @@ namespace Data {
 			dataDisplayElement->setWidth(element->getWidth() - left);
 			dataDisplayElement->setHeight(element->getHeight());
 		};
+
+		this->overlayMainDisplay(element);
+
 		element->arrange();
 
 		return element;

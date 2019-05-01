@@ -1,5 +1,6 @@
 #include "pch_ofApp.h"
 #include "MovingHead.h"
+#include "Widgets/PanTiltTrackpad.h"
 
 //---------
 MovingHead::MovingHead() {
@@ -9,6 +10,13 @@ MovingHead::MovingHead() {
 //---------
 string MovingHead::getTypeName() const {
 	return "MovingHead";
+}
+
+//---------
+void MovingHead::update() {
+	// Update the range of pan-tilt
+	this->currentPanTilt.setMin({ this->fixtureSettings.panRange.get().x, this->fixtureSettings.tiltRange.get().x });
+	this->currentPanTilt.setMax({ this->fixtureSettings.panRange.get().y, this->fixtureSettings.tiltRange.get().y });
 }
 
 //---------
@@ -48,12 +56,12 @@ void MovingHead::drawWorld(bool selected) {
 		ofPopMatrix();
 
 		//draw selected data point
-		auto selectedDataPoint = this->selectedDataPoint.lock();
-		if (selectedDataPoint) {
+		auto focusedDataPoint = this->focusedDataPoint.lock();
+		if (focusedDataPoint) {
 			ofPushStyle();
 			{
 				ofNoFill();
-				ofDrawCircle(selectedDataPoint->targetPoint.get(), 0.05f);
+				ofDrawCircle(focusedDataPoint->targetPoint.get(), 0.05f);
 			}
 			ofPopStyle();
 		}
@@ -64,7 +72,7 @@ void MovingHead::drawWorld(bool selected) {
 			{
 				for (const auto & calibrationPoint : calibrationPoints) {
 					ofSetColor(calibrationPoint->color);
-					auto transmissionObject = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(calibrationPoint->getPanTiltAngles()
+					auto transmissionObject = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(calibrationPoint->panTiltAngles.get()
 						, this->tiltOffset.get());
 
 					auto transmissionWorld4 = transform * glm::vec4(transmissionObject, 1.0f);
@@ -94,50 +102,147 @@ void MovingHead::serialize(nlohmann::json & json) {
 	json << this->translation;
 	json << this->rotationVector;
 	json << this->tiltOffset;
+
+	// fixtureSettings
+	{
+		json << this->fixtureSettings.panRange;
+		json << this->fixtureSettings.tiltRange;
+
+		// dmxAddresses
+		{
+			json << this->fixtureSettings.dmxAddresses.panCoarse;
+			json << this->fixtureSettings.dmxAddresses.panFine;
+			json << this->fixtureSettings.dmxAddresses.tiltCoarse;
+			json << this->fixtureSettings.dmxAddresses.tiltFine;
+			json << this->fixtureSettings.dmxAddresses.brightness;
+		}
+	}
 }
 
 //---------
 void MovingHead::deserialize(const nlohmann::json & json) {
 	if (json.count("calibrationPoints") != 0) {
 		this->calibrationPoints.deserialize(json["calibrationPoints"]);
+
+		// Setup callbacks
 		auto calibrationPoints = this->calibrationPoints.getAllCaptures();
-
-		auto getResidualFunction = [this](Data::MovingHeadDataPoint * dataPoint) {
-			return this->getResidualOnDataPoint(dataPoint);
-		};
-
 		for (auto calibrationPoint : calibrationPoints) {
-			calibrationPoint->getResidualFunction = getResidualFunction;
+			this->prepareDataPoint(calibrationPoint);
 		}
 	}
 
 	json >> this->translation;
 	json >> this->rotationVector;
 	json >> this->tiltOffset;
+
+	// fixtureSettings
+	{
+		json >> this->fixtureSettings.panRange;
+		json >> this->fixtureSettings.tiltRange;
+
+		// dmxAddresses
+		{
+			json >> this->fixtureSettings.dmxAddresses.panCoarse;
+			json >> this->fixtureSettings.dmxAddresses.panFine;
+			json >> this->fixtureSettings.dmxAddresses.tiltCoarse;
+			json >> this->fixtureSettings.dmxAddresses.tiltFine;
+			json >> this->fixtureSettings.dmxAddresses.brightness;
+		}
+	}
 }
 
 //---------
 void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) {
-	this->calibrationPoints.populateWidgets(widgets);
 
-	widgets->addButton("Toggle selection", [this]() {
-		auto selectedDataPoint = this->selectedDataPoint.lock();
-		if (selectedDataPoint) {
-			selectedDataPoint->setSelected(!selectedDataPoint->isSelected());
+	{
+		auto trackpadWidget = make_shared<Widgets::PanTiltTrackpad>(this->currentPanTilt);
+		auto trackpadWidgetWeak = weak_ptr<Widgets::PanTiltTrackpad>(trackpadWidget);
+
+		trackpadWidget->onDraw += [this, trackpadWidgetWeak](ofxCvGui::DrawArguments & args) {
+			auto trackpadWidget = trackpadWidgetWeak.lock();
+
+			// draw the existing selected data points onto the trackpad
+			ofMesh pointsPreview;
+			auto calibrationPoints = this->calibrationPoints.getSelection();
+			for (auto calibrationPoint : calibrationPoints) {
+				pointsPreview.addColor(calibrationPoint->color.get());
+				pointsPreview.addVertex(glm::vec3(trackpadWidget->toXY(calibrationPoint->panTiltAngles.get()), 0.0f));
+
+				if (focusedDataPoint.lock() == calibrationPoint) {
+					ofPushStyle();
+					{
+						ofDrawCircle(trackpadWidget->toXY(calibrationPoint->panTiltAngles.get()), 3.0f);
+					}
+					ofPopStyle();
+				}
+			}
+			pointsPreview.drawVertices();
+		};
+
+		trackpadWidget->onMouse += [this, trackpadWidgetWeak](ofxCvGui::MouseArguments & args) {
+			// Focus the data point next to cursor
+			auto trackpadWidget = trackpadWidgetWeak.lock();
+
+			// Check mouse is inside widget
+			if (trackpadWidget->isMouseOver()) {
+
+				// search for closest dataPoint
+				auto minDistance2 = std::numeric_limits<float>::max();
+				auto calibrationPoints = this->calibrationPoints.getSelection();
+
+				for (auto calibrationPoint : calibrationPoints) {
+					auto drawnPosition = trackpadWidget->toXY(calibrationPoint->panTiltAngles.get());
+					auto distance2 = glm::distance2(args.local, drawnPosition);
+					if (distance2 < minDistance2 && sqrt(distance2) < 30) {
+						minDistance2 = distance2;
+						this->focusedDataPoint = calibrationPoint;
+					}
+				}
+			}
+		};
+		widgets->add(trackpadWidget);
+	}
+
+	widgets->add(make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->currentPanTilt));
+
+	widgets->addTitle("Calibration", ofxCvGui::Widgets::Title::Level::H2);
+	{
+		this->calibrationPoints.populateWidgets(widgets);
+
+		widgets->addButton("Toggle selection", [this]() {
+			auto focusedDataPoint = this->focusedDataPoint.lock();
+			if (focusedDataPoint) {
+				focusedDataPoint->setSelected(!focusedDataPoint->isSelected());
+			}
+		}, ' ');
+
+		widgets->addButton("Solve", [this]() {
+			this->solve();
+		}, OF_KEY_RETURN)->setHeight(100.0f);
+
+		widgets->addEditableValue<glm::vec3>(this->translation);
+		widgets->addEditableValue<glm::vec3>(this->rotationVector);
+		widgets->addSlider(this->tiltOffset);
+
+		widgets->addButton("Add test data", [this]() {
+			this->addTestData();
+		});
+	}
+
+	widgets->addTitle("Fixture settings", ofxCvGui::Widgets::Title::Level::H2);
+	{
+		widgets->addEditableValue<glm::vec2>(this->fixtureSettings.panRange);
+		widgets->addEditableValue<glm::vec2>(this->fixtureSettings.tiltRange);
+
+		widgets->addTitle("DMX Addresses", ofxCvGui::Widgets::Title::Level::H3);
+		{
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panCoarse);
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panFine);
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltCoarse);
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltFine);
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.brightness);
 		}
-	}, ' ');
-
-	widgets->addButton("Solve", [this]() {
-		this->solve();
-	}, OF_KEY_RETURN)->setHeight(100.0f);
-
-	widgets->addEditableValue<glm::vec3>(this->translation);
-	widgets->addEditableValue<glm::vec3>(this->rotationVector);
-	widgets->addSlider(this->tiltOffset);
-
-	widgets->addButton("Add test data", [this]() {
-		this->addTestData();
-	});
+	}
 }
 
 //---------
@@ -148,7 +253,7 @@ void MovingHead::solve() {
 	auto calibrationPoints = this->calibrationPoints.getSelection();
 	for (auto calibrationPoint : calibrationPoints) {
 		targetPoints.push_back(calibrationPoint->targetPoint);
-		panTiltAngles.push_back(calibrationPoint->getPanTiltAngles());
+		panTiltAngles.push_back(calibrationPoint->panTiltAngles);
 	}
 
 	auto result = ofxCeres::Models::MovingHead::solve(targetPoints
@@ -284,24 +389,45 @@ void MovingHead::addTestData() {
 			, {-2.20, -1.89, 0.78}
 			, {-2.20, -1.89, 1.03}
 			, {-2.20, -1.89, 1.28}
-		});
+		});	
 
 	// SketchUp to openFrameworks coordinates
 	for (auto & targetPoint : targetPoints) {
 		targetPoint = glm::vec3(targetPoint.x, targetPoint.z, -targetPoint.y);
 	}
 
-	auto getResidualFunction = [this](Data::MovingHeadDataPoint * dataPoint) {
-		return this->getResidualOnDataPoint(dataPoint);
-	};
+	// Convert DMX into pan-tilt angles
+	vector<glm::vec2> panTiltAngles;
+	for (const auto & dmxValue : dmxValues) {
+		uint16_t panTotal = (uint16_t)dmxValue[0] << 8;
+		panTotal += (uint16_t)dmxValue[1];
+
+		uint16_t tiltTotal = (uint16_t)dmxValue[2] << 8;
+		tiltTotal += (uint16_t)dmxValue[3];
+
+		panTiltAngles.push_back({
+			ofMap(panTotal
+				, 0
+				, std::numeric_limits<uint16_t>::max()
+				, this->fixtureSettings.panRange.get().x
+				, this->fixtureSettings.panRange.get().y)
+
+			, ofMap(tiltTotal
+				, 0
+				, std::numeric_limits<uint16_t>::max()
+				, this->fixtureSettings.tiltRange.get().x
+				, this->fixtureSettings.tiltRange.get().y)
+			});
+	}
 
 	for (size_t i = 0; i < names.size(); i++) {
 		auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
 		newDataPoint->name = names[i];
-		newDataPoint->dmxValues = dmxValues[i];
+		newDataPoint->panTiltAngles = panTiltAngles[i];
 		newDataPoint->targetPoint = targetPoints[i];
 
-		newDataPoint->getResidualFunction = getResidualFunction;
+		this->prepareDataPoint(newDataPoint);
+
 		this->calibrationPoints.add(newDataPoint);
 	}
 }
@@ -313,27 +439,111 @@ glm::mat4 MovingHead::getTransform() const {
 }
 
 //---------
-glm::vec2 MovingHead::getPanTiltForWorldPosition(const glm::vec3 & world) const {
-    auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
-    auto objectSpacePosition = (glm::vec3) (objectSpacePosition4 / objectSpacePosition4.w);
-    auto panTiltAngles = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(objectSpacePosition
-                                                                               , this->tiltOffset.get());
-    return panTiltAngles;
+glm::vec2 MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
+	, const glm::vec2 & currentPanTilt) const {
+	auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
+	auto objectSpacePosition = (glm::vec3) (objectSpacePosition4 / objectSpacePosition4.w);
+
+	auto panTiltObject = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(objectSpacePosition, 0.0f);
+	glm::vec2 axisOffset = glm::vec2(0, -this->tiltOffset.get());
+
+	// build up the options
+	vector<glm::vec2> panTiltOptions;
+	{
+		// basic option
+		panTiltOptions.push_back(panTiltObject + axisOffset);
+
+		// alternative pan options
+		{
+			for (float pan = panTiltObject.x - 360.0f; pan >= this->fixtureSettings.panRange.get().x; pan -= 360.0f) {
+				panTiltOptions.push_back(glm::vec2(pan, panTiltObject.y) + axisOffset);
+			}
+			for (float pan = panTiltObject.x + 360.0f; pan <= this->fixtureSettings.panRange.get().y; pan += 360.0f) {
+				panTiltOptions.push_back(glm::vec2(pan, panTiltObject.y) + axisOffset);
+			}
+		}
+
+		// flipped tilt options
+		{
+			for (float pan = panTiltObject.x - 180.0f; pan >= this->fixtureSettings.panRange.get().x; pan -= 360.0f) {
+				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) + axisOffset);
+			}
+			for (float pan = panTiltObject.x + 180.0f; pan <= this->fixtureSettings.panRange.get().y; pan += 360.0f) {
+				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) + axisOffset);
+			}
+		}
+	}
+	
+	// search through options for closest one
+	auto minDistance2 = std::numeric_limits<float>::max();
+	glm::vec2 bestOption = panTiltObject + axisOffset;
+	for (const auto & panTiltOption : panTiltOptions) {
+		auto distance2 = glm::distance2(panTiltOption, currentPanTilt);
+		if (distance2 < minDistance2) {
+			bestOption = panTiltOption;
+			minDistance2 = distance2;
+		}
+	}
+
+	return bestOption;
+}
+
+//---------
+void MovingHead::navigateToWorldTarget(const glm::vec3 & world) {
+	auto panTiltAngles = this->getPanTiltForWorldTarget(world, this->currentPanTilt.get());
+	this->currentPanTilt.set(panTiltAngles);
 }
 
 //---------
 void MovingHead::setWorldCursorPosition(const glm::vec3 & position) {
-	auto minDistance = numeric_limits<float>::max();
+	// Focus the data point close to the world cursor
+	auto minDistance2 = numeric_limits<float>::max();
 	auto dataPoints = this->calibrationPoints.getAllCaptures();
 	for (auto dataPoint : dataPoints) {
-		auto distance = glm::distance2(dataPoint->targetPoint.get(), position);
-		if (distance < minDistance) {
-			this->selectedDataPoint = dataPoint;
-			minDistance = distance;
+		auto distance2 = glm::distance2(dataPoint->targetPoint.get(), position);
+
+		// take the point as the focus if it's closest to the cursor so far (within 30cm)
+		if (distance2 < minDistance2 && sqrt(distance2) < 0.3f) {
+			this->focusedDataPoint = dataPoint;
+			minDistance2 = distance2;
 		}
 	}
 }
 
+//---------
+void MovingHead::prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint> dataPoint) {
+	auto getResidualFunction = [this](Data::MovingHeadDataPoint * dataPoint) {
+		return this->getResidualOnDataPoint(dataPoint);
+	};
+
+	dataPoint->getResidualFunction = getResidualFunction;
+
+	auto dataPointWeak = weak_ptr<Data::MovingHeadDataPoint>(dataPoint);
+
+	dataPoint->onTakeCurrent += [dataPointWeak, this]() {
+		auto dataPoint = dataPointWeak.lock();
+		dataPoint->panTiltAngles.set(this->currentPanTilt.get());
+	};
+
+	dataPoint->onGoValue += [dataPointWeak, this]() {
+		auto dataPoint = dataPointWeak.lock();
+		this->currentPanTilt.set(dataPoint->panTiltAngles.get());
+	};
+
+	dataPoint->onGoPrediction += [dataPointWeak, this]() {
+		auto dataPoint = dataPointWeak.lock();
+		this->navigateToWorldTarget(dataPoint->targetPoint.get());
+	};
+
+	dataPoint->onRequestFocus += [dataPointWeak, this]() {
+		auto dataPoint = dataPointWeak.lock();
+		this->focusedDataPoint = dataPoint;
+	};
+
+	dataPoint->isFocused = [dataPoint, this]() {
+		return dataPoint == this->focusedDataPoint.lock();
+	};
+}
 //---------
 float MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) const {
 	// copied out of ofxCeres::Models::MovingHead cpp file
@@ -352,7 +562,7 @@ float MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) 
 	//
 	//--
 
-	auto rayCastForPanTiltValues = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt<float>(dataPoint->getPanTiltAngles(), tiltOffset);
+	auto rayCastForPanTiltValues = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt<float>(dataPoint->panTiltAngles, tiltOffset);
 
 	//--
 	//Get the disparity between the real and actual object space rays

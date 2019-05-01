@@ -29,6 +29,7 @@ void ofApp::setup() {
 				this->drawWorld();
 			};
 			this->worldPanel->setGridEnabled(false);
+			this->worldPanel->getCamera().setCursorDrawEnabled(true);
 			strip->add(this->worldPanel);
 		}
 
@@ -45,7 +46,9 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	
+	for (const auto & movingHead : this->movingHeads) {
+		movingHead.second->update();
+	}
 }
 
 //--------------------------------------------------------------
@@ -152,7 +155,7 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+	this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
 }
 
 //--------------------------------------------------------------
@@ -167,7 +170,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-	this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
+
 }
 
 //--------------------------------------------------------------

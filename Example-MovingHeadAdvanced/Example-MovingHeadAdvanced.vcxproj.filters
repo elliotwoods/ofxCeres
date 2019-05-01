@@ -25,6 +25,9 @@
     <ClCompile Include="src\MovingHead.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Widgets\PanTiltTrackpad.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -35,6 +38,9 @@
     </Filter>
     <Filter Include="src\Data">
       <UniqueIdentifier>{7e929f45-bc70-42b7-9c9e-4517a8e0f787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Widgets">
+      <UniqueIdentifier>{9c6b5dbf-177c-4be5-b0e5-1e3524567ccf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="src\MovingHead.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Widgets\PanTiltTrackpad.h">
+      <Filter>src\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

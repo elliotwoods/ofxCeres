@@ -28,14 +28,14 @@ namespace Data {
 	//----------
 	void MovingHeadDataPoint::serialize(nlohmann::json & json) {
 		json << this->name;
-		json << this->dmxValues;
+		json << this->panTiltAngles;
 		json << this->targetPoint;
 	}
 
 	//----------
 	void MovingHeadDataPoint::deserialize(const nlohmann::json & json) {
 		json >> this->name;
-		json >> this->dmxValues;
+		json >> this->panTiltAngles;
 		json >> this->targetPoint;
 	}
 
@@ -45,11 +45,8 @@ namespace Data {
 
 		auto children = vector<ofxCvGui::ElementPtr>({
 			make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->name)
-			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec4>>(this->dmxValues)
+			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltAngles)
 			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec3>>(this->targetPoint)
-			, make_shared<ofxCvGui::Widgets::LiveValue<glm::vec2>>("Pan-Tilt angles", [this]() {
-				return this->getPanTiltAngles();
-			})
 		});
 
 		{
@@ -86,25 +83,54 @@ namespace Data {
 			}
 		};
 
-		element->setHeight(element->getChildren().size() * 40.0f);
+		element->setHeight(element->getChildren().size() * 40.0f + 5.0f);
 
 		return element;
 	}
 
 	//----------
-	glm::vec2 MovingHeadDataPoint::getPanTiltAngles() const {
-		uint16_t panTotal = (uint16_t)this->dmxValues.get()[0] << 8;
-		panTotal += (uint16_t)this->dmxValues.get()[1];
+	void MovingHeadDataPoint::overlayMainDisplay(ofxCvGui::ElementPtr element) {
+		float y = 60.0f;
 
-		uint16_t tiltTotal = (uint16_t)this->dmxValues.get()[2] << 8;
-		tiltTotal += (uint16_t)this->dmxValues.get()[3];
+		auto addButton = [element, &y](string caption, function<void()> action) {
+			auto button = make_shared<ofxCvGui::Widgets::Button>(caption, action);
 
-		auto panRatio = (double)panTotal / (double)std::numeric_limits<uint16_t>::max();
-		auto tiltRatio = (double)tiltTotal / (double)std::numeric_limits<uint16_t>::max();
+			button->setBounds({ 2, y, 120.0f, 30.0f });
+			element->addChild(button);
 
-		return glm::vec2{
-			ofMap(panRatio, 0, 1.0f, -270, +270)
-			, ofMap(tiltRatio, 0, 1.0f, -130, +130)
+			y += 35.0f;
+		};
+
+		addButton("GO Value", [this] {
+			this->onGoValue.notifyListeners();
+		});
+
+		addButton("GO Prediction", [this] {
+			this->onGoPrediction.notifyListeners();
+		});
+
+		addButton("TAKE Current", [this] {
+			this->onTakeCurrent.notifyListeners();
+		});
+
+		element->onDraw += [this](ofxCvGui::DrawArguments & args) {
+			if (this->isFocused) {
+				if (this->isFocused()) {
+					// Draw an outline
+					ofPushStyle();
+					{
+						ofNoFill();
+						ofDrawRectangle(args.localBounds);
+					}
+					ofPopStyle();
+				}
+			}
+		};
+
+		element->onMouse += [this](ofxCvGui::MouseArguments & args) {
+			if (args.isLocal()) {
+				this->onRequestFocus.notifyListeners();
+			}
 		};
 	}
 }
