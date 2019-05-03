@@ -56,6 +56,13 @@ void ofApp::setup() {
 
 	// Load for json file
 	this->load();
+
+	// look at moving head #1 to start with
+	{
+		auto position4 = this->movingHeads.begin()->second->getTransform() * glm::vec4(0, 0, 0, 1);
+		auto position = (glm::vec3) (position4 / position4.w);
+		this->worldPanel->getCamera().lookAt(position);
+	}
 }
 
 //--------------------------------------------------------------
@@ -84,7 +91,7 @@ void ofApp::drawWorld() {
 			ofPushMatrix();
 			{
 				ofRotateDeg(180, 0, 1, 0);
-				ofRotateDeg(90, 0, 0, 1);
+				ofRotateDeg(-90, 0, 0, 1);
 				ofDrawGridPlane(1.0f, 20, true);
 			}
 			ofPopMatrix();
@@ -100,21 +107,19 @@ void ofApp::drawWorld() {
 
 //--------------------------------------------------------------
 void ofApp::renderDMX() {
-	vector<uint8_t> dmxValues(512, 0);
+	// dmx values have addersses starting with 1, so we keep these addresses and throw away the first value
+	vector<uint8_t> dmxValues(513, 0);
+
 	for (auto & movingHead : this->movingHeads) {
 		movingHead.second->renderDMX(dmxValues);
 	}
 
 	//--
 	// HERE YOU NEED TO SEND DMX OUT
-	// The dmx values are in the vector dmxValues which has length 512, with an 8 bit unsigned integer for each address
 	//--
 	//
 	//
-	for (int i = 0; i < 5; i++) {
-		cout << (int) dmxValues[i] << ", ";
-	}
-	cout << endl;
+
 	//
 	//--
 }

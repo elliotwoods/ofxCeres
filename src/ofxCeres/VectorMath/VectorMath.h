@@ -55,7 +55,8 @@ namespace ofxCeres {
 		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T> & objectSpacePoint
 			, T tiltOffset = (T) 0.0) {
 
-			auto pan = atan2(objectSpacePoint.x, objectSpacePoint.z) * (T) RAD_TO_DEG;
+			// Left (+) corresponds with positive atan, so we switch since professional fixtures are Right (+)
+			auto pan = - atan2(objectSpacePoint.x, objectSpacePoint.z) * (T) RAD_TO_DEG;
 
 			T distance2 = objectSpacePoint.x * objectSpacePoint.x
 				+ objectSpacePoint.y * objectSpacePoint.y
@@ -75,10 +76,11 @@ namespace ofxCeres {
 		glm::tvec3<T> getObjectSpaceRayForPanTilt(const glm::tvec2<T> & panTiltAngle, T tiltOffset) {
 			auto actualTilt = panTiltAngle.y + tiltOffset;
 
+			// Left (+) corresponds with positive atan, so we switch since professional fixtures are Right (+)
 			glm::tvec3<T> transmission(
-				sin(actualTilt * DEG_TO_RAD) * sin(panTiltAngle.x * DEG_TO_RAD)
+				sin(actualTilt * DEG_TO_RAD) * sin(- panTiltAngle.x * DEG_TO_RAD)
 				, cos(actualTilt * DEG_TO_RAD)
-				, sin(actualTilt * DEG_TO_RAD) * cos(panTiltAngle.x * DEG_TO_RAD)
+				, sin(actualTilt * DEG_TO_RAD) * cos(- panTiltAngle.x * DEG_TO_RAD)
 			);
 
 			return transmission;

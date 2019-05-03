@@ -34,7 +34,7 @@ void MovingHead::drawWorld(bool selected) {
 
 		auto transform = this->getTransform();
 
-		//draw moving head
+		//draw moving head body
 		ofNoFill();
 		vector<glm::vec3> transmissionsInObjectSpace;
 		ofPushMatrix();
@@ -42,32 +42,65 @@ void MovingHead::drawWorld(bool selected) {
 			ofMultMatrix(transform);
 
 			//draw hardware
-			ofSetColor(selected ? 220 : 100);
-			ofDrawAxis(0.4f);
-			ofSetSphereResolution(6);
-			ofDrawBox(glm::vec3(0, -0.35, 0), 0.5, 0.1, 0.4);
-			ofPushMatrix();
 			{
-				ofScale(0.6, 1, 0.6);
-				ofDrawSphere(0.2f);
+				ofSetColor(selected ? 220 : 100);
+				ofDrawAxis(0.4f);
+
+				// base
+				ofDrawBox(glm::vec3(0, -0.35, 0), 0.5, 0.1, 0.4);
+
+				// Axis 1
+				ofPushMatrix();
+				{
+					ofRotateDeg(- this->currentPanTilt.get().x, 0, 1, 0);
+
+					ofDrawBox({ -0.15, -0.3 + 0.35f / 2.0f, 0 }, 0.075, 0.35, 0.2);
+					ofDrawBox({ +0.15, -0.3 + 0.35f / 2.0f, 0 }, 0.075, 0.35, 0.2);
+
+					// Axis 2
+					ofPushMatrix();
+					{
+						ofRotateDeg(this->currentPanTilt.get().y + this->tiltOffset.get(), 1, 0, 0);
+
+						// head
+						ofPushMatrix();
+						{
+							ofSetSphereResolution(6);
+							ofScale(0.1, 0.2, 0.1);
+							ofDrawSphere(1.0);
+						}
+						ofPopMatrix();
+
+						// beam
+						ofPushMatrix();
+						{
+							ofTranslate(0.0f, 0.05 + 0.5f / 2.0f, 0.0f);
+							ofSetColor(selected ? 255 : 100);
+							ofDrawCylinder(0.02, 0.5f);
+						}
+						ofPopMatrix();
+					}
+					ofPopMatrix();
+				}
+				ofPopMatrix();
 			}
-			ofPopMatrix();
 		}
 		ofPopMatrix();
 
-		//draw selected data point
-		auto focusedDataPoint = this->focusedDataPoint.lock();
-		if (focusedDataPoint) {
-			ofPushStyle();
-			{
-				ofNoFill();
-				ofDrawCircle(focusedDataPoint->targetPoint.get(), 0.05f);
-			}
-			ofPopStyle();
-		}
-
-		//draw rays and residuals
 		if (selected) {
+			//draw selected data point
+			auto focusedDataPoint = this->focusedDataPoint.lock();
+			if (focusedDataPoint) {
+				ofPushStyle();
+				{
+					ofNoFill();
+					ofSetColor(255);
+					ofDrawCircle(focusedDataPoint->targetPoint.get(), 0.05f);
+				}
+				ofPopStyle();
+			}
+
+			//draw rays and residuals
 			ofPushStyle();
 			{
 				for (const auto & calibrationPoint : calibrationPoints) {
@@ -98,7 +131,7 @@ void MovingHead::serialize(nlohmann::json & json) {
 	nlohmann::json jsonCalibrationPoints;
 	this->calibrationPoints.serialize(jsonCalibrationPoints);
 	json["calibrationPoints"] = jsonCalibrationPoints;
-
+	
 	json << this->translation;
 	json << this->rotationVector;
 	json << this->tiltOffset;
@@ -107,9 +140,11 @@ void MovingHead::serialize(nlohmann::json & json) {
 	{
 		json << this->fixtureSettings.panRange;
 		json << this->fixtureSettings.tiltRange;
+		json << this->fixtureSettings.dmxPanPolarity;
 
 		// dmxAddresses
 		{
+			json << this->fixtureSettings.dmxAddresses.dmxStartAddress;
 			json << this->fixtureSettings.dmxAddresses.panCoarse;
 			json << this->fixtureSettings.dmxAddresses.panFine;
 			json << this->fixtureSettings.dmxAddresses.tiltCoarse;
@@ -139,9 +174,11 @@ void MovingHead::deserialize(const nlohmann::json & json) {
 	{
 		json >> this->fixtureSettings.panRange;
 		json >> this->fixtureSettings.tiltRange;
+		json >> this->fixtureSettings.dmxPanPolarity;
 
 		// dmxAddresses
 		{
+			json >> this->fixtureSettings.dmxAddresses.dmxStartAddress;
 			json >> this->fixtureSettings.dmxAddresses.panCoarse;
 			json >> this->fixtureSettings.dmxAddresses.panFine;
 			json >> this->fixtureSettings.dmxAddresses.tiltCoarse;
@@ -285,21 +322,61 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 		widgets->addEditableValue<glm::vec3>(this->translation);
 		widgets->addEditableValue<glm::vec3>(this->rotationVector);
 		widgets->addSlider(this->tiltOffset);
+		widgets->addButton("Reset", [this]() {
+			this->translation.set(glm::vec3(0.0));
+			this->rotationVector.set(glm::vec3(0.0));
+			this->tiltOffset.set(0.0);
+		});
 	}
 
 	widgets->addTitle("Fixture settings", ofxCvGui::Widgets::Title::Level::H2);
 	{
 		widgets->addEditableValue<glm::vec2>(this->fixtureSettings.panRange);
 		widgets->addEditableValue<glm::vec2>(this->fixtureSettings.tiltRange);
+		{
+			auto selector = widgets->addMultipleChoice("DMX pan polarity");
+			selector->addOptions({ "Right (+)", "Left (+)" });
+			selector->entangle(this->fixtureSettings.dmxPanPolarity);
+		}
 
 		widgets->addTitle("DMX Addresses", ofxCvGui::Widgets::Title::Level::H3);
 		{
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.dmxStartAddress);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panCoarse);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panFine);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltCoarse);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltFine);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.brightness);
 		}
+	}
+
+	widgets->addTitle("Data fudge", ofxCvGui::Widgets::Title::Level::H2);
+	{
+		widgets->addButton("Scale pan values", [this]() {
+			auto response = ofSystemTextBoxDialog("Scale pan values", "1.0");
+			if (!response.empty()) {
+				auto scale = ofToFloat(response);
+				auto calibrationPoints = this->calibrationPoints.getSelection();
+				for (auto calibrationPoint : calibrationPoints) {
+					auto panTiltValue = calibrationPoint->panTiltAngles.get();
+					panTiltValue.x *= scale;
+					calibrationPoint->panTiltAngles.set(panTiltValue);
+				}
+			}
+		});
+
+		widgets->addButton("Scale tilt values", [this]() {
+			auto response = ofSystemTextBoxDialog("Scale tilt values", "1.0");
+			if (!response.empty()) {
+				auto scale = ofToFloat(response);
+				auto calibrationPoints = this->calibrationPoints.getSelection();
+				for (auto calibrationPoint : calibrationPoints) {
+					auto panTiltValue = calibrationPoint->panTiltAngles.get();
+					panTiltValue.y *= scale;
+					calibrationPoint->panTiltAngles.set(panTiltValue);
+				}
+			}
+		});
 	}
 }
 
@@ -469,7 +546,12 @@ void MovingHead::addTestData() {
 		uint16_t tiltTotal = (uint16_t)dmxValue[2] << 8;
 		tiltTotal += (uint16_t)dmxValue[3];
 
-		panTiltAngles.push_back({
+		// WARNING : flip at the DMX level if the polarity is inversed
+		if (this->fixtureSettings.dmxPanPolarity.get() == 1) {
+			panTotal = std::numeric_limits<uint16_t>::max() - panTotal;
+		}
+
+		panTiltAngles.push_back({			
 			ofMap(panTotal
 				, 0
 				, std::numeric_limits<uint16_t>::max()
@@ -582,19 +664,25 @@ void MovingHead::renderDMX(vector<uint8_t> & dmxValues) const {
 		, 0
 		, std::numeric_limits<uint16_t>::max());
 
+	if (this->fixtureSettings.dmxPanPolarity.get() == 1) {
+		panSignalValue = std::numeric_limits<uint16_t>::max() - panSignalValue;
+	}
+
 	auto tiltSignalValue = (uint16_t) ofMap(this->currentPanTilt.get().y
 		, this->currentPanTilt.getMin().y
 		, this->currentPanTilt.getMax().y
 		, 0
 		, std::numeric_limits<uint16_t>::max());
 
-	dmxValues[this->fixtureSettings.dmxAddresses.panCoarse.get()] = panSignalValue >> 8;
-	dmxValues[this->fixtureSettings.dmxAddresses.panFine.get()] = panSignalValue & 255;
+	auto dmxOffset = this->fixtureSettings.dmxAddresses.dmxStartAddress.get() - 1;
 
-	dmxValues[this->fixtureSettings.dmxAddresses.tiltCoarse.get()] = tiltSignalValue >> 8;
-	dmxValues[this->fixtureSettings.dmxAddresses.tiltFine.get()] = tiltSignalValue & 255;
+	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.panCoarse.get()] = panSignalValue >> 8;
+	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.panFine.get()] = panSignalValue & 255;
 
-	dmxValues[this->fixtureSettings.dmxAddresses.brightness.get()] = 255;
+	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.tiltCoarse.get()] = tiltSignalValue >> 8;
+	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.tiltFine.get()] = tiltSignalValue & 255;
+
+	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.brightness.get()] = 255;
 }
 
 //---------

@@ -29,6 +29,16 @@ struct MovingHeadError {
 
 
 		//--
+		// Ignore point if it is in same position as the light fixture right now
+		if ((glm::tvec3<T>)this->targetPoint == translation) {
+			residuals[0] = (T) 0.0;
+			return true;
+		}
+		//
+		//--
+			
+
+		//--
 		//World -> Object space
 		//
 
@@ -120,7 +130,8 @@ namespace ofxCeres {
 				options.linear_solver_type = ceres::DENSE_QR;
 				
 				options.minimizer_progress_to_stdout = true;
-				options.max_num_iterations = 1000;
+				options.max_num_iterations = 100;
+				options.function_tolerance = 5e-6;
 				ceres::Solver::Summary summary;
 				ceres::Solve(options, &problem, &summary);
 				std::cout << summary.FullReport() << "\n";

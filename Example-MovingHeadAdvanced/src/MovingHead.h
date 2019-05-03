@@ -36,18 +36,20 @@ protected:
 	Data::CalibrationPointSet<Data::MovingHeadDataPoint> calibrationPoints;
 	ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };
 	ofParameter<glm::vec3> rotationVector{ "Rotation vector", glm::vec3(0, -PI / 2, 0), glm::vec3(-PI / 2), glm::vec3(+PI / 2) };
-	ofParameter<float> tiltOffset{ "Tilt offset", 0, -20, 20 };
+	ofParameter<float> tiltOffset{ "Tilt offset", 0, -180, 180 };
 
 	struct {
 		ofParameter<glm::vec2> panRange{ "Pan range", glm::vec2(-270, +270) };
 		ofParameter<glm::vec2> tiltRange{ "Tilt range", glm::vec2(-130, +130) };
+		ofParameter<int> dmxPanPolarity{ "DMX pan polarity", 0 };
 
 		struct {
-			ofParameter<uint16_t> panCoarse{ "Pan coarse", 0 };
-			ofParameter<uint16_t> panFine{ "Pan fine", 1 };
-			ofParameter<uint16_t> tiltCoarse{ "Tilt coarse", 2 };
-			ofParameter<uint16_t> tiltFine{ "Tilt fine", 3 };
-			ofParameter<uint16_t> brightness{ "Brightness", 4 };
+			ofParameter<uint16_t> dmxStartAddress{ "DMX Start Address", 1 };
+			ofParameter<uint16_t> panCoarse{ "Pan coarse", 1 };
+			ofParameter<uint16_t> panFine{ "Pan fine", 2 };
+			ofParameter<uint16_t> tiltCoarse{ "Tilt coarse", 3 };
+			ofParameter<uint16_t> tiltFine{ "Tilt fine", 4 };
+			ofParameter<uint16_t> brightness{ "Brightness", 5 };
 		} dmxAddresses;
 
 	} fixtureSettings;
