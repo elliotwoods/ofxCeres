@@ -32,6 +32,7 @@ public:
 protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
+	void focusDataPointWithHighestResidual();
 
 	Data::CalibrationPointSet<Data::MovingHeadDataPoint> calibrationPoints;
 	ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };

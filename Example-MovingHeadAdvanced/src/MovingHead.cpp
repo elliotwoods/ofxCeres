@@ -327,6 +327,10 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 			this->rotationVector.set(glm::vec3(0.0));
 			this->tiltOffset.set(0.0);
 		});
+
+		widgets->addButton("Focus datapoint with highest residual", [this]() {
+			this->focusDataPointWithHighestResidual();
+		});
 	}
 
 	widgets->addTitle("Fixture settings", ofxCvGui::Widgets::Title::Level::H2);
@@ -747,4 +751,18 @@ float MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) 
 	auto angleBetweenResults = acos(dotProduct);
 
 	return angleBetweenResults * RAD_TO_DEG;
+}
+
+//----------
+void MovingHead::focusDataPointWithHighestResidual() {
+	float highestResidual = 0.0f;
+	auto dataPoints = this->calibrationPoints.getSelection();
+
+	for (auto dataPoint : dataPoints) {
+		auto residual = this->getResidualOnDataPoint(dataPoint.get());
+		if (residual > highestResidual) {
+			this->focusedDataPoint = dataPoint;
+			highestResidual = residual;
+		}
+	}
 }
