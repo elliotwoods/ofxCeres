@@ -38,5 +38,6 @@ namespace Data {
 		shared_ptr<ofxCvGui::Panels::Widgets> listPanel;
 
 		bool viewDirty = true;
+		bool isDeleting = false;
 	};
 }

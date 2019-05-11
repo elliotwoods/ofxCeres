@@ -36,6 +36,7 @@ namespace Data {
 
 	//----------
 	AbstractCalibrationPointSet::~AbstractCalibrationPointSet() {
+		this->isDeleting = true;
 		this->clear();
 	}
 
@@ -47,6 +48,10 @@ namespace Data {
 
 		auto captureWeak = weak_ptr<AbstractCalibrationPoint>(capture);
 		capture->onDeletePressed += [captureWeak, this]() {
+			if (this->isDeleting) {
+				return;
+			}
+
 			this->listPanel->clear();
 			this->viewDirty = true;
 			auto capture = captureWeak.lock();
@@ -56,10 +61,18 @@ namespace Data {
 		};
 
 		capture->onChange += [this]() {
+			if (this->isDeleting) {
+				return;
+			}
+
 			this->onChange.notifyListeners();
 		};
 
 		capture->onSelectionChanged += [captureWeak, this](bool selection) {
+			if (this->isDeleting) {
+				return;
+			}
+
 			if (!this->getIsMultipleSelectionAllowed() && selection) {
 				auto selectionSet = this->getSelectionUntyped();
 				auto selectedCapture = captureWeak.lock();
