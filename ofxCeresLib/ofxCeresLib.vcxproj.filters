@@ -36,6 +36,18 @@
     <ClInclude Include="..\src\ofxCeres\Exception.h">
       <Filter>src\ofxCeres</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHead.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\SolverSettings.h">
+      <Filter>src\ofxCeres</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHeadError.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\MovingHeadError.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">
@@ -46,6 +58,12 @@
     </ClCompile>
     <ClCompile Include="..\src\ofxCeres\Models\MovingHead.cpp">
       <Filter>src\ofxCeres\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\DistortedMovingHead.cpp">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\SolverSettings.cpp">
+      <Filter>src\ofxCeres</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

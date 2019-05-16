@@ -411,6 +411,16 @@ void MovingHead::solve() {
 	this->translation = result.solution.translation;
 	this->rotationVector = result.solution.rotationVector;
 	this->tiltOffset = result.solution.tiltOffset;
+
+	//perform the distorted solve
+	{
+		auto distortedSolution = ofxCeres::Models::DistortedMovingHead::Solution();
+		distortedSolution.basicSolution = result.solution;
+
+		auto distortedResult = ofxCeres::Models::DistortedMovingHead::solve(targetPoints
+			, panTiltAngles
+			, distortedSolution);
+	}
 }
 
 //---------

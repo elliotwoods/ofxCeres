@@ -22,15 +22,21 @@
     <ClInclude Include="..\src\ofxCeres.h" />
     <ClInclude Include="..\src\ofxCeres\Exception.h" />
     <ClInclude Include="..\src\ofxCeres\Models\Base.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHead.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHeadError.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\MovingHeadError.h" />
     <ClInclude Include="..\src\ofxCeres\Result.h" />
     <ClInclude Include="..\src\ofxCeres\Models\MovingHead.h" />
     <ClInclude Include="..\src\ofxCeres\Models\RigidBodyTransform.h" />
+    <ClInclude Include="..\src\ofxCeres\SolverSettings.h" />
     <ClInclude Include="..\src\ofxCeres\VectorMath\VectorMath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Exception.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\DistortedMovingHead.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\MovingHead.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp" />
+    <ClCompile Include="..\src\ofxCeres\SolverSettings.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</ProjectGuid>
