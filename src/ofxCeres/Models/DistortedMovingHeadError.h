@@ -19,22 +19,6 @@ struct DistortedMovingHeadError {
 		auto transform = ofxCeres::VectorMath::createTransform(translation, rotationVector);
 
 		T tiltOffset = transformParameters[6];
-
-		ofxCeres::Models::DistortedMovingHead::TDistortion<T> panDistortion{
-			{
-				panDistortionParameters[0] / (T) 1000.0
-				, panDistortionParameters[1]
-				, panDistortionParameters[2]
-			}
-		};
-
-		ofxCeres::Models::DistortedMovingHead::TDistortion<T> tiltDistortion{
-			{
-				tiltDistortionParameters[0] / (T) 1000.0
-				, tiltDistortionParameters[1]
-				, tiltDistortionParameters[2]
-			}
-		};
 		//
 		//--
 
@@ -60,27 +44,17 @@ struct DistortedMovingHeadError {
 
 		//
 		//--
+		
 
-		// get ideal pan-tilt values
-		glm::tvec2<T> panTiltValuesIdeal;
-		try {
-			panTiltValuesIdeal = glm::tvec2<T>{
-				panDistortion.getSignal((T)this->panTiltValuesSignal.x)
-				, tiltDistortion.getSignal((T)this->panTiltValuesSignal.y)
-			};
-		}
-		catch (ofxCeres::Exception & e) {
-			return false;
-		}
-
-		glm::tvec3<T> rayCastForPanTiltValues = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt<T>(panTiltValuesIdeal, tiltOffset);
-
-		//--
+		// Get ideal angles
+		auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace, tiltOffset);
+		glm::tvec2<T> idealAnglesFromCapture{
+			ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.x, panDistortionParameters)
+			, ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.y, tiltDistortionParameters)
+		};
+		
 		//Get the disparity between the real and actual object space rays
-		//
-		auto dotProduct = ofxCeres::VectorMath::dot(rayCastForPanTiltValues, targetInViewSpace);
-		dotProduct = dotProduct / (ofxCeres::VectorMath::length(rayCastForPanTiltValues) * ofxCeres::VectorMath::length(targetInViewSpace));
-		auto angleBetweenResults = acos(dotProduct);
+		auto angleBetweenResults = ofxCeres::VectorMath::sphericalPolarDistance(idealAnglesForTarget, idealAnglesFromCapture);
 
 		residuals[0] = angleBetweenResults * angleBetweenResults;
 

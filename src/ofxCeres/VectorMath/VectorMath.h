@@ -3,6 +3,8 @@
 #define GLM_FORCE_UNRESTRICTED_GENTYPE
 #include "ofVectorMath.h"
 
+#include <utility>
+
 namespace ofxCeres {
 	namespace VectorMath {
 		//----------
@@ -84,6 +86,69 @@ namespace ofxCeres {
 			);
 
 			return transmission;
+		}
+
+		//----------
+		template<typename T>
+		T powerSeries2(const T & x, const T * const coefficients) {
+			return x * x * coefficients[0]
+				+ x * coefficients[1]
+				+ coefficients[2];
+		}
+
+		//----------
+		// from Wolfram alpha 'inverse of x*x*a + a*b + c'
+		template<typename T>
+		std::pair<T, T> powerSeries2Inverse(const T & x, const T * const coefficients) {
+			auto sqrt_inner = (T)4 * coefficients[0] * x
+				+ coefficients[1] * coefficients[1]
+				- (T)4 * coefficients[2] * x;
+			if (sqrt_inner < (T)0) {
+				throw(ofxCeres::Exception("No root found"));
+			}
+
+			auto sqrt_part = sqrt(sqrt_inner);
+
+			T solution_1 = -coefficients[1] - sqrt_part;
+			solution_1 /= (T)2 * x;
+
+			T solution_2 = -coefficients[1] + sqrt_part;
+			solution_2 /= (T)2 * x;
+
+			return { solution_1, solution_2 };
+		}
+
+		//----------
+		template<typename T>
+		T sphericalPolarDistance(const glm::tvec2<T> & panTilt1, const glm::tvec2<T> & panTilt2) {
+			auto projected1 = getObjectSpaceRayForPanTilt(panTilt1, (T) 0.0);
+			auto projected2 = getObjectSpaceRayForPanTilt(panTilt2, (T) 0.0);
+
+			auto dotProduct = dot(projected1, projected2);
+			auto angleBetweenResults = acos(dotProduct / (length(projected1) * length(projected2)));
+
+			return angleBetweenResults;
+		}
+
+		//----------
+		template<typename T>
+		T pickClosest(const T & target, const T & option1, const T & option2) {
+			if (option1 == option1) {
+				if (option2 == option2) {
+					if (abs(target - option1) < abs(target - option2)) {
+						return option1;
+					}
+					else {
+						return option2;
+					}
+				}
+				else {
+					return option1;
+				}
+			}
+			else {
+				return option2;
+			}
 		}
 	}
 }

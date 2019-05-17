@@ -68,8 +68,8 @@ namespace ofxCeres {
 				double panDistortionParameters[3];
 				double tiltDistortionParameters[3];
 				for (int i = 0; i < 3; i++) {
-					panDistortionParameters[i] = initialSolution.panDistortion.polynomial[i];
-					tiltDistortionParameters[i] = initialSolution.tiltDistortion.polynomial[i];
+					panDistortionParameters[i] = initialSolution.panDistortion[i];
+					tiltDistortionParameters[i] = initialSolution.tiltDistortion[i];
 				}
 				//
 				//--
