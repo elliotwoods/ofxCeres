@@ -10,6 +10,10 @@ void ofApp::setup() {
 	{
 		this->movingHeads.emplace("1", make_shared<MovingHead>());
 		this->movingHeads.emplace("2", make_shared<MovingHead>());
+		this->movingHeads.emplace("3", make_shared<MovingHead>());
+		this->movingHeads.emplace("4", make_shared<MovingHead>());
+		this->movingHeads.emplace("5", make_shared<MovingHead>());
+		this->movingHeads.emplace("6", make_shared<MovingHead>());
 	}
 	this->selection = this->movingHeads.begin()->first;
 

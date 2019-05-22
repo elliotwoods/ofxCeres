@@ -38,6 +38,10 @@ protected:
 	ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };
 	ofParameter<glm::vec3> rotationVector{ "Rotation vector", glm::vec3(0, -PI / 2, 0), glm::vec3(-PI / 2), glm::vec3(+PI / 2) };
 	ofParameter<float> tiltOffset{ "Tilt offset", 0, -180, 180 };
+	
+	struct {
+		ofParameter<float> focus{ "Focus", 0.5f, 0.0f, 1.0f };
+	} beamParameters;
 
 	struct {
 		ofParameter<glm::vec2> panRange{ "Pan range", glm::vec2(-270, +270) };
@@ -51,6 +55,8 @@ protected:
 			ofParameter<uint16_t> tiltCoarse{ "Tilt coarse", 3 };
 			ofParameter<uint16_t> tiltFine{ "Tilt fine", 4 };
 			ofParameter<uint16_t> brightness{ "Brightness", 5 };
+			ofParameter<uint16_t> focusCoarse{ "Focus coarse", 6 };
+			ofParameter<uint16_t> focusFine{ "Focus fine", 7 };
 		} dmxAddresses;
 
 	} fixtureSettings;

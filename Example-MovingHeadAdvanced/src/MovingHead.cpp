@@ -138,18 +138,20 @@ void MovingHead::serialize(nlohmann::json & json) {
 
 	// fixtureSettings
 	{
-		json << this->fixtureSettings.panRange;
-		json << this->fixtureSettings.tiltRange;
-		json << this->fixtureSettings.dmxPanPolarity;
+		json["fixtureSettings"] << this->fixtureSettings.panRange;
+		json["fixtureSettings"] << this->fixtureSettings.tiltRange;
+		json["fixtureSettings"] << this->fixtureSettings.dmxPanPolarity;
 
 		// dmxAddresses
 		{
-			json << this->fixtureSettings.dmxAddresses.dmxStartAddress;
-			json << this->fixtureSettings.dmxAddresses.panCoarse;
-			json << this->fixtureSettings.dmxAddresses.panFine;
-			json << this->fixtureSettings.dmxAddresses.tiltCoarse;
-			json << this->fixtureSettings.dmxAddresses.tiltFine;
-			json << this->fixtureSettings.dmxAddresses.brightness;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.dmxStartAddress;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.panCoarse;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.panFine;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.tiltCoarse;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.tiltFine;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.brightness;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.focusCoarse;
+			json["fixtureSettings"]["dmxAddresses"] << this->fixtureSettings.dmxAddresses.focusFine;
 		}
 	}
 }
@@ -171,19 +173,21 @@ void MovingHead::deserialize(const nlohmann::json & json) {
 	json >> this->tiltOffset;
 
 	// fixtureSettings
-	{
-		json >> this->fixtureSettings.panRange;
-		json >> this->fixtureSettings.tiltRange;
-		json >> this->fixtureSettings.dmxPanPolarity;
+	if(json.count("fixtureSettings") != 0) {
+		json["fixtureSettings"] >> this->fixtureSettings.panRange;
+		json["fixtureSettings"] >> this->fixtureSettings.tiltRange;
+		json["fixtureSettings"] >> this->fixtureSettings.dmxPanPolarity;
 
 		// dmxAddresses
-		{
-			json >> this->fixtureSettings.dmxAddresses.dmxStartAddress;
-			json >> this->fixtureSettings.dmxAddresses.panCoarse;
-			json >> this->fixtureSettings.dmxAddresses.panFine;
-			json >> this->fixtureSettings.dmxAddresses.tiltCoarse;
-			json >> this->fixtureSettings.dmxAddresses.tiltFine;
-			json >> this->fixtureSettings.dmxAddresses.brightness;
+		if (json["fixtureSettings"].count("dmxAddresses") != 0) {
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.dmxStartAddress;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.panCoarse;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.panFine;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.tiltCoarse;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.tiltFine;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.brightness;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.focusCoarse;
+			json["fixtureSettings"]["dmxAddresses"] >> this->fixtureSettings.dmxAddresses.focusFine;
 		}
 	}
 }
@@ -351,6 +355,8 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltCoarse);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltFine);
 			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.brightness);
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.focusCoarse);
+			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.focusFine);
 		}
 	}
 
@@ -650,8 +656,29 @@ glm::vec2 MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
 
 //---------
 void MovingHead::navigateToWorldTarget(const glm::vec3 & world) {
+	// Navigate pan-tilt values
 	auto panTiltAngles = this->getPanTiltForWorldTarget(world, this->currentPanTilt.get());
 	this->currentPanTilt.set(panTiltAngles);
+
+	// Navigate the focus (NOTE : hardcoded for Robe Pointe)
+	{
+		//check 'Fit focus values.ipynb'
+		auto distance = glm::distance(world, this->translation.get());
+
+		if (distance < 1.5f) {
+			// near range
+			this->beamParameters.focus.set(1.0f);
+		}
+		else {
+			auto inverseDistance = 1.0f / distance;
+			auto dmxCoarseFloat =
+				-77.16738954 * inverseDistance * inverseDistance * inverseDistance
+				+ -45.98512483 * inverseDistance * inverseDistance
+				+ 403.21323162 * inverseDistance
+				+ 29.67284246;
+			this->beamParameters.focus.set(dmxCoarseFloat / 256.0f);
+		}
+	}
 }
 
 //---------
@@ -697,6 +724,17 @@ void MovingHead::renderDMX(vector<uint8_t> & dmxValues) const {
 	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.tiltFine.get()] = tiltSignalValue & 255;
 
 	dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.brightness.get()] = 255;
+
+	//focus
+	{
+		auto focusSignalFloat = floor(this->beamParameters.focus.get() * (std::numeric_limits<uint16_t>::max()- 1));
+		auto focusSignal = (uint16_t)focusSignalFloat;
+
+		auto focusCoarse = (uint8_t)(focusSignal >> 8);
+		auto focusFine = (uint8_t)(focusSignal & 255);
+		dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.focusCoarse.get()] = focusCoarse;
+		dmxValues[dmxOffset + this->fixtureSettings.dmxAddresses.focusCoarse.get()] = focusFine;
+	}
 }
 
 //---------
