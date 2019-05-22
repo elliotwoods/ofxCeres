@@ -13,7 +13,7 @@ namespace Data {
 		void deserialize(const nlohmann::json &);
 
 		ofParameter<string> name{ "Name", "" };
-		ofParameter<glm::vec2> panTiltAngles{ "Pan tilt angles", glm::vec2(0, 0) };
+		ofParameter<glm::vec2> panTiltSignal{ "Pan tilt angles", glm::vec2(0, 0) };
 		ofParameter<glm::vec3> targetPoint{ "Target point", glm::vec3() };
 
 		function<float(MovingHeadDataPoint*)> getResidualFunction;

@@ -97,25 +97,26 @@ namespace ofxCeres {
 		}
 
 		//----------
-		// from Wolfram alpha 'inverse of x*x*a + a*b + c'
+		// from Wolfram alpha 'y = a*x*x + b * x + c, solve for x'
 		template<typename T>
-		std::pair<T, T> powerSeries2Inverse(const T & x, const T * const coefficients) {
-			auto sqrt_inner = (T)4 * coefficients[0] * x
-				+ coefficients[1] * coefficients[1]
-				- (T)4 * coefficients[2] * x;
-			if (sqrt_inner < (T)0) {
-				throw(ofxCeres::Exception("No root found"));
+		std::pair<T, T> powerSeries2Inverse(const T & y, const T * const coefficients) {
+			auto & a = coefficients[0];
+			auto & b = coefficients[1];
+			auto & c = coefficients[2];
+
+			if (a != 0) {
+				auto solution_1 = -(sqrt(-4 * a*c + 4 * a*y + b * b) + b) / (2 * a);
+				auto solution_2 = (sqrt(4 * a*(y - c) + b * b) - b) / (2 * a);
+
+				return { solution_1, solution_2 };
 			}
-
-			auto sqrt_part = sqrt(sqrt_inner);
-
-			T solution_1 = -coefficients[1] - sqrt_part;
-			solution_1 /= (T)2 * x;
-
-			T solution_2 = -coefficients[1] + sqrt_part;
-			solution_2 /= (T)2 * x;
-
-			return { solution_1, solution_2 };
+			else if (b != 0) {
+				auto solution = (y - c) / b;
+				return { solution, solution };
+			}
+			else {
+				throw(ofxCeres::Exception("Cannot invert polynomial"));
+			}
 		}
 
 		//----------

@@ -11,8 +11,8 @@ namespace ofxCeres {
 			struct Solution {
 				MovingHead::Solution basicSolution;
 
-				double tiltDistortion[3]{ 0, 1, 0 };
 				double panDistortion[3]{ 0, 1, 0 };
+				double tiltDistortion[3]{ 0, 1, 0 };
 			};
 
 			static SolverSettings defaultSolverSettings();

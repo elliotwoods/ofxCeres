@@ -23,25 +23,38 @@ public:
 	glm::mat4 getTransform() const;
 
 	glm::vec2 getPanTiltForWorldTarget(const glm::vec3 &
-		, const glm::vec2 & currentPanTilt) const;
+		, const glm::vec2 & currentPanTiltSignal) const;
 	void navigateToWorldTarget(const glm::vec3 &);
 
 	void setWorldCursorPosition(const glm::vec3 &);
 
 	void renderDMX(vector<uint8_t> & dmxValues) const;
+
+	glm::vec2 panTiltIdealToSignal(const glm::vec2 &) const;
+	glm::vec2 panTiltSignalToIdeal(const glm::vec2 &) const;
 protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
 	void focusDataPointWithHighestResidual();
 
 	Data::CalibrationPointSet<Data::MovingHeadDataPoint> calibrationPoints;
-	ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };
-	ofParameter<glm::vec3> rotationVector{ "Rotation vector", glm::vec3(0, -PI / 2, 0), glm::vec3(-PI / 2), glm::vec3(+PI / 2) };
-	ofParameter<float> tiltOffset{ "Tilt offset", 0, -180, 180 };
-	
+
 	struct {
 		ofParameter<float> focus{ "Focus", 0.5f, 0.0f, 1.0f };
 	} beamParameters;
+
+	struct {
+		ofParameter<bool> distortionEnabled{ "Distortion enabled", true };
+	} fitParameters;
+
+	struct {
+		ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };
+		ofParameter<glm::vec3> rotationVector{ "Rotation vector", glm::vec3(0, -PI / 2, 0), glm::vec3(-PI / 2), glm::vec3(+PI / 2) };
+		ofParameter<float> tiltOffset{ "Tilt offset", 0, -180, 180 };
+		ofParameter<glm::vec3> panDistortion{ "Pan distortion", {0, 1, 0} };
+		ofParameter<glm::vec3> tiltDistortion{ "Tilt distortion", {0, 1, 0} };
+		ofParameter<float> residual{ "Residual", 0 };
+	} calibrationParameters;
 
 	struct {
 		ofParameter<glm::vec2> panRange{ "Pan range", glm::vec2(-270, +270) };
@@ -61,7 +74,7 @@ protected:
 
 	} fixtureSettings;
 
-	ofParameter<glm::vec2> currentPanTilt{ "Current Pan Tilt", glm::vec2(0, 0) };
+	ofParameter<glm::vec2> currentPanTiltSignal{ "Current Pan Tilt", glm::vec2(0, 0) };
 	weak_ptr<Data::MovingHeadDataPoint> focusedDataPoint;
 
 	glm::vec3 lastWorldPosition;

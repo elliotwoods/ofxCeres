@@ -52,6 +52,7 @@ struct DistortedMovingHeadError {
 			ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.x, panDistortionParameters)
 			, ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.y, tiltDistortionParameters)
 		};
+
 		
 		//Get the disparity between the real and actual object space rays
 		auto angleBetweenResults = ofxCeres::VectorMath::sphericalPolarDistance(idealAnglesForTarget, idealAnglesFromCapture);

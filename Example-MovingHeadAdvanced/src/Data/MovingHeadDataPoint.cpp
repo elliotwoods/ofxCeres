@@ -28,14 +28,14 @@ namespace Data {
 	//----------
 	void MovingHeadDataPoint::serialize(nlohmann::json & json) {
 		json << this->name;
-		json << this->panTiltAngles;
+		json << this->panTiltSignal;
 		json << this->targetPoint;
 	}
 
 	//----------
 	void MovingHeadDataPoint::deserialize(const nlohmann::json & json) {
 		json >> this->name;
-		json >> this->panTiltAngles;
+		json >> this->panTiltSignal;
 		json >> this->targetPoint;
 	}
 
@@ -45,7 +45,7 @@ namespace Data {
 
 		auto children = vector<ofxCvGui::ElementPtr>({
 			make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->name)
-			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltAngles)
+			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltSignal)
 			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec3>>(this->targetPoint)
 		});
 
