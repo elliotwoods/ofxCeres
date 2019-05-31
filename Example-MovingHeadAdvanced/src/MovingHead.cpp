@@ -235,6 +235,8 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 
 			// draw the existing selected data points onto the trackpad
 			ofMesh pointsPreview;
+			pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_POINTS);
+
 			auto calibrationPoints = this->calibrationPoints.getSelection();
 			for (auto calibrationPoint : calibrationPoints) {
 				pointsPreview.addColor(calibrationPoint->color.get());
@@ -248,7 +250,7 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 					ofPopStyle();
 				}
 			}
-			pointsPreview.drawVertices();
+			pointsPreview.draw();
 		};
 
 		trackpadWidget->onMouse += [this, trackpadWidgetWeak](ofxCvGui::MouseArguments & args) {
@@ -279,6 +281,10 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 
 	widgets->addTitle("Data", ofxCvGui::Widgets::Title::Level::H2);
 	{
+		widgets->addButton("Debug", [this]() {
+			this->debugFunction();
+		});
+
 		widgets->addButton("Add new data point...", [this]() {
 			auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
 			newDataPoint->name = ofSystemTextBoxDialog("Name");
@@ -739,10 +745,10 @@ glm::vec2 MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
 		// flipped tilt options
 		{
 			for (float pan = panTiltObject.x - 180.0f; pan >= this->fixtureSettings.panRange.get().x; pan -= 360.0f) {
-				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) + axisOffset);
+				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) - axisOffset);
 			}
 			for (float pan = panTiltObject.x + 180.0f; pan <= this->fixtureSettings.panRange.get().y; pan += 360.0f) {
-				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) + axisOffset);
+				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) - axisOffset);
 			}
 		}
 	}
@@ -796,7 +802,7 @@ void MovingHead::navigateToWorldTarget(const glm::vec3 & world) {
 void MovingHead::setWorldCursorPosition(const glm::vec3 & position) {
 	// Focus the data point close to the world cursor
 	auto minDistance2 = numeric_limits<float>::max();
-	auto dataPoints = this->calibrationPoints.getAllCaptures();
+	auto dataPoints = this->calibrationPoints.getSelection();
 	for (auto dataPoint : dataPoints) {
 		auto distance2 = glm::distance2(dataPoint->targetPoint.get(), position);
 
@@ -946,4 +952,22 @@ void MovingHead::focusDataPointWithHighestResidual() {
 			highestResidual = residual;
 		}
 	}
+}
+
+//----------
+void MovingHead::debugFunction() {
+	auto dataPoint = this->focusedDataPoint.lock();
+	if (!dataPoint) {
+		return;
+	}
+
+	auto targetPoint = dataPoint->targetPoint;
+	auto panTiltRecordedSignal = dataPoint->panTiltSignal;
+
+	auto panTiltIdealRecorded = this->panTiltSignalToIdeal(panTiltRecordedSignal);
+	auto panTiltSignalNavigated = this->getPanTiltForWorldTarget(targetPoint, panTiltRecordedSignal);
+
+	auto targetInObjectSpace4 = glm::inverse(this->getTransform()) * glm::vec4(targetPoint.get(), 1.0f);
+	auto targetInObjectspace = targetInObjectSpace4 / targetInObjectSpace4.w;
+	auto panTiltIdealNavigated = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace<float>(targetInObjectspace, this->calibrationParameters.tiltOffset.get());
 }

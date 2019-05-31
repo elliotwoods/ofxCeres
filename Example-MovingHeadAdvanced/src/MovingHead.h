@@ -37,6 +37,8 @@ protected:
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
 	void focusDataPointWithHighestResidual();
 
+	void debugFunction();
+
 	Data::CalibrationPointSet<Data::MovingHeadDataPoint> calibrationPoints;
 
 	struct {
