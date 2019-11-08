@@ -1,6 +1,5 @@
 #pragma once
 
-#define GLM_FORCE_UNRESTRICTED_GENTYPE
 #include "ofVectorMath.h"
 
 #include <utility>
@@ -17,8 +16,47 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
+		T dot(const glm::tvec2<T> & A, const glm::tvec2<T> & B) {
+			return A.x * B.x
+				+ A.y * B.y;
+		}
+
+		//----------
+		template<typename T>
+		T length2(const glm::tvec3<T> & vector) {
+			return dot(vector, vector);
+		}
+
+		//----------
+		template<typename T>
 		T length(const glm::tvec3<T> & vector) {
-			return sqrt(dot(vector, vector));
+			return sqrt(length(vector));
+		}
+
+		//----------
+		template<typename T>
+		T distance2(const glm::tvec3<T> & A, const glm::tvec3<T> & B) {
+			auto delta = B - A;
+			return dot(delta, delta);
+		}
+
+		//----------
+		template<typename T>
+		T distance(const glm::tvec3<T> & A, const glm::tvec3<T> & B) {
+			return sqrt(distance2(A, B));
+		}
+
+		//----------
+		template<typename T>
+		T distance2(const glm::tvec2<T> & A, const glm::tvec2<T> & B) {
+			const glm::tvec2<T> delta(B.x - A.x, B.y - A.y);
+			return dot(delta, delta);
+		}
+
+		//----------
+		template<typename T>
+		T distance(const glm::tvec2<T> & A, const glm::tvec2<T> & B) {
+			return sqrt(distance2(A, B));
 		}
 
 		//----------

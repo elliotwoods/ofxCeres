@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch_ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\MovingHeadDataPoint.cpp">
+      <Filter>src\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Serializable.cpp">
+      <Filter>src\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\AbstractCalibrationPointSet.cpp">
+      <Filter>src\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\AbstractCalibrationPoint.cpp">
+      <Filter>src\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MovingHead.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Widgets\PanTiltTrackpad.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{ed21f078-c663-41cf-9349-9f5b5b93c06a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Data">
+      <UniqueIdentifier>{7e929f45-bc70-42b7-9c9e-4517a8e0f787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Widgets">
+      <UniqueIdentifier>{9c6b5dbf-177c-4be5-b0e5-1e3524567ccf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch_ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\MovingHeadDataPoint.h">
+      <Filter>src\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\Serializable.h">
+      <Filter>src\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\AbstractCalibrationPointSet.h">
+      <Filter>src\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\CalibrationPointSet.h">
+      <Filter>src\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\AbstractCalibrationPoint.h">
+      <Filter>src\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MovingHead.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Widgets\PanTiltTrackpad.h">
+      <Filter>src\Widgets</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+</Project>

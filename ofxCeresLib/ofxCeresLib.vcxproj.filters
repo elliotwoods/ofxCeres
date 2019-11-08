@@ -66,4 +66,7 @@
       <Filter>src\ofxCeres</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+  </ItemGroup>
 </Project>

@@ -38,6 +38,9 @@
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp" />
     <ClCompile Include="..\src\ofxCeres\SolverSettings.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</ProjectGuid>
     <RootNamespace>ofxOrbbec</RootNamespace>
