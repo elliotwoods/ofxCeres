@@ -64,6 +64,8 @@ namespace Data {
 		options.minimizer_progress_to_stdout = false;
 		options.num_threads = 16;
 		options.function_tolerance = 1e-10;
+		options.line_search_direction_type = ceres::LBFGS;
+		options.minimizer_type = ceres::TRUST_REGION;
 		ceres::Solver::Summary summary;
 		for (int i = 0; i < this->annealing.maxIterations; i++) {
 			ceres::Solve(options, &problem, &summary);

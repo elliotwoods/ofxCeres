@@ -4,10 +4,16 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\pch_ofApp.cpp" />
+    <ClCompile Include="src\Data\Serializable.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Block.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
     <ClCompile Include="src\Data\System.cpp">
       <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\Data\Serializable.cpp">
+    <ClCompile Include="src\Data\DrawProperties.cpp">
       <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -19,6 +25,13 @@
     </ClInclude>
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Data\Serializable.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\Block.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\System.inl" />
+    <ClInclude Include="src\Data\DrawProperties.h">
       <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>

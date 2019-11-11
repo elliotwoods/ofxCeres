@@ -2,15 +2,16 @@
 
 #include "Data/System.h"
 #include "ofMain.h"
-
-#define SYSTEM_CONFIG <3, 8>
+#include "Data/Block.h"
+#include "ofxCvGui.h"
 
 class ofApp : public ofBaseApp{
 public:
 	void setup();
 	void update();
 	void draw();
-
+	void drawWorld();
+	void repopulateWidgets();
 
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -24,6 +25,10 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	
-	Data::System SYSTEM_CONFIG system;
+	ofxCvGui::Builder gui;
+	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
+	shared_ptr<ofxCvGui::Panels::World> worldPanel;
+	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
+
+	Data::System system;
 };

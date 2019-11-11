@@ -9,7 +9,10 @@ void ofApp::setup() {
 	this->system.jointPositionConstraints[0].jointIndex = 6;
 	this->system.jointPositionConstraints[1].jointIndex = 12;
 	this->system.jointPositionConstraints[1].position = glm::vec2(ofGetWidth(), ofGetHeight());
-	this->system.bodyLengths.assign(12, 100);
+	this->system.bodyLengths.assign(12, 200);
+	for (auto & rotation : this->system.currentRotationState) {
+		rotation = ofRandom(-PI, 0);
+	}
 }
 
 //--------------------------------------------------------------
@@ -19,6 +22,7 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+	ofBackgroundGradient(40, 10);
 	system.draw();
 }
 

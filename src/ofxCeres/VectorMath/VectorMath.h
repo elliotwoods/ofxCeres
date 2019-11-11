@@ -67,6 +67,15 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
+		glm::tvec3<T> cross(const glm::tvec3<T> & x, const glm::tvec3<T> & y) {
+			return glm::tvec3<T>(
+				x.y * y.z - y.y * x.z,
+				x.z * y.x - y.z * x.x,
+				x.x * y.y - y.x * x.y);
+		}
+
+		//----------
+		template<typename T>
 		glm::tquat<T> eulerToQuat(const glm::tvec3<T> & eulerAngles) {
 			glm::tvec3<T> c(cos(eulerAngles[0] * T(0.5)), cos(eulerAngles[1] * T(0.5)), cos(eulerAngles[2] * T(0.5)));
 			glm::tvec3<T> s(sin(eulerAngles[0] * T(0.5)), sin(eulerAngles[1] * T(0.5)), sin(eulerAngles[2] * T(0.5)));

@@ -1,22 +1,24 @@
 #pragma once
 
 #include "ofxCeres.h"
+#include "ofxLiquidEvent.h"
 #include <vector>
 #include <glm/glm.hpp>
 
-#define TEMPLATE_HEAD template<int jointConnectionCount, int groundSupportCount, typename T>
-#define TEMPLATE_BODY <jointConnectionCount, groundSupportCount, T>
-
 namespace Data {
-	template<int jointConnectionCount, int groundSupportCount>
 	class System;
 
-	TEMPLATE_HEAD
+	template<typename T>
 	class TSystem {
 	public:
 		struct Joint {
 			glm::vec3 position;
 			glm::tvec3<T> force;
+		};
+
+		struct Load {
+			glm::vec3 position;
+			glm::vec3 force;
 		};
 
 		struct JointAddress {
@@ -34,41 +36,53 @@ namespace Data {
 			glm::tvec3<T> force;
 		};
 
-		struct Load {
-			glm::tvec3<T> postiion;
-			glm::tvec3<T> force;
-		};
-
-		class Body {
+		class Body : public ofNode {
 		public:
-			T getForceError() {
-				tvec3<T> total;
+			Body();
 
-				for (const auto & load : this->loads) {
-					total += load.force;
+			T getForceError() const {
+				glm::tvec3<T> total;
+
+				for (const auto & loadIt : this->loads) {
+					total += loadIt.second.force;
 				}
-				for (const auto & joint : this->joint) {
-					total += joint.force;
+				for (const auto & jointIt : this->joints) {
+					total += jointIt.second.force;
 				}
 
-				return glm::dot(total, total);
+				return ofxCeres::VectorMath::dot(total, total);
 			}
 
-			T getTorqueError() {
-				tvec3<T> total;
+			T getTorqueError() const {
+				glm::tvec3<T> total;
 
-				for (const auto & load : this->loads) {
-					total += glm::cross(load.position, load.force);
+				for (const auto & loadIt : this->loads) {
+					total += glm::cross(loadIt.second.position, loadIt.second.force);
 				}
-				for (const auto & joint : this->joint) {
-					total += glm::cross(joint.position, joint.force);
+				for (const auto & jointIt : this->joints) {
+					total += ofxCeres::VectorMath::cross((glm::tvec3<T>) jointIt.second.position, jointIt.second.force);
 				}
 
-				return glm::dot(total, total);
+				return ofxCeres::VectorMath::dot(total, total);
+			}
+
+			ofColor getColor() const {
+				return ofColor(100);
 			}
 
 			std::map<std::string, Load> loads;
 			std::map<std::string, Joint> joints;
+
+			ofxLiquidEvent<void> onDraw;
+			struct {
+				ofParameter<bool> enabled{ "Enabled", true };
+				ofParameter<bool> joints{ "Joints", true };
+				ofParameter<bool> loads { "Loads", true };
+			} drawArgs;
+		protected:
+			void customDraw() override {
+				this->onDraw.notifyListeners();
+			}
 		};
 
 		TSystem() {
@@ -76,20 +90,20 @@ namespace Data {
 		}
 
 		template<typename T2>
-		TSystem(const TSystem<jointConnectionCount, groundSupportCount, T2> & referenceSystem) {
+		TSystem(const TSystem<T2> & referenceSystem) {
 			for (const auto & bodyIt : referenceSystem.bodies) {
 				Body newBody;
 				auto & body = bodyIt.second;
 				for (const auto & loadIt : body.loads) {
 					Load newLoad{
-						(glm::tvec3<T>) loadIt.second.force
-						, (glm::tvec3<T>) loadIt.second.position
+						loadIt.second.position
+						, loadIt.second.force
 					};
 					newBody.loads[loadIt.first] = newLoad;
 				}
 				for (const auto & jointIt : body.joints) {
-					Load newJoint{
-						(glm::tvec3<T>) jointIt.second.position
+					Joint newJoint{
+						jointIt.second.position
 					};
 					newBody.joints[jointIt.first] = newJoint;
 				}
@@ -98,17 +112,14 @@ namespace Data {
 
 			for (const auto & jointConnection : referenceSystem.jointConnections) {
 				JointConnection newJointConnection;
-				newJointConnection.A = jointConnection.A;
-				newJointConnection.B = jointConnection.B;
-				
+				newJointConnection.A = reinterpret_cast<const JointAddress &>(jointConnection.A);
+				newJointConnection.B = reinterpret_cast<const JointAddress &>(jointConnection.B);
 				this->jointConnections.push_back(newJointConnection);
 			}
 
 			for (const auto & groundSupport : referenceSystem.groundSupports) {
 				GroundSupport newGroundSupport;
-
-				newGroundSupport.A = groundSupport.A;
-
+				newGroundSupport.A = reinterpret_cast<const JointAddress &>(groundSupport.A);
 				this->groundSupports.push_back(newGroundSupport);
 			}
 		}
@@ -116,14 +127,14 @@ namespace Data {
 		template<typename T2>
 		void updateStateParameters(const T2 * const parameters) {
 			auto movingParameters = (glm::tvec3<T2> * const) parameters;
-			for (const auto & jointConnection : this->jointConnections) {
+			for (auto & jointConnection : this->jointConnections) {
 				jointConnection.force = (glm::tvec3<T>) *movingParameters++;
-				this->bodies[jointConnection.A.bodyName].joints[jointConnection.A.jointName] = jointConnection.force;
-				this->bodies[jointConnection.B.bodyName].joints[jointConnection.B.jointName] = -jointConnection.force;
+				this->bodies[jointConnection.A.bodyName].joints[jointConnection.A.jointName].force = jointConnection.force;
+				this->bodies[jointConnection.B.bodyName].joints[jointConnection.B.jointName].force = -jointConnection.force;
 			}
-			for (const auto & groundSupport : this->groundSupports) {
+			for (auto & groundSupport : this->groundSupports) {
 				groundSupport.force = (glm::tvec3<T>) *movingParameters++;
-				this->bodies[groundSupport.A.bodyName].joints[groundSupport.A.jointName] = groundSupport.force;
+				this->bodies[groundSupport.A.bodyName].joints[groundSupport.A.jointName].force = groundSupport.force;
 			}
 		}
 
@@ -132,9 +143,13 @@ namespace Data {
 		std::vector<GroundSupport> groundSupports;
 	};
 
-	template<int jointConnectionCount, int groundSupportCount>
-	class System : public TSystem <jointConnectionCount, groundSupportCount, float> {
+	class System : public TSystem <float> {
 	public:
+		template<int jointConnectionCount, int groundSupportCount>
 		void solve();
+		void draw();
+		void populateInspector(shared_ptr<ofxCvGui::Panels::Widgets>);
 	};
 }
+
+#include "System.inl"
