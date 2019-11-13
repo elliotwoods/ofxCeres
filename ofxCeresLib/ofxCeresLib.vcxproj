@@ -21,16 +21,43 @@
   <ItemGroup>
     <ClInclude Include="..\src\ofxCeres.h" />
     <ClInclude Include="..\src\ofxCeres\Exception.h" />
+    <ClInclude Include="..\src\ofxCeres\Includes.h" />
     <ClInclude Include="..\src\ofxCeres\Models\Base.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHead.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHeadError.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\InverseKinematics\System.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\MovingHeadError.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.h" />
     <ClInclude Include="..\src\ofxCeres\Result.h" />
     <ClInclude Include="..\src\ofxCeres\Models\MovingHead.h" />
     <ClInclude Include="..\src\ofxCeres\Models\RigidBodyTransform.h" />
+    <ClInclude Include="..\src\ofxCeres\SolverSettings.h" />
     <ClInclude Include="..\src\ofxCeres\VectorMath\VectorMath.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\DrawProperties.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\System.h" />
+    <ClInclude Include="..\src\pch_ofxCeres.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Exception.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\DistortedMovingHead.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\InverseKinematics\System.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\MovingHead.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.cpp" />
+    <ClCompile Include="..\src\ofxCeres\SolverSettings.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\DrawProperties.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\System.cpp" />
+    <ClCompile Include="..\src\pch_ofxCeres.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="..\src\ofxCeres\Models\InverseKinematics\System.inl" />
+    <None Include="..\src\ofxCeres\Models\StructuralAnalysis\System.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</ProjectGuid>
@@ -72,24 +99,28 @@
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
     <Import Project="..\..\..\addons\ofxAddonLib\ofxAddonLib.props" />
     <Import Project="ofxCeres.props" />
+    <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
     <Import Project="..\..\..\addons\ofxAddonLib\ofxAddonLib.props" />
     <Import Project="ofxCeres.props" />
+    <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
     <Import Project="..\..\..\addons\ofxAddonLib\ofxAddonLib.props" />
     <Import Project="ofxCeres.props" />
+    <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
     <Import Project="..\..\..\addons\ofxAddonLib\ofxAddonLib.props" />
     <Import Project="ofxCeres.props" />
+    <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -97,6 +128,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_ofxCeres.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -118,6 +151,8 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalIncludeDirectories>..\..\..\addons\ofxSquash\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_ofxCeres.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -140,6 +175,8 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>..\..\..\addons\ofxCvMin\src;..\..\..\addons\ofxCvMin\libs\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_ofxCeres.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -164,6 +201,8 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>..\..\..\addons\ofxSquash\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch_ofxCeres.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

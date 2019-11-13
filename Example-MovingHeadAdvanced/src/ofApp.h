@@ -32,6 +32,7 @@ public:
 	void gotMessage(ofMessage msg);
 
     ofParameter<bool> drawGrid{ "Draw grid", true };		
+	ofParameter<bool> drawOtherFixtures{ "Draw other fixtures", true };
 
 	map<string, shared_ptr<MovingHead>> movingHeads;
 	string selection;

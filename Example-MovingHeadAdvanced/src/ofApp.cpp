@@ -6,10 +6,16 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 
+	vector<string> movingHeadNames {
+		"6"
+		, "9_smallGobo_zoomOut"
+		, "10_smallGobo_zoomIn"
+		, "99_smallGobo_zoomOut"
+	};
+
 	// Initialise the moving heads
-	{
-		this->movingHeads.emplace("1", make_shared<MovingHead>());
-		this->movingHeads.emplace("2", make_shared<MovingHead>());
+	for(auto movingHeadName : movingHeadNames) {
+		this->movingHeads.emplace(movingHeadName, make_shared<MovingHead>());
 	}
 	this->selection = this->movingHeads.begin()->first;
 
@@ -101,7 +107,13 @@ void ofApp::drawWorld() {
 
 	// Draw the moving heads
 	for (auto & movingHead : this->movingHeads) {
-		movingHead.second->drawWorld(movingHead.first == this->selection);
+		bool isSelected = movingHead.first == this->selection;
+		if (isSelected) {
+			movingHead.second->drawWorld(true);
+		}
+		else if(this->drawOtherFixtures) {
+			movingHead.second->drawWorld(false);
+		}
 	}
 }
 
@@ -214,7 +226,9 @@ void ofApp::mousePressed(int x, int y, int button) {
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button) {
-	this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
+	if (this->worldPanel->isMouseOver()) {
+		this->movingHeads[this->selection]->setWorldCursorPosition(this->worldPanel->getCamera().getCursorWorld());
+	}
 }
 
 //--------------------------------------------------------------
