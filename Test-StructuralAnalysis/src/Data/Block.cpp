@@ -1,10 +1,6 @@
 #include "pch_ofApp.h"
 #include "Block.h"
 
-const float axleGap = 0.05f;
-const float topBearingHeight = 0.2f;
-const float bottomBearingHeight = 0.1f;
-
 namespace Data {
 	//----------
 	BaseBlock::BaseBlock() {
@@ -20,13 +16,13 @@ namespace Data {
 
 		this->joints.insert({
 			{
-				"bearingUp",
+				"bearingTop",
 				{
 					{0, topBearingHeight, 0}
 				}
 			},
 			{
-				"bearingDown",
+				"bearingBottom",
 				{
 					{0, bottomBearingHeight, 0}
 				}
@@ -66,13 +62,13 @@ namespace Data {
 	TopBlock::TopBlock() {
 		this->joints.insert({
 			{
-				"bearing2Up",
+				"bearing2Top",
 				{
 					{1.0, topBearingHeight, 0}
 				}
 			},
 			{
-				"bearing2Down",
+				"bearing2Bottom",
 				{
 					{1.0, bottomBearingHeight, 0}
 				}

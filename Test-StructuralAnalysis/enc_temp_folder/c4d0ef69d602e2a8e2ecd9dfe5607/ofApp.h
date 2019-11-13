@@ -39,6 +39,6 @@ public:
 	struct {
 		ofxCeres::Models::StructuralAnalysis::System system;
 		ofParameter<bool> solve{ "Solve", true };
-		ofParameter<float> solveTime{ "Solve time", 1.0, 0.01, 10 };
+		ofParameter<float> solveTime{ "Solve time", 0.5, 0.01, 10 };
 	} structuralAnalysis;
 };

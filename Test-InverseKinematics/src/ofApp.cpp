@@ -6,10 +6,12 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	this->system.jointPositionConstraints.resize(2);
-	this->system.jointPositionConstraints[0].jointIndex = 6;
-	this->system.jointPositionConstraints[1].jointIndex = 12;
-	this->system.jointPositionConstraints[1].position = glm::vec2(ofGetWidth(), ofGetHeight());
-	this->system.bodyLengths.assign(12, 200);
+	this->system.jointPositionConstraints[0].jointIndex = 3;
+	this->system.jointPositionConstraints[0].position = glm::vec2{200, 200};
+	this->system.jointPositionConstraints[1].jointIndex = 6;
+	this->system.jointPositionConstraints[1].position = glm::vec2{ 400, 400 };
+
+	this->system.bodyLengths.assign(6, 400);
 	for (auto & rotation : this->system.currentRotationState) {
 		rotation = ofRandom(-PI, 0);
 	}
@@ -17,7 +19,14 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-
+	if (doSolve) {
+		try {
+			doSolve = !this->system.solve<6>();
+		}
+		catch (ofxCeres::Exception e) {
+			cout << e.what();
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -52,15 +61,7 @@ void ofApp::mousePressed(int x, int y, int button) {
 	if (button == 0 || button == 1) {
 		this->system.jointPositionConstraints[button].position = glm::vec2(x, y);
 	}
-	try {
-		this->system.solve();
-	}
-	catch (const char * e) {
-		cout << e << endl;
-	}
-	catch (const std::exception & e) {
-		cout << e.what() << endl;
-	}
+	this->doSolve = true;
 }
 
 //--------------------------------------------------------------

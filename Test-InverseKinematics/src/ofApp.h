@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Data/System.h"
+#include "ofxCeres.h"
 #include "ofMain.h"
 
 class ofApp : public ofBaseApp{
@@ -23,5 +23,7 @@ public:
 	void gotMessage(ofMessage msg);
 
 	
-	Data::System<12, 2> system;
+	ofxCeres::Models::InverseKinematics::System system;
+
+	bool doSolve = true;
 };

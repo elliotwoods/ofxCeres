@@ -13,6 +13,12 @@
     <Filter Include="src\ofxCeres\VectorMath">
       <UniqueIdentifier>{c0733185-5c5b-4c20-8597-5fd2898205a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ofxCeres\Models\StructuralAnalysis">
+      <UniqueIdentifier>{600ba5b2-6cdc-4f24-b828-50c43181fdfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxCeres\Models\InverseKinematics">
+      <UniqueIdentifier>{95bed862-84b1-45cc-b875-fe72ba02b542}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ofxCeres.h">
@@ -48,6 +54,24 @@
     <ClInclude Include="..\src\ofxCeres\Models\MovingHeadError.h">
       <Filter>src\ofxCeres\Models</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\DrawProperties.h">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\System.h">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pch_ofxCeres.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\InverseKinematics\System.h">
+      <Filter>src\ofxCeres\Models\InverseKinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Includes.h">
+      <Filter>src\ofxCeres</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.h">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">
@@ -65,8 +89,29 @@
     <ClCompile Include="..\src\ofxCeres\SolverSettings.cpp">
       <Filter>src\ofxCeres</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\System.cpp">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\DrawProperties.cpp">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pch_ofxCeres.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\InverseKinematics\System.cpp">
+      <Filter>src\ofxCeres\Models\InverseKinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.cpp">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+    <None Include="..\src\ofxCeres\Models\StructuralAnalysis\System.inl">
+      <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
+    </None>
+    <None Include="..\src\ofxCeres\Models\InverseKinematics\System.inl">
+      <Filter>src\ofxCeres\Models\InverseKinematics</Filter>
+    </None>
   </ItemGroup>
 </Project>

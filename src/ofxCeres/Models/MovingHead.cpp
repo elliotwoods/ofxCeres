@@ -1,3 +1,4 @@
+#include "pch_ofxCeres.h"
 #include "../VectorMath/VectorMath.h"
 
 #include "MovingHead.h"

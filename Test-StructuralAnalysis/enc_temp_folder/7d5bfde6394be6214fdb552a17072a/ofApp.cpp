@@ -167,7 +167,7 @@ void ofApp::setup() {
 void ofApp::update() {
 	if (this->structuralAnalysis.solve) {
 		auto solverSettings = ofxCeres::Models::StructuralAnalysis::System::getDefaultSolverSettings();
-		solverSettings.options.max_solver_time_in_seconds = this->structuralAnalysis.solveTime;
+		//solverSettings.options.max_solver_time_in_seconds = this->structuralAnalysis.solveTime;
 		if (this->structuralAnalysis.system.solve<(TOWER_HEIGHT * 4 - 2) * 2, 2 * 2>(solverSettings)) {
 			this->structuralAnalysis.solve = false;
 		}

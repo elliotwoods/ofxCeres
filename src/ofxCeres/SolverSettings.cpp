@@ -1,3 +1,4 @@
+#include "pch_ofxCeres.h"
 #include "SolverSettings.h"
 
 namespace ofxCeres {

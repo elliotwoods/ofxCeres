@@ -196,8 +196,6 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Data\Serializable.cpp" />
-    <ClCompile Include="src\Data\System.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\pch_ofApp.cpp">
@@ -209,8 +207,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\Data\Serializable.h" />
-    <ClInclude Include="src\Data\System.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\pch_ofApp.h" />
   </ItemGroup>
