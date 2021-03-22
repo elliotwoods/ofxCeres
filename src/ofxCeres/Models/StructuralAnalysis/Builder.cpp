@@ -1,6 +1,14 @@
 #include "pch_ofxCeres.h"
 #include "Builder.h"
 
+template<typename T>
+glm::tvec3<T> operator*(glm::tmat4x4<T> matrix, glm::tvec3<T> vec3)
+{
+	auto vec4 = matrix * glm::tvec4<T>(vec3.x, vec3.y, vec3.z, 1.0f);
+	vec4 /= vec4.w;
+	return glm::tvec3<T>(vec4.x, vec4.y, vec4.z);
+}
+
 namespace ofxCeres {
 	namespace Models {
 		namespace StructuralAnalysis {
