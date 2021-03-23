@@ -164,24 +164,24 @@ void ofApp::setup() {
 			this->gui.add(this->stripPanel);
 		}
 
-		// Add the panel for drawing 3D world
+// Add the panel for drawing 3D world
 		{
-			this->worldPanel = ofxCvGui::Panels::makeWorld();
-			this->worldPanel->onDrawWorld += [this](ofCamera &) {
-				this->drawWorld();
-			};
-			this->worldPanel->setGridEnabled(false);
-			{
-				auto & camera = this->worldPanel->getCamera();
-				camera.setCursorDrawEnabled(true);
-				camera.setPosition({0, 5, 5});
-				camera.lookAt({ 0, 0, 0 });
-			}
+		this->worldPanel = ofxCvGui::Panels::makeWorld();
+		this->worldPanel->onDrawWorld += [this](ofCamera&) {
+			this->drawWorld();
+		};
+		this->worldPanel->setGridEnabled(false);
+		{
+			auto& camera = this->worldPanel->getCamera();
+			camera.setCursorDrawEnabled(true);
+			camera.setPosition({ 0, 5, 5 });
+			camera.lookAt({ 0, 0, 0 });
+		}
 
-			this->worldPanel->onDraw += [this](ofxCvGui::DrawArguments & args) {
-				SA::DrawProperties::X().drawScaleLegend(args.localBounds);
-			};
-			this->stripPanel->add(this->worldPanel);
+		this->worldPanel->onDraw += [this](ofxCvGui::DrawArguments& args) {
+			SA::DrawProperties::X().drawScaleLegend(args.localBounds);
+		};
+		this->stripPanel->add(this->worldPanel);
 		}
 
 		// Add the widgets panel
@@ -209,16 +209,7 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 	if (this->structuralAnalysis.solve) {
-		auto solverSettings = ofxCeres::Models::StructuralAnalysis::System::getDefaultSolverSettings();
-		solverSettings.options.max_solver_time_in_seconds = this->structuralAnalysis.solveTime;
-		try {
-			if (this->structuralAnalysis.system.solve<(TOWER_HEIGHT * 4 - 2) * 2 + 8, 2 * 2>(solverSettings)) {
-				this->structuralAnalysis.solve = false;
-			}
-		}
-		catch (const ofxCeres::Exception & e) {
-			ofLogError() << e.what();
-		}
+		this->solve();
 	}
 	SA::DrawProperties::X().updateMaxScalar();
 }
@@ -236,8 +227,8 @@ void ofApp::drawWorld() {
 	{
 		auto PandRs = this->inverseKinematics.system.getCurrentPositionsAndRotations();
 		ofPolyline line;
-		for (const auto & PandR : PandRs) {
-			line.addVertex(glm::vec3{ PandR.position.x, 0, - PandR.position.y });
+		for (const auto& PandR : PandRs) {
+			line.addVertex(glm::vec3{ PandR.position.x, 0, -PandR.position.y });
 		}
 		line.draw();
 	}
@@ -245,11 +236,25 @@ void ofApp::drawWorld() {
 		ofPushStyle();
 		{
 			ofNoFill();
-			auto & domain = this->inverseKinematics.system.domainConstraints[0].domain;
+			auto& domain = this->inverseKinematics.system.domainConstraints[0].domain;
 			ofRotateDeg(-90, 1, 0, 0);
 			ofDrawRectangle(domain);
 		}
 		ofPopStyle();
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::solve() {
+	auto solverSettings = ofxCeres::Models::StructuralAnalysis::System::getDefaultSolverSettings();
+	//solverSettings.options.max_solver_time_in_seconds = this->structuralAnalysis.solveTime;
+	try {
+		if (this->structuralAnalysis.system.solve<(TOWER_HEIGHT * 4 - 2) * 2 + 8, 2 * 2>(solverSettings)) {
+			this->structuralAnalysis.solve = false;
+		}
+	}
+	catch (const ofxCeres::Exception& e) {
+		ofLogError() << e.what();
 	}
 }
 
@@ -263,6 +268,9 @@ void ofApp::repopulateWidgets() {
 		button->setHeight(100.0f);
 		button->setHotKey(OF_KEY_RETURN);
 	}
+	inspector->addButton("Solve once", [this]() {
+		this->solve();
+	});
 	inspector->addSlider(this->structuralAnalysis.solveTime);
 	SA::DrawProperties::X().populateInspector(inspector);
 	

@@ -32,12 +32,6 @@ public:
 	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
 
 	struct {
-		ofxCeres::Models::InverseKinematics::System system;
-		ofParameter<bool> solve{ "Solve", true };
-		ofParameter<float> solveTime{ "Solve time", 0.1, 0.01, 10 };
-	} inverseKinematics;
-
-	struct {
 		ofxCeres::Models::StructuralAnalysis::System system;
 		ofParameter<bool> solve{ "Solve", false };
 		ofParameter<float> solveTime{ "Solve time", 1.0, 0.01, 10 };

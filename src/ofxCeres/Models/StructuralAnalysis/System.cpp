@@ -16,7 +16,7 @@ namespace ofxCeres {
 					options.function_tolerance = 1e-10;
 					options.line_search_direction_type = ceres::LBFGS;
 					options.minimizer_type = ceres::LINE_SEARCH;
-					options.num_threads = 16;
+					options.num_threads = std::thread::hardware_concurrency();
 				}
 				return solverSettings;
 			}

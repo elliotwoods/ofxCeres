@@ -18,7 +18,7 @@ namespace ofxCeres {
 					std::string bodyName;
 					std::vector<ChainJoint> jointConnections;
 					std::vector<std::string> groundSupports;
-					glm::quat orientation;
+					glm::quat orientation = glm::quat(1, 0, 0, 0);
 				};
 
 				typedef std::vector<ChainBody> Chain;

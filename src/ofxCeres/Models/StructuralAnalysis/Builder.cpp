@@ -54,6 +54,18 @@ namespace ofxCeres {
 						previousBody = newBody;
 						previousBodyName = chainLink.bodyName;
 					}
+
+					// initialise forces with random variables
+					for (auto& connection : system.jointConnections) {
+						connection.force.x = ofRandomf() * 0.01;
+						connection.force.y = ofRandomf() * 0.01;
+						connection.force.z = ofRandomf() * 0.01;
+					}
+					for (auto& connection : system.groundSupports) {
+						connection.force.x = ofRandomf() * 0.01;
+						connection.force.y = ofRandomf() * 0.01;
+						connection.force.z = ofRandomf() * 0.01;
+					}
 				}
 			}
 		}

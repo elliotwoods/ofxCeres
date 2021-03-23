@@ -11,5 +11,5 @@ To effectively use ceres, the solver requires the derivative of your cost functi
 Here we exploit the feature of glm whereby all major maths functions are templated. However, there are some caveats and problem cases. Generally these issues come out as compile errors. Here we explain some strategies to avoid compile errors:
 
 
-1. ceres doesn't play nice with swizzle and some of the other features of glm, therefore I suggest that you set `GLM_FORCE_UNRESTRICTED_GENTYPE` project-wide. `ofxCeres.props` already includes this define.
+1. ceres doesn't play nice with swizzle, unions (e.g. x,y,z or r,g,b) and some of the other features of glm, therefore I suggest that you set `GLM_FORCE_UNRESTRICTED_GENTYPE` and `GLM_FORCE_XYZW_ONLY` project-wide. `ofxCeres.props` already includes this define.
 2. Some of the maths functions of glm aren't working well. You can find some replacement functions in the `ofxCeres::VectorMath` namespace which should work as expected. Check [https://github.com/g-truc/glm/issues/973] for notes on why this is.
