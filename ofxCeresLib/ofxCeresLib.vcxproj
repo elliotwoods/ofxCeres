@@ -62,7 +62,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</ProjectGuid>
     <RootNamespace>ofxOrbbec</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -136,12 +136,10 @@
     </Link>
     <Lib>
       <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
-    <Lib>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxCeres\libs\ceres\lib\VS2017\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS2017/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
+      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS/$(PlatformToolset)/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
 if errorlevel 1 exit 0 else exit %errorlevel%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -161,10 +159,10 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxCeres\libs\ceres\lib\VS2017\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS2017/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
+      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS/$(PlatformToolset)/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
 if errorlevel 1 exit 0 else exit %errorlevel%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -187,10 +185,10 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxCeres\libs\ceres\lib\VS2017\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS2017/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
+      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS/$(PlatformToolset)/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
 if errorlevel 1 exit 0 else exit %errorlevel%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -213,10 +211,10 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxCeres\libs\ceres\lib\VS2017\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS2017/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
+      <Command>robocopy "$(OF_ROOT)addons/ofxCeres/libs/ceres/bin/VS/$(PlatformToolset)/$(Platform)/$(Configuration)/" "$(SolutionDir)bin/" /njs /njh /np /fp /bytes /s
 if errorlevel 1 exit 0 else exit %errorlevel%</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

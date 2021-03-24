@@ -102,7 +102,7 @@ void ofApp::setup() {
 			, { "upBottom", "bearing2Bottom"}
 		}
 		});
-	auto flipBlock = glm::rotate(glm::quat{}, (float)PI, glm::vec3(0, 1, 0));
+	auto flipBlock = glm::rotate(glm::quat{0,0,0,1}, (float)PI, glm::vec3(0, 1, 0));
 
 	for (int i = 0; i < TOWER_HEIGHT; i++) {
 		systemDefinition.push_back({
@@ -247,7 +247,7 @@ void ofApp::drawWorld() {
 //--------------------------------------------------------------
 void ofApp::solve() {
 	auto solverSettings = ofxCeres::Models::StructuralAnalysis::System::getDefaultSolverSettings();
-	//solverSettings.options.max_solver_time_in_seconds = this->structuralAnalysis.solveTime;
+	solverSettings.options.max_solver_time_in_seconds = this->structuralAnalysis.solveTime;
 	try {
 		if (this->structuralAnalysis.system.solve<(TOWER_HEIGHT * 4 - 2) * 2 + 8, 2 * 2>(solverSettings)) {
 			this->structuralAnalysis.solve = false;
