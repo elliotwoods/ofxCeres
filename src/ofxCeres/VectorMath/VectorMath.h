@@ -198,5 +198,15 @@ namespace ofxCeres {
 				return option2;
 			}
 		}
+
+		//----------
+		template<typename T>
+		glm::tvec3<T> applyTransform(glm::tmat4x4<T> matrix, glm::tvec3<T> vector)
+		{
+			glm::tvec4<T> vec4(vector.x, vector.y, vector.z, (T) 1.0f);
+			auto result4 = matrix * vec4;
+			result4 /= result4.w;
+			return glm::tvec3<T>(result4.x, result4.y, result4.z);
+		}
 	}
 }

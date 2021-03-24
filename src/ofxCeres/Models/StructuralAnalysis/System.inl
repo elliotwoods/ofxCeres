@@ -46,6 +46,12 @@ namespace ofxCeres {
 
 			//----------
 			template<typename T>
+			bool TSystem<T>::JointAddress::operator==(const JointAddress& other) const {
+				return this->bodyName == other.bodyName && this->jointName == other.jointName;
+			}
+
+			//----------
+			template<typename T>
 			TSystem<T>::Body::Body() {
 
 			}

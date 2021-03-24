@@ -33,6 +33,7 @@ namespace ofxCeres {
 					std::string bodyName;
 					std::string jointName;
 					std::string toString() const;
+					bool operator==(const JointAddress&) const;
 				};
 
 				struct JointConnection {
@@ -53,8 +54,15 @@ namespace ofxCeres {
 
 					T getTorqueError() const;
 
-					ofColor getColor() const {
+					ofColor getColor() const
+					{
 						return ofColor(100);
+					}
+
+					glm::tvec3<T> getJointPosition(const string& name) const
+					{
+						auto vec3 = this->joints.at(name).position;
+						return VectorMath::applyTransform(this->getGlobalTransformMatrix(), vec3);
 					}
 
 					std::map<std::string, Load> loads;
@@ -134,6 +142,22 @@ namespace ofxCeres {
 						groundSupport.force = (glm::tvec3<T>) *movingParameters++;
 						this->setJointForce(groundSupport.A, groundSupport.force, false);
 					}
+				}
+
+				JointAddress findConnectedJoint(JointAddress jointAddress)
+				{
+					for (const auto& jointConnection : this->jointConnections)
+					{
+						if (jointConnection.A == jointAddress)
+						{
+							return jointConnection.B;
+						}
+						if (jointConnection.B == jointAddress)
+						{
+							return jointConnection.A;
+						}
+					}
+					throw(Exception("No joint found connected to " + jointAddress.toString()));
 				}
 
 				std::map<std::string, shared_ptr<Body>> bodies;
