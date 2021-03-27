@@ -50,6 +50,30 @@ namespace ofxCeres {
 				public:
 					Body();
 
+					template<typename T2>
+					Body(const T2& otherBody)
+					{
+						//copy node transform
+						this->setGlobalOrientation(otherBody.getGlobalOrientation());
+						this->setPosition(otherBody.getGlobalPosition());
+						this->setScale(otherBody.getScale());
+
+						for (const auto& loadIt : otherBody.loads) {
+							Load newLoad{
+								loadIt.second.position
+								, loadIt.second.force
+							};
+							this->loads[loadIt.first] = newLoad;
+						}
+						for (const auto& jointIt : otherBody.joints) {
+							Joint newJoint{
+								jointIt.second.position
+								// We don't copy force since this is re-applied using parameters
+							};
+							this->joints[jointIt.first] = newJoint;
+						}
+					}
+
 					T getForceError() const;
 
 					T getTorqueError() const;
@@ -92,27 +116,8 @@ namespace ofxCeres {
 				template<typename T2>
 				TSystem(const TSystem<T2> & referenceSystem) {
 					for (const auto & bodyIt : referenceSystem.bodies) {
-						auto newBody = make_shared<Body>();
-						auto & body = bodyIt.second;
-
-						//copy node transform
-						newBody->setGlobalOrientation(body->getGlobalOrientation());
-						newBody->setPosition(body->getGlobalPosition());
-						newBody->setScale(body->getScale());
-
-						for (const auto & loadIt : body->loads) {
-							Load newLoad{
-								loadIt.second.position
-								, loadIt.second.force
-							};
-							newBody->loads[loadIt.first] = newLoad;
-						}
-						for (const auto & jointIt : body->joints) {
-							Joint newJoint{
-								jointIt.second.position
-							};
-							newBody->joints[jointIt.first] = newJoint;
-						}
+						const auto & body = bodyIt.second;
+						auto newBody = make_shared<Body>(*body);
 						this->bodies[bodyIt.first] = newBody;
 					}
 

@@ -3,6 +3,7 @@
 #include "ofApp.h"
 #include "ofxCeres.h"
 
+
 #define TOWER_HEIGHT 12
 #define IK_SIZE (TOWER_HEIGHT * 2 + 1)
 
@@ -69,11 +70,21 @@ void ofApp::drawWorld() {
 }
 
 //--------------------------------------------------------------
+void ofApp::solve() {
+	this->stewartPlatform.solveForces();
+}
+
+//--------------------------------------------------------------
 void ofApp::repopulateWidgets() {
 	auto inspector = this->widgetsPanel;
 	inspector->addFps();
 	inspector->addMemoryUsage();
 	SA::DrawProperties::X().populateInspector(inspector);
+	inspector->addButton("Solve", [this]() {
+		this->solve();
+		}, OF_KEY_RETURN)->setHeight(100.0f);
+	
+
 	inspector->addParameterGroup(this->stewartPlatform);
 }
 

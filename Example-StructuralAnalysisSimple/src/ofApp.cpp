@@ -10,6 +10,7 @@ namespace SA = ofxCeres::Models::StructuralAnalysis;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	ofSetWindowTitle("Solver");
 	ofxCeres::Models::StructuralAnalysis::Builder::Chain systemDefinition{
 		{
 			"Axle"

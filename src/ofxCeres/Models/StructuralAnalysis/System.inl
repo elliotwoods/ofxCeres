@@ -19,9 +19,6 @@ struct SolverError {
 			residual += bodyIt.second->getForceError();
 			residual += bodyIt.second->getTorqueError();
 		}
-		for (const auto & groundSupport : system.groundSupports) {
-			residual += glm::length2(groundSupport.force) * 1e-8;
-		}
 		
 		return true;
 	}
@@ -59,7 +56,7 @@ namespace ofxCeres {
 			//----------
 			template<typename T>
 			T TSystem<T>::Body::getForceError() const {
-				glm::tvec3<T> total;
+				glm::tvec3<T> total{ 0, 0, 0 };
 
 				for (const auto & loadIt : this->loads) {
 					total += loadIt.second.force;
@@ -74,7 +71,7 @@ namespace ofxCeres {
 			//----------
 			template<typename T>
 			T TSystem<T>::Body::getTorqueError() const {
-				glm::tvec3<T> total;
+				glm::tvec3<T> total{ 0, 0, 0 };
 
 				for (const auto & loadIt : this->loads) {
 					total += glm::cross(loadIt.second.position, loadIt.second.force);

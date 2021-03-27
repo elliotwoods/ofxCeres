@@ -27,11 +27,12 @@ namespace ofxCeres {
 				void drawScaleLegend(const ofRectangle & viewBounds) const;
 #endif
 
-				ofParameter<float> sceneScale{ "Scene scale x10^x", -5, -10, 2 };
+				ofParameter<float> sceneScale{ "Scene scale x10^x", -1, -10, 2 };
 				ofParameter<float> arrowHeadSize{ "Arrow head size", 0.005, 0.001, 0.1 };
 				ofParameter<float> anchorSize{ "Anchor size", 0.03, 0.001, 1 };
 				ofParameter<bool> jointLabels{ "Joint labels", false };
 				ofParameter<bool> loadLabels{ "Load labels", false };
+				ofParameter<bool> magnitudes{ "Magnitudes", true };
 
 				float maxScalar = 1;
 				float nextMaxScalar = 1;

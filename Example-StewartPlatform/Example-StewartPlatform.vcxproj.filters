@@ -7,6 +7,9 @@
     <ClCompile Include="src\Data\StewartPlatform.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="src\Solvers\StewartPlatformForces.cpp">
+      <Filter>Solvers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h" />
@@ -15,6 +18,9 @@
     <ClInclude Include="src\Data\StewartPlatform.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="src\Solvers\StewartPlatformForces.h">
+      <Filter>Solvers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
@@ -22,6 +28,9 @@
   <ItemGroup>
     <Filter Include="Data">
       <UniqueIdentifier>{fa5466b5-9591-470f-8fb6-58489cbe0901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Solvers">
+      <UniqueIdentifier>{6179704e-1b1c-48ea-98aa-7940573fcb98}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

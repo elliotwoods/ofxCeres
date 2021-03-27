@@ -1,5 +1,6 @@
 #include "pch_ofApp.h"
 #include "StewartPlatform.h"
+#include "Solvers/StewartPlatformForces.h"
 
 namespace Data
 {
@@ -34,7 +35,7 @@ namespace Data
 			}
 			ofPopMatrix();
 		};
-		this->rebuild();
+		this->markDirty();
 	}
 
 	//----------
@@ -52,6 +53,14 @@ namespace Data
 		StewartPlatform::Deck::markDirty()
 	{
 		this->isDirty = true;
+	}
+
+	//----------
+	void
+		StewartPlatform::solveForces()
+	{
+		auto result = Solvers::StewartPlatformForces::solve(*this);
+		//auto result = this->system.solve<12, 1>();
 	}
 
 	//----------
@@ -82,6 +91,9 @@ namespace Data
 
 		this->line.clear();
 		for (const auto& joint : this->joints) {
+			if (joint.first == "Ground") {
+				continue;
+			}
 			this->line.addVertex(joint.second.position);
 		}
 		this->line.close();
@@ -176,12 +188,13 @@ namespace Data
 		this->upperDeck->onChange += rebuildCallback;
 		this->lowerDeck->onChange += rebuildCallback;
 
-		this->upperDeck->rotate(180, 0, 1, 0);
+		this->lowerDeck->rotateDeg(180, 0, 1, 0);
 		this->upperDeck->setPosition({ 0, 1, 0 });
 		this->upperDeck->diameter.set(0.7f);
 
 		this->add(*this->upperDeck);
 		this->add(*this->lowerDeck);
+		this->add(this->weight);
 
 		// Init system other parts
 		{
@@ -191,54 +204,56 @@ namespace Data
 				this->system.bodies[actuator->value.getName()] = actuator;
 			}
 
-			// Connect joints
-			auto connectActuator = [this](int actuatorIndex, const std::string& lowerJoint, const std::string& upperJoint)
+			// Connect joints on actuators
 			{
-				const auto actuatorName = this->actuators.actuators[actuatorIndex]->value.getName();
-				this->system.jointConnections.push_back(
-					{
+				auto connectActuator = [this](int actuatorIndex, const std::string& lowerJoint, const std::string& upperJoint)
+				{
+					const auto actuatorName = this->actuators.actuators[actuatorIndex]->value.getName();
+					this->system.jointConnections.push_back(
 						{
-							actuatorName
-							, "lower"
+							{
+								actuatorName
+								, "lower"
+							}
+							, {
+								this->lowerDeck->getName()
+								, lowerJoint
+							}
 						}
-						, {
-							this->lowerDeck->getName()
-							, lowerJoint
-						}
-					}
-				);
-				this->system.jointConnections.push_back(
-					{
+					);
+					this->system.jointConnections.push_back(
 						{
-							actuatorName
-							, "upper"
+							{
+								actuatorName
+								, "upper"
+							}
+							, {
+								this->upperDeck->getName()
+								, upperJoint
+							}
 						}
-						, {
-							this->upperDeck->getName()
-							, upperJoint
-						}
-					}
-				);
-			};
+					);
+				};
 
-			connectActuator(0, "A1", "B2");
-			connectActuator(1, "A2", "C1");
-			connectActuator(2, "B1", "C2");
-			connectActuator(3, "B2", "A1");
-			connectActuator(4, "C1", "A2");
-			connectActuator(5, "C2", "B1");
+				connectActuator(0, "A1", "B2");
+				connectActuator(1, "A2", "C1");
+				connectActuator(2, "B1", "C2");
+				connectActuator(3, "B2", "A1");
+				connectActuator(4, "C1", "A2");
+				connectActuator(5, "C2", "B1");
+			}
 
 			// Add ground support (additional joint + set it as ground support)
-			this->lowerDeck->joints["Ground"].position = glm::vec3();
-			this->system.groundSupports.push_back({
-				{
-					this->lowerDeck->getName()
-					, "Ground"
-				}
-				});
+			{
+				this->lowerDeck->joints["Ground"].position = glm::vec3();
+				this->system.groundSupports.push_back({
+					{
+						this->lowerDeck->getName()
+						, "Ground"
+					}
+					});
+			}
 		}
-
-		this->rebuild();
 	}
 
 	//----------
@@ -247,6 +262,10 @@ namespace Data
 	{
 		this->upperDeck->update();
 		this->lowerDeck->update();
+
+		if (this->weight.isDirty) {
+			this->rebuildWeight();
+		}
 
 		if (this->isDirty)
 		{
@@ -293,5 +312,14 @@ namespace Data
 		}
 
 		this->isDirty = false;
+	}
+
+	//----------
+	void
+		StewartPlatform::rebuildWeight()
+	{
+		this->upperDeck->loads["Weight"].position.z = this->weight.offset;
+		this->upperDeck->loads["Weight"].force.y = this->weight.mass * -9.81;
+		this->weight.isDirty = false;
 	}
 }

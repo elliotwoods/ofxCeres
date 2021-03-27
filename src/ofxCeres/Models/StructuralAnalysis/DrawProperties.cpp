@@ -26,6 +26,7 @@ namespace ofxCeres {
 				widgets->addSlider(this->arrowHeadSize);
 				widgets->addToggle(this->jointLabels);
 				widgets->addToggle(this->loadLabels);
+				widgets->addToggle(this->magnitudes);
 			}
 #endif
 

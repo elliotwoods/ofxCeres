@@ -75,6 +75,8 @@ namespace Data
 		{
 			ofParameter<float> offset{ "Offset [m]", 0.5f, -1.0f, 1.0f };
 			ofParameter<float> mass{ "Mass [kg]", 150, 0, 300 };
+
+			bool isDirty = true;
 			PARAM_DECLARE("Weight", offset, mass);
 		} weight;
 
@@ -83,14 +85,18 @@ namespace Data
 		void customDraw() override;
 		
 		void markDirty();
-	protected:
-		SA::System system;
 
-		void rebuild();
-		bool isDirty = true;
+		void solveForces();
+
+		SA::System system;
 
 		std::shared_ptr<Deck> upperDeck;
 		std::shared_ptr<Deck> lowerDeck;
+
+	protected:
+		void rebuild();
+		void rebuildWeight();
+		bool isDirty = true;
 
 		struct {
 			float jointAngleOffsetUpper; /// offset from joints coinciding in radians

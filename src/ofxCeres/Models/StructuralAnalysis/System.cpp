@@ -49,15 +49,20 @@ namespace ofxCeres {
 
 								auto force = joint.second.force;
 								if (force.length() != 0) {
+									auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
+
 									ofPushStyle();
 									{
 #ifdef HAS_OFXCVGUI
 										ofSetColor(DrawProperties::X().scalarToColor(glm::length(force)));
 #endif
-										auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
 										ofDrawArrow(position, arrowEnd, DrawProperties::X().arrowHeadSize);
 									}
 									ofPopStyle();
+
+									if (DrawProperties::X().magnitudes) {
+										ofDrawBitmapString(ofToString(glm::length(force)), arrowEnd);
+									}
 								}
 
 								if (DrawProperties::X().jointLabels) {
@@ -79,15 +84,20 @@ namespace ofxCeres {
 
 								auto force = load.second.force;
 								if (force.length() != 0) {
+									auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
+
 									ofPushStyle();
 									{
 #ifdef HAS_OFXCVGUI
 										ofSetColor(DrawProperties::X().scalarToColor(glm::length(force)));
 #endif
-										auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
 										ofDrawArrow(position, arrowEnd, DrawProperties::X().arrowHeadSize);
 									}
 									ofPopStyle();
+
+									if (DrawProperties::X().magnitudes) {
+										ofDrawBitmapString(ofToString(glm::length(force)), arrowEnd);
+									}
 								}
 
 								if (DrawProperties::X().loadLabels) {
