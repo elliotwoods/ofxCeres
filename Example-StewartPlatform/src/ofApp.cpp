@@ -31,8 +31,9 @@ void ofApp::setup() {
 			{
 				auto& camera = this->worldPanel->getCamera();
 				camera.setCursorDrawEnabled(true);
-				camera.setPosition({ 0, 5, 5 });
-				camera.lookAt({ 0, 0, 0 });
+				camera.setPosition({ 3, 3, 3 });
+				camera.lookAt({ 0, 0.5, 0 });
+				camera.setFov(20);
 			}
 
 			this->worldPanel->onDraw += [this](ofxCvGui::DrawArguments& args) {

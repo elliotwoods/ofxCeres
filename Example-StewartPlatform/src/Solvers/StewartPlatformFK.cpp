@@ -18,14 +18,19 @@ struct StewartPlatformFKCost
 	{
 		const auto vectors = (glm::tvec3<T> *) parameters;
 		const auto& translation = vectors[0];
-		const auto& rotationVector = vectors[1];
+		auto rotationVector = vectors[1];
+
+		rotationVector.x = DEG_TO_RAD * rotationVector.x;
+		rotationVector.y = DEG_TO_RAD * rotationVector.y;
+		rotationVector.z = DEG_TO_RAD * rotationVector.z;
 
 		auto transform = ofxCeres::VectorMath::createTransform(translation, rotationVector);
 
 		for (int i = 0; i < 6; i++)
 		{
-			const auto upperJoint_ = ofxCeres::VectorMath::applyTransform(transform, (glm::tvec3<T>) this->upperDeckJoints[i]);
-			const auto actuatorLength_ = glm::distance(upperJoint_, (glm::tvec3<T>) this->lowerDeckJoints[i]);
+			const auto upperJoint_ = ofxCeres::VectorMath::applyTransform(transform, (glm::tvec3<T>) this->upperDeckJointsLocal[i]);
+			const auto lowerJoint = (glm::tvec3<T>) this->lowerDeckJoints[i];
+			const auto actuatorLength_ = glm::distance(upperJoint_, lowerJoint);
 			const auto delta = actuatorLength_ - this->actuatorLengths[i];
 			residuals[i] = delta * delta;
 		}
@@ -47,7 +52,7 @@ struct StewartPlatformFKCost
 				actuator->value.getName()
 				, "lower"
 					});
-				newCostFunction->lowerDeckJoints[i] = stewartPlatform.system.bodies[connectedJointAddress.bodyName]->joints.at(connectedJointAddress.jointName).position;
+				newCostFunction->lowerDeckJoints[i] = stewartPlatform.system.bodies[connectedJointAddress.bodyName]->getJointPosition(connectedJointAddress.jointName);
 			}
 
 			{
@@ -55,7 +60,7 @@ struct StewartPlatformFKCost
 				actuator->value.getName()
 				, "upper"
 					});
-				newCostFunction->upperDeckJoints[i] = stewartPlatform.system.bodies[connectedJointAddress.bodyName]->joints.at(connectedJointAddress.jointName).position;
+				newCostFunction->upperDeckJointsLocal[i] = stewartPlatform.system.bodies[connectedJointAddress.bodyName]->joints.at(connectedJointAddress.jointName).position;
 			}
 
 			newCostFunction->actuatorLengths[i] = (double) actuator->value.get();
@@ -68,7 +73,7 @@ struct StewartPlatformFKCost
 
 	double actuatorLengths[6];
 	glm::vec3 lowerDeckJoints[6];
-	glm::vec3 upperDeckJoints[6];
+	glm::vec3 upperDeckJointsLocal[6];
 
 	Data::StewartPlatform& stewartPlatform;
 };
@@ -131,8 +136,6 @@ namespace Solvers
 			stewartPlatform.transform.rotate.x.set(parameters[3]);
 			stewartPlatform.transform.rotate.x.set(parameters[4]);
 			stewartPlatform.transform.rotate.x.set(parameters[5]);
-
-			stewartPlatform.markDirty();
 
 			// Construct and return result
 			{

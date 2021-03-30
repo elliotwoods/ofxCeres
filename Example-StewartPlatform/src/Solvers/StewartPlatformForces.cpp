@@ -14,13 +14,20 @@ struct StewartPlatformForcesCost
 	void
 		getParameters(double * parameters) const
 	{
+		auto globalToLocal = glm::inverse(this->stewartPlatform.upperDeck->getOrientationQuat());
+
 		// get forces acting on upper deck
 		for (int i = 0; i < 6; i++) {
 			auto actuator = this->stewartPlatform.actuators.actuators[i];
 
 			// Get direction of actuator in world coords
-			auto direction = actuator->getJointPosition("upper") - actuator->getJointPosition("lower");
-			direction /= glm::length(direction);
+			auto directionLocal = actuator->getJointPosition("upper") - actuator->getJointPosition("lower");
+
+			//Move direction into upperDeck space 
+			directionLocal = globalToLocal * directionLocal;
+
+			// Normalise direction
+			directionLocal /= glm::length(directionLocal);
 
 			// Find joint which force is applied to
 			auto connectedJointAddress = this->stewartPlatform.system.findConnectedJoint({
@@ -28,7 +35,8 @@ struct StewartPlatformForcesCost
 				, "upper"
 				});
 
-			parameters[i] = glm::dot(this->stewartPlatform.upperDeck->joints[connectedJointAddress.jointName].force, direction);
+			
+			parameters[i] = glm::dot(this->stewartPlatform.upperDeck->joints[connectedJointAddress.jointName].force, directionLocal);
 		}
 	}
 
@@ -36,12 +44,19 @@ struct StewartPlatformForcesCost
 	void
 		applyParameters(typename SA::TSystem<T>::Body& upperDeck, const T* parameters) const
 	{
+		auto globalToLocal = glm::inverse(this->stewartPlatform.upperDeck->getOrientationQuat());
+
 		// Update forces acting on upper deck
 		for (int i = 0; i < 6; i++) {
 			auto actuator = this->stewartPlatform.actuators.actuators[i];
 
 			// Get direction of actuator in world coords
 			auto direction = actuator->getJointPosition("upper") - actuator->getJointPosition("lower");
+
+			//Move direction into upperDeck space 
+			direction = globalToLocal * direction;
+
+			// Normalise direction
 			direction /= glm::length(direction);
 
 			// Find joint which force is applied to

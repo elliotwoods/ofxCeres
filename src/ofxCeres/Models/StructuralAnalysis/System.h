@@ -27,6 +27,7 @@ namespace ofxCeres {
 				struct Load {
 					glm::vec3 position;
 					glm::vec3 force;
+					bool isGlobalOrientation = true; /// e.g. Gravity direction is not affected by body rotations
 				};
 
 				struct JointAddress {

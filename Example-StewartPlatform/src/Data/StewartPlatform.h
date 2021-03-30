@@ -86,7 +86,7 @@ namespace Data
 		void update();
 		void customDraw() override;
 		
-		void markDirty();
+		void markNeedsRebuild();
 
 		void solveForces();
 		void solveIK();
@@ -118,14 +118,18 @@ namespace Data
 		} transform;
 
 		struct : ofParameterGroup {
-			ofParameter<bool> solveWhenDirty{ "Solve when dirty", true };
-			PARAM_DECLARE("Options", solveWhenDirty);
-		} options;
+			ofParameter<bool> forcesWhenRebuild{ "Forces when rebuild", true };
+			ofParameter<bool> IKWhenRebuild{ "IK when rebuild", true };
+			ofParameter<bool> FKWhenActuatorChange{ "FK when actuator change", true };
+			PARAM_DECLARE("Solve", forcesWhenRebuild, IKWhenRebuild, FKWhenActuatorChange);
+		} solveOptions;
 
 	protected:
-		void rebuild();
+		void rebuild(bool allowIKSolve);
 		void rebuildWeight();
-		bool isDirty = true;
+
+		bool needsRebuild = true;
+		bool needsFKSolve = false;
 
 		struct {
 			float jointAngleOffsetUpper; /// offset from joints coinciding in radians

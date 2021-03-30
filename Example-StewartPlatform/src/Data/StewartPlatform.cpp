@@ -97,6 +97,7 @@ namespace Data
 	void
 		StewartPlatform::solveFK()
 	{
+
 		{
 			auto solverSettings = Solvers::StewartPlatformForces::defaultSolverSettings();
 			{
@@ -112,6 +113,12 @@ namespace Data
 			}
 			auto result = Solvers::StewartPlatformFK::solve(*this, true, solverSettings);
 		}
+
+		// Clear a flag which might get set to stop infinite loop
+		this->needsFKSolve = false;
+
+		// Rebuild but don't IK
+		this->rebuild(false);
 	}
 
 	//----------
@@ -218,7 +225,7 @@ namespace Data
 	StewartPlatform::StewartPlatform()
 	{
 		auto rebuildCallback = [this]() {
-			this->markDirty();
+			this->markNeedsRebuild();
 		};
 
 		this->upperDeck = std::make_shared<Deck>();
@@ -235,7 +242,11 @@ namespace Data
 		initDeck(lowerDeck, "Lower deck");
 
 
-		this->actuators.onValueChange += rebuildCallback;
+		this->actuators.onValueChange += [this]() {
+			if (this->solveOptions.FKWhenActuatorChange) {
+				this->needsFKSolve = true;
+			}
+		};
 		this->upperDeck->onChange += rebuildCallback;
 		this->lowerDeck->onChange += rebuildCallback;
 
@@ -243,7 +254,7 @@ namespace Data
 		this->upperDeck->setPosition({ 0, 1, 0 });
 		this->upperDeck->diameter.set(0.7f);
 
-		this->add(this->options);
+		this->add(this->solveOptions);
 		this->add(*this->upperDeck);
 		this->add(*this->lowerDeck);
 		this->add(this->weight);
@@ -312,7 +323,7 @@ namespace Data
 		// Listen for transform change
 		{
 			auto transformChangeCallback = [this](float&) {
-				this->markDirty();
+				this->markNeedsRebuild();
 			};
 			this->transform.translate.changeListenerX = this->transform.translate.x.newListener(transformChangeCallback);
 			this->transform.translate.changeListenerY = this->transform.translate.y.newListener(transformChangeCallback);
@@ -339,25 +350,20 @@ namespace Data
 		this->upperDeck->update();
 		this->lowerDeck->update();
 
-		bool change = false;
+		bool needsRebuild = false;
 		if (this->weight.isDirty)
 		{
 			this->rebuildWeight();
-			change = true;
 		}
 
-		if (this->isDirty)
+		if (this->needsRebuild)
 		{
-			this->rebuild();
-			change = true;
+			this->rebuild(true);
 		}
 
-		if (change)
+		if (this->needsFKSolve)
 		{
-			if (this->options.solveWhenDirty)
-			{
-				this->solveForces();
-			}
+			this->solveFK();
 		}
 	}
 
@@ -370,14 +376,14 @@ namespace Data
 
 	//----------
 	void
-		StewartPlatform::markDirty()
+		StewartPlatform::markNeedsRebuild()
 	{
-		this->isDirty = true;
+		this->needsRebuild = true;
 	}
 
 	//----------
 	void
-		StewartPlatform::rebuild()
+		StewartPlatform::rebuild(bool allowIKSolve)
 	{
 		// Update the upper deck transform
 		{
@@ -415,7 +421,20 @@ namespace Data
 			actuator->joints["upper"].position = upperPosition - lowerPosition;
 		}
 
-		this->isDirty = false;
+		// Clear all forces (they will be invalid now)
+		for (auto & joint : this->upperDeck->joints) {
+			joint.second.force = glm::vec3(0, 0, 0);
+		}
+
+		if (this->solveOptions.IKWhenRebuild && allowIKSolve) {
+			this->solveIK();
+		}
+		if (this->solveOptions.forcesWhenRebuild) {
+			this->solveForces();
+		}
+		
+
+		this->needsRebuild = false;
 	}
 
 	//----------
@@ -425,5 +444,6 @@ namespace Data
 		this->upperDeck->loads["Weight"].position.z = this->weight.offset;
 		this->upperDeck->loads["Weight"].force.y = this->weight.mass * -9.81;
 		this->weight.isDirty = false;
+		this->markNeedsRebuild();
 	}
 }

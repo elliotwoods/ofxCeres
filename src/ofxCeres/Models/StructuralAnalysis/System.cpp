@@ -90,6 +90,11 @@ namespace ofxCeres {
 								ofPopMatrix();
 
 								auto force = load.second.force;
+
+								if (load.second.isGlobalOrientation) {
+									// Rotate force into world space
+									force = glm::inverse(body.second->getOrientationQuat()) * force;
+								}
 								if (force != glm::vec3(0, 0, 0)) {
 									auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
 									auto forceColor = DrawProperties::X().scalarToColor(glm::length(force));

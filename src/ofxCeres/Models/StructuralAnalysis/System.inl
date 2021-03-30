@@ -56,11 +56,18 @@ namespace ofxCeres {
 			//----------
 			template<typename T>
 			T TSystem<T>::Body::getForceError() const {
-				glm::tvec3<T> total{ 0, 0, 0 };
+				glm::tvec3<T> total{ 0, 0, 0 }; // Local orientation frame
+
+				auto bodyInverseRotation = glm::inverse(this->getGlobalOrientation());
 
 				for (const auto & loadIt : this->loads) {
-					total += loadIt.second.force;
+					auto force = loadIt.second.force;
+					if (loadIt.second.isGlobalOrientation) {
+						force = bodyInverseRotation * force;
+					}
+					total += force;
 				}
+
 				for (const auto & jointIt : this->joints) {
 					total += jointIt.second.force;
 				}
@@ -71,10 +78,16 @@ namespace ofxCeres {
 			//----------
 			template<typename T>
 			T TSystem<T>::Body::getTorqueError() const {
-				glm::tvec3<T> total{ 0, 0, 0 };
+				glm::tvec3<T> total{ 0, 0, 0 }; // Local orientation frame
+
+				auto bodyInverseRotation = glm::inverse(this->getGlobalOrientation());
 
 				for (const auto & loadIt : this->loads) {
-					total += glm::cross(loadIt.second.position, loadIt.second.force);
+					auto force = loadIt.second.force;
+					if (loadIt.second.isGlobalOrientation) {
+						force = bodyInverseRotation * force;
+					}
+					total += glm::cross(loadIt.second.position, force);
 				}
 				for (const auto & jointIt : this->joints) {
 					total += glm::cross((glm::tvec3<T>) jointIt.second.position, jointIt.second.force);
