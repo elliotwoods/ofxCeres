@@ -81,15 +81,34 @@ void ofApp::repopulateWidgets() {
 	inspector->addFps();
 	inspector->addMemoryUsage();
 	SA::DrawProperties::X().populateInspector(inspector);
+
+	auto drawSolved = [](const ofxCvGui::DrawArguments& drawArgs, bool solved) {
+		ofPushStyle();
+		if (solved) {
+			ofFill();
+		}
+		else {
+			ofNoFill();
+		}
+		ofDrawCircle(20
+			, drawArgs.localBounds.height / 2.0f
+			, 7.0f);
+		ofPopStyle();
+	};
+
 	inspector->addButton("Solve forces", [this]() {
 		this->solve();
-		});
+		})->onDraw += [this, drawSolved](const ofxCvGui::DrawArguments & drawArgs) {
+			drawSolved(drawArgs, this->stewartPlatform.isForcesSolved());
+		};
 	inspector->addButton("Solve IK", [this]() {
 		this->stewartPlatform.solveIK();
 		});
 	inspector->addButton("Solve FK", [this]() {
 		this->stewartPlatform.solveFK();
-		});
+		})->onDraw += [this, drawSolved](const ofxCvGui::DrawArguments& drawArgs) {
+			drawSolved(drawArgs, this->stewartPlatform.isFKSolved());
+		};
 
 
 	inspector->addParameterGroup(this->stewartPlatform);

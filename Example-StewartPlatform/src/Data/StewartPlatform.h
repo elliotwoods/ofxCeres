@@ -87,10 +87,15 @@ namespace Data
 		void customDraw() override;
 		
 		void markNeedsRebuild();
+		void markNeedsFKSolve();
+		void markNeedsForceSolve();
 
 		void solveForces();
 		void solveIK();
 		void solveFK();
+
+		bool isForcesSolved() const;
+		bool isFKSolved() const;
 
 		SA::System system;
 
@@ -107,9 +112,9 @@ namespace Data
 			} translate;
 			
 			struct : ofParameterGroup {
-				ofParameter<float> x{ "X", 0, -90, 90 };
-				ofParameter<float> y{ "Y", 0, -90, 90 };
-				ofParameter<float> z{ "Z", 0, -90, 90 };
+				ofParameter<float> x{ "X", 0, -180, 180 };
+				ofParameter<float> y{ "Y", 0, -180, 180 };
+				ofParameter<float> z{ "Z", 0, -180, 180 };
 				ofEventListener changeListenerX, changeListenerY, changeListenerZ;
 				PARAM_DECLARE("Rotate", x, y, z);
 			} rotate;
@@ -118,10 +123,10 @@ namespace Data
 		} transform;
 
 		struct : ofParameterGroup {
-			ofParameter<bool> forcesWhenRebuild{ "Forces when rebuild", true };
+			ofParameter<bool> forcesWhenDirty{ "Forces when dirty", true };
 			ofParameter<bool> IKWhenRebuild{ "IK when rebuild", true };
 			ofParameter<bool> FKWhenActuatorChange{ "FK when actuator change", true };
-			PARAM_DECLARE("Solve", forcesWhenRebuild, IKWhenRebuild, FKWhenActuatorChange);
+			PARAM_DECLARE("Solve", forcesWhenDirty, IKWhenRebuild, FKWhenActuatorChange);
 		} solveOptions;
 
 	protected:
@@ -130,6 +135,10 @@ namespace Data
 
 		bool needsRebuild = true;
 		bool needsFKSolve = false;
+		bool needsForceSolve = false;
+
+		bool forcesSolved = false;
+		bool fkSolved = false;
 
 		struct {
 			float jointAngleOffsetUpper; /// offset from joints coinciding in radians

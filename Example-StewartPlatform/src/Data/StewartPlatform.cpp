@@ -75,6 +75,10 @@ namespace Data
 #endif
 			}
 			auto result = Solvers::StewartPlatformForces::solve(*this, true, solverSettings);
+			this->forcesSolved = result.success;
+			if (result.success) {
+				this->needsForceSolve = false;
+			}
 		}
 	}
 
@@ -112,13 +116,28 @@ namespace Data
 #endif
 			}
 			auto result = Solvers::StewartPlatformFK::solve(*this, true, solverSettings);
+			this->fkSolved = result.success;
+			if (result.success) {
+				this->needsFKSolve = false;
+			}
 		}
-
-		// Clear a flag which might get set to stop infinite loop
-		this->needsFKSolve = false;
 
 		// Rebuild but don't IK
 		this->rebuild(false);
+	}
+
+	//----------
+	bool
+		StewartPlatform::isForcesSolved() const
+	{
+		return this->forcesSolved;
+	}
+
+	//----------
+	bool
+		StewartPlatform::isFKSolved() const
+	{
+		return this->fkSolved;
 	}
 
 	//----------
@@ -365,6 +384,16 @@ namespace Data
 		{
 			this->solveFK();
 		}
+
+		if (!this->forcesSolved && this->solveOptions.forcesWhenDirty)
+		{
+			this->needsForceSolve = true;
+		}
+
+		if (this->needsForceSolve)
+		{
+			this->solveForces();
+		}
 	}
 
 	//----------
@@ -379,6 +408,22 @@ namespace Data
 		StewartPlatform::markNeedsRebuild()
 	{
 		this->needsRebuild = true;
+	}
+
+	//----------
+	void
+		StewartPlatform::markNeedsFKSolve()
+	{
+		this->needsFKSolve = true;
+		this->fkSolved = false;
+	}
+
+	//----------
+	void
+		StewartPlatform::markNeedsForceSolve()
+	{
+		this->needsForceSolve = true;
+		this->forcesSolved = false;
 	}
 
 	//----------
@@ -426,13 +471,12 @@ namespace Data
 			joint.second.force = glm::vec3(0, 0, 0);
 		}
 
+		this->fkSolved = false;
+		this->forcesSolved = false;
+
 		if (this->solveOptions.IKWhenRebuild && allowIKSolve) {
 			this->solveIK();
 		}
-		if (this->solveOptions.forcesWhenRebuild) {
-			this->solveForces();
-		}
-		
 
 		this->needsRebuild = false;
 	}
