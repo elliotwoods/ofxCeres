@@ -80,10 +80,16 @@ void ofApp::repopulateWidgets() {
 	inspector->addFps();
 	inspector->addMemoryUsage();
 	SA::DrawProperties::X().populateInspector(inspector);
-	inspector->addButton("Solve", [this]() {
+	inspector->addButton("Solve forces", [this]() {
 		this->solve();
-		}, OF_KEY_RETURN)->setHeight(100.0f);
-	
+		});
+	inspector->addButton("Solve IK", [this]() {
+		this->stewartPlatform.solveIK();
+		});
+	inspector->addButton("Solve FK", [this]() {
+		this->stewartPlatform.solveFK();
+		});
+
 
 	inspector->addParameterGroup(this->stewartPlatform);
 }

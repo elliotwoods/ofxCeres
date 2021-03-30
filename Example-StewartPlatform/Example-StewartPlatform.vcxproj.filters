@@ -10,6 +10,9 @@
     <ClCompile Include="src\Solvers\StewartPlatformForces.cpp">
       <Filter>Solvers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Solvers\StewartPlatformFK.cpp">
+      <Filter>Solvers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h" />
@@ -19,6 +22,9 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="src\Solvers\StewartPlatformForces.h">
+      <Filter>Solvers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Solvers\StewartPlatformFK.h">
       <Filter>Solvers</Filter>
     </ClInclude>
   </ItemGroup>

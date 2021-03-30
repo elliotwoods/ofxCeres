@@ -1,6 +1,8 @@
 #include "pch_ofApp.h"
 #include "StewartPlatform.h"
 #include "Solvers/StewartPlatformForces.h"
+#include "Solvers/StewartPlatformFK.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace Data
 {
@@ -59,8 +61,57 @@ namespace Data
 	void
 		StewartPlatform::solveForces()
 	{
-		auto result = Solvers::StewartPlatformForces::solve(*this);
-		//auto result = this->system.solve<12, 1>();
+		{
+			auto solverSettings = Solvers::StewartPlatformForces::defaultSolverSettings();
+			{
+				solverSettings.options.function_tolerance = 0.0f;
+				solverSettings.options.max_num_iterations = 1000;
+#ifdef _DEBUG
+				//solverSettings.printReport = true;
+				//solverSettings.options.minimizer_progress_to_stdout = true;
+#else
+				solverSettings.printReport = false;
+				solverSettings.options.minimizer_progress_to_stdout = false;
+#endif
+			}
+			auto result = Solvers::StewartPlatformForces::solve(*this, true, solverSettings);
+		}
+	}
+
+	//----------
+	void
+		StewartPlatform::solveIK()
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			auto actuator = this->actuators.actuators[i];
+			auto upperPosition = actuator->getJointPosition("upper");
+			auto lowerPosition = actuator->getJointPosition("lower");
+
+			//Update the length
+			actuator->value.set(glm::distance(upperPosition, lowerPosition));
+		}
+	}
+
+	//----------
+	void
+		StewartPlatform::solveFK()
+	{
+		{
+			auto solverSettings = Solvers::StewartPlatformForces::defaultSolverSettings();
+			{
+				solverSettings.options.function_tolerance = 0.0f;
+				solverSettings.options.max_num_iterations = 1000;
+#ifdef _DEBUG
+				//solverSettings.printReport = true;
+				//solverSettings.options.minimizer_progress_to_stdout = true;
+#else
+				solverSettings.printReport = false;
+				solverSettings.options.minimizer_progress_to_stdout = false;
+#endif
+			}
+			auto result = Solvers::StewartPlatformFK::solve(*this, true, solverSettings);
+		}
 	}
 
 	//----------
@@ -192,9 +243,12 @@ namespace Data
 		this->upperDeck->setPosition({ 0, 1, 0 });
 		this->upperDeck->diameter.set(0.7f);
 
+		this->add(this->options);
 		this->add(*this->upperDeck);
 		this->add(*this->lowerDeck);
 		this->add(this->weight);
+		this->add(this->transform);
+		this->add(this->actuators);
 
 		// Init system other parts
 		{
@@ -254,6 +308,28 @@ namespace Data
 					});
 			}
 		}
+
+		// Listen for transform change
+		{
+			auto transformChangeCallback = [this](float&) {
+				this->markDirty();
+			};
+			this->transform.translate.changeListenerX = this->transform.translate.x.newListener(transformChangeCallback);
+			this->transform.translate.changeListenerY = this->transform.translate.y.newListener(transformChangeCallback);
+			this->transform.translate.changeListenerZ = this->transform.translate.z.newListener(transformChangeCallback);
+			this->transform.rotate.changeListenerX = this->transform.rotate.x.newListener(transformChangeCallback);
+			this->transform.rotate.changeListenerY = this->transform.rotate.y.newListener(transformChangeCallback);
+			this->transform.rotate.changeListenerZ = this->transform.rotate.z.newListener(transformChangeCallback);
+		}
+
+		// Listen for weight change
+		{
+			auto weightChangeCallback = [this](float&) {
+				this->weight.isDirty = true;
+			};
+			this->weight.offsetListener = this->weight.offset.newListener(weightChangeCallback);
+			this->weight.massListener = this->weight.mass.newListener(weightChangeCallback);
+		}
 	}
 
 	//----------
@@ -263,13 +339,25 @@ namespace Data
 		this->upperDeck->update();
 		this->lowerDeck->update();
 
-		if (this->weight.isDirty) {
+		bool change = false;
+		if (this->weight.isDirty)
+		{
 			this->rebuildWeight();
+			change = true;
 		}
 
 		if (this->isDirty)
 		{
 			this->rebuild();
+			change = true;
+		}
+
+		if (change)
+		{
+			if (this->options.solveWhenDirty)
+			{
+				this->solveForces();
+			}
 		}
 	}
 
@@ -291,6 +379,22 @@ namespace Data
 	void
 		StewartPlatform::rebuild()
 	{
+		// Update the upper deck transform
+		{
+			const auto translation = glm::vec3(this->transform.translate.x.get()
+				, this->transform.translate.y.get()
+				, this->transform.translate.z.get());
+
+			const auto rotationVector = glm::vec3(this->transform.rotate.x.get() * DEG_TO_RAD
+				, this->transform.rotate.y.get() * DEG_TO_RAD
+				, this->transform.rotate.z.get() * DEG_TO_RAD);
+
+			const auto orientation = ofxCeres::VectorMath::eulerToQuat(rotationVector);
+
+			this->upperDeck->setOrientation(orientation);
+			this->upperDeck->setPosition(translation);
+		}
+
 		// Update the joint positions on actuators + set the actuator position to its lower position
 		for (auto actuator : this->actuators.actuators)
 		{

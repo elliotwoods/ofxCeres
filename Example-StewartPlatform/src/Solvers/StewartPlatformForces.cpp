@@ -64,10 +64,8 @@ struct StewartPlatformForcesCost
 		this->applyParameters(upperDeckTyped, parameters);
 
 		// Calculate residual
-		auto& residual = residuals[0];
-		residual = (T)0;
-		residual += upperDeckTyped.getForceError();
-		residual += upperDeckTyped.getTorqueError();
+		residuals[0] = upperDeckTyped.getForceError();
+		residuals[1] = upperDeckTyped.getTorqueError();
 
 		return true;
 	}
@@ -75,7 +73,7 @@ struct StewartPlatformForcesCost
 	static ceres::CostFunction* 
 		Create(Data::StewartPlatform & stewartPlatform)
 	{
-		return new ceres::AutoDiffCostFunction<StewartPlatformForcesCost, 1, 6>(
+		return new ceres::AutoDiffCostFunction<StewartPlatformForcesCost, 2, 6>(
 			new StewartPlatformForcesCost(stewartPlatform)
 			);
 	}
@@ -100,8 +98,17 @@ namespace Solvers {
 	{
 		try {
 			// Initialise parameters
-			double parameters[7];
+			double parameters[6];
 			StewartPlatformForcesCost(stewartPlatform).getParameters(parameters);
+
+			// Check for NaN's
+			for (int i = 0; i < 6; i++)
+			{
+				if (isnan(parameters[i]))
+				{
+					parameters[i] = 0.0;
+				}
+			}
 
 			ceres::Problem problem;
 			auto costFunction = StewartPlatformForcesCost::Create(stewartPlatform);
@@ -139,7 +146,7 @@ namespace Solvers {
 				StewartPlatformForces::Result result{
 					true
 					, solution
-					, sqrt(summary.final_cost / (double)6)
+					, summary.final_cost
 					, summary
 				};
 				return result;

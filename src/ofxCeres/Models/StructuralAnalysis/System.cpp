@@ -3,6 +3,12 @@
 #include "ofMain.h"
 #include "ofxCeres/Exception.h"
 
+#ifdef HAS_OFXCVGUI
+	#define ANNOTATE(text, position, color) ofxCvGui::Utils::AnnotationManager::X().annotate(text, position, color)
+#else
+	#define NNOTATE(text, position, color) ofDrawBitmapString(text, position)
+#endif
+
 namespace ofxCeres {
 	namespace Models {
 		namespace StructuralAnalysis {
@@ -28,7 +34,7 @@ namespace ofxCeres {
 						continue;
 					}
 
-					ofDrawBitmapString(body.first, body.second->getPosition());
+					ANNOTATE(body.first, body.second->getPosition(), ofColor(120, 120, 120));
 					body.second->draw();
 
 					ofPushMatrix();
@@ -48,25 +54,26 @@ namespace ofxCeres {
 
 
 								auto force = joint.second.force;
-								if (force.length() != 0) {
+								if (force != glm::vec3(0, 0, 0)) {
 									auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
+									auto forceColor = DrawProperties::X().scalarToColor(glm::length(force));
 
 									ofPushStyle();
 									{
 #ifdef HAS_OFXCVGUI
-										ofSetColor(DrawProperties::X().scalarToColor(glm::length(force)));
+										ofSetColor(forceColor);
 #endif
 										ofDrawArrow(position, arrowEnd, DrawProperties::X().arrowHeadSize);
 									}
 									ofPopStyle();
 
 									if (DrawProperties::X().magnitudes) {
-										ofDrawBitmapString(ofToString(glm::length(force)), arrowEnd);
+										ANNOTATE(ofToString(glm::length(force)) + "N", arrowEnd, forceColor);
 									}
 								}
 
 								if (DrawProperties::X().jointLabels) {
-									ofDrawBitmapString(joint.first, position);
+									ANNOTATE(joint.first, position, ofColor(80, 80, 80));
 								}
 							}
 						}
@@ -83,25 +90,26 @@ namespace ofxCeres {
 								ofPopMatrix();
 
 								auto force = load.second.force;
-								if (force.length() != 0) {
+								if (force != glm::vec3(0, 0, 0)) {
 									auto arrowEnd = position + force * DrawProperties::X().getScalarToSceneScale();
+									auto forceColor = DrawProperties::X().scalarToColor(glm::length(force));
 
 									ofPushStyle();
 									{
 #ifdef HAS_OFXCVGUI
-										ofSetColor(DrawProperties::X().scalarToColor(glm::length(force)));
+										ofSetColor(forceColor);
 #endif
 										ofDrawArrow(position, arrowEnd, DrawProperties::X().arrowHeadSize);
 									}
 									ofPopStyle();
 
 									if (DrawProperties::X().magnitudes) {
-										ofDrawBitmapString(ofToString(glm::length(force)), arrowEnd);
+										ANNOTATE(ofToString(glm::length(force)) + "N", arrowEnd, forceColor);
 									}
 								}
 
 								if (DrawProperties::X().loadLabels) {
-									ofDrawBitmapString(load.first, position);
+									ANNOTATE(load.first, position, ofColor(80, 80, 80));
 								}
 							}
 						}

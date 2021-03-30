@@ -78,6 +78,8 @@ namespace Data
 
 			bool isDirty = true;
 			PARAM_DECLARE("Weight", offset, mass);
+
+			ofEventListener offsetListener, massListener;
 		} weight;
 
 		StewartPlatform();
@@ -87,11 +89,38 @@ namespace Data
 		void markDirty();
 
 		void solveForces();
+		void solveIK();
+		void solveFK();
 
 		SA::System system;
 
 		std::shared_ptr<Deck> upperDeck;
 		std::shared_ptr<Deck> lowerDeck;
+
+		struct : ofParameterGroup {
+			struct : ofParameterGroup {
+				ofParameter<float> x{ "X", 0, -1, 1 };
+				ofParameter<float> y{ "Y", 1, 0.5, 1.5 };
+				ofParameter<float> z{ "Z", 0, -1, 1 };
+				ofEventListener changeListenerX, changeListenerY, changeListenerZ;
+				PARAM_DECLARE("Translate", x, y, z);
+			} translate;
+			
+			struct : ofParameterGroup {
+				ofParameter<float> x{ "X", 0, -90, 90 };
+				ofParameter<float> y{ "Y", 0, -90, 90 };
+				ofParameter<float> z{ "Z", 0, -90, 90 };
+				ofEventListener changeListenerX, changeListenerY, changeListenerZ;
+				PARAM_DECLARE("Rotate", x, y, z);
+			} rotate;
+
+			PARAM_DECLARE("Transform", translate, rotate);
+		} transform;
+
+		struct : ofParameterGroup {
+			ofParameter<bool> solveWhenDirty{ "Solve when dirty", true };
+			PARAM_DECLARE("Options", solveWhenDirty);
+		} options;
 
 	protected:
 		void rebuild();

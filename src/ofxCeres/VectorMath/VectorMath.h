@@ -80,12 +80,12 @@ namespace ofxCeres {
 			glm::tvec3<T> c(cos(eulerAngles[0] * T(0.5)), cos(eulerAngles[1] * T(0.5)), cos(eulerAngles[2] * T(0.5)));
 			glm::tvec3<T> s(sin(eulerAngles[0] * T(0.5)), sin(eulerAngles[1] * T(0.5)), sin(eulerAngles[2] * T(0.5)));
 
-			glm::tquat<T> result;
-
-			result.w = c.x * c.y * c.z + s.x * s.y * s.z;
-			result.x = s.x * c.y * c.z - c.x * s.y * s.z;
-			result.y = c.x * s.y * c.z + s.x * c.y * s.z;
-			result.z = c.x * c.y * s.z - s.x * s.y * c.z;
+			glm::tquat<T> result{
+				c.x* c.y* c.z + s.x * s.y * s.z
+				, s.x* c.y* c.z - c.x * s.y * s.z
+				, c.x* s.y* c.z + s.x * c.y * s.z
+				, c.x* c.y* s.z - s.x * s.y * c.z
+			};
 
 			return result;
 		}
