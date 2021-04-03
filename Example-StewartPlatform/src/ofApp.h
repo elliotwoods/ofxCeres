@@ -4,6 +4,7 @@
 #include "ofxCvGui.h"
 #include "ofxCeres.h"
 #include "Data/StewartPlatform.h"
+#include "ofxDualSense.h"
 
 #define LAST_SAVE_PATH "lastSave.txt"
 
@@ -40,4 +41,7 @@ public:
 	Data::StewartPlatform stewartPlatform;
 
 	ofParameter<string> lastFilePath{ "Last file path", "" };
+
+	std::vector<std::shared_ptr<ofxDualSense::Controller>> controllers;
+	ofParameter<float> movementSpeed{ "Movement speed [m/s]", 0.1, 0, 1 };
 };

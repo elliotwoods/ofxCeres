@@ -31,8 +31,8 @@ void ofApp::setup() {
 			{
 				auto& camera = this->worldPanel->getCamera();
 				camera.setCursorDrawEnabled(true);
-				camera.setPosition({ 3, 3, 3 });
-				camera.lookAt({ 0, 0.5, 0 });
+				camera.setPosition({ 0, 1, 3 });
+				camera.lookAt({ 0, 0.0, 0 });
 				camera.setFov(20);
 			}
 
@@ -68,10 +68,50 @@ void ofApp::setup() {
 			}
 		}
 	}
+
+
+	// setup controllers
+	{
+		this->controllers = ofxDualSense::Controller::listControllers();
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
+	for (const auto& controller : this->controllers) {
+		controller->update();
+		if (controller->isFrameNew()) {
+			auto inputState = controller->getInputState();
+
+			auto controllerOrientation = glm::angleAxis(
+				(inputState.gyroscope.z + 0.125f) * (float) TWO_PI * 2.0f
+				, glm::vec3(-1, 0, 0));
+			
+			// Translate
+			{
+				auto analogStickLeft = ofxDualSense::applyDeadZone(inputState.analogStickLeft, 0.125f);
+				glm::vec3 translate{
+					analogStickLeft.x
+					, analogStickLeft.y
+					, 0
+				};
+				translate = controllerOrientation * translate;
+				translate *= ofGetLastFrameTime() * this->movementSpeed;
+				this->stewartPlatform.upperDeck->move(translate);
+			}
+
+			// Rotate
+			{
+				auto analogStickRight = ofxDualSense::applyDeadZone(inputState.analogStickRight, 0.125f);
+				auto rotate = glm::rotation(
+					glm::vec3(0, 0, 1)
+					, glm::normalize(glm::vec3(analogStickRight.x, analogStickRight.y, 1)));
+				rotate = controllerOrientation * rotate * glm::inverse(controllerOrientation);
+				rotate = glm::slerp<float>(glm::quat{ 1, 0, 0, 0 }, rotate, ofGetLastFrameTime() * this->movementSpeed);
+				this->stewartPlatform.upperDeck->rotate(rotate);
+			}
+		}
+	}
 	SA::DrawProperties::X().updateMaxScalar();
 	this->stewartPlatform.update();
 }
