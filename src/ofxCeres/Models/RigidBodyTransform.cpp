@@ -84,19 +84,13 @@ namespace ofxCeres {
 						, ofxCeres::VectorMath::createTransform(translation, rotationVector)
 					};
 
-					Result result{
-						true
-						, solution
-					};
+					Result result(summary);
 					return result;
 				}
 			}
 			catch (const Exception & e) {
-				Result result;
-				result.success = false;
-				result.errorMessage = string(e.what());
+				Result result(e);
 				ofLogError("ofxCeres") << result.errorMessage;
-
 				return result;
 			}
 		}

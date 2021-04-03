@@ -18,10 +18,24 @@ namespace Data
 			};
 
 			ofParameter<float> jointSpacing{
-				"Join spacing [m]"
+				"Joint spacing [m]"
 				, 0.1
 				, 0
 				, 1
+			};
+
+			ofParameter<float> rotationOffset{
+				"Rotation Offset [cycles]"
+				, 1.0f / 3.0f
+				, 0
+				, 1
+			};
+
+			ofParameter<float> rotationX{
+				"Rotation X [deg]"
+				, 0
+				, -180
+				, 180
 			};
 
 			ofxLiquidEvent<void> onChange;
@@ -29,10 +43,14 @@ namespace Data
 			Deck();
 			void update();
 			void markDirty();
+			void serialize(nlohmann::json&);
+			void deserialize(const nlohmann::json&);
 		protected:
 			void rebuild();
 			ofEventListener diameterChangeListener;
 			ofEventListener jointSpacingChangeListener;
+			ofEventListener rotationOffsetChangeListener;
+			ofEventListener rotationXChangeListener;
 
 			bool isDirty = true;
 			float jointAngleOffset = 0; // angle between joint and coincident point
@@ -59,6 +77,8 @@ namespace Data
 				Actuator();
 
 				ofParameter<float> value;
+				int framesSinceChange = 10;
+				ofEventListener valueChangeListener;
 			};
 			std::shared_ptr<Actuator> actuators[6];
 
@@ -68,24 +88,26 @@ namespace Data
 
 			ofEventListener maxChangeListener;
 			ofEventListener minChangeListener;
-			ofEventListener valueChangeListener[6];
 		} actuators;
 
 		struct : ofParameterGroup
 		{
-			ofParameter<float> offset{ "Offset [m]", 0.5f, -1.0f, 1.0f };
+			ofParameter<float> offsetY{ "Offset Y [m]", 0.0f, -1.0f, 1.0f };
+			ofParameter<float> offsetZ{ "Offset Z [m]", 0.0f, -1.0f, 1.0f };
 			ofParameter<float> mass{ "Mass [kg]", 150, 0, 300 };
 
 			bool isDirty = true;
-			PARAM_DECLARE("Weight", offset, mass);
+			PARAM_DECLARE("Weight", offsetY, offsetZ, mass);
 
-			ofEventListener offsetListener, massListener;
+			ofEventListener offsetYListener, offsetZListener, massListener;
 		} weight;
 
 		StewartPlatform();
 		void update();
 		void customDraw() override;
-		
+		void serialize(nlohmann::json&);
+		void deserialize(const nlohmann::json&);
+
 		void markNeedsRebuild();
 		void markNeedsFKSolve();
 		void markNeedsForceSolve();
@@ -103,9 +125,11 @@ namespace Data
 		std::shared_ptr<Deck> lowerDeck;
 
 		struct : ofParameterGroup {
+			ofParameter<bool> reset{ "Reset", false };
+
 			struct : ofParameterGroup {
 				ofParameter<float> x{ "X", 0, -1, 1 };
-				ofParameter<float> y{ "Y", 1, 0.5, 1.5 };
+				ofParameter<float> y{ "Y", 1, -1, 1.5 };
 				ofParameter<float> z{ "Z", 0, -1, 1 };
 				ofEventListener changeListenerX, changeListenerY, changeListenerZ;
 				PARAM_DECLARE("Translate", x, y, z);
@@ -119,19 +143,23 @@ namespace Data
 				PARAM_DECLARE("Rotate", x, y, z);
 			} rotate;
 
-			PARAM_DECLARE("Transform", translate, rotate);
+			PARAM_DECLARE("Transform", reset, translate, rotate);
 		} transform;
 
 		struct : ofParameterGroup {
+			ofParameter<bool> printOutput{ "Print output", false };
+			ofParameter<int> maxIterations{ "Max iterations", 50 };
 			ofParameter<bool> forcesWhenDirty{ "Forces when dirty", true };
 			ofParameter<bool> IKWhenRebuild{ "IK when rebuild", true };
 			ofParameter<bool> FKWhenActuatorChange{ "FK when actuator change", true };
-			PARAM_DECLARE("Solve", forcesWhenDirty, IKWhenRebuild, FKWhenActuatorChange);
+			PARAM_DECLARE("Solve", printOutput, maxIterations, forcesWhenDirty, IKWhenRebuild, FKWhenActuatorChange);
 		} solveOptions;
 
 	protected:
+		void resetTransform();
 		void rebuild(bool allowIKSolve);
 		void rebuildWeight();
+		ofxCeres::SolverSettings getDefaultSolverSettings() const;
 
 		bool needsRebuild = true;
 		bool needsFKSolve = false;

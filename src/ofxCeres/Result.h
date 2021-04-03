@@ -2,16 +2,40 @@
 
 #include <string>
 #include <ceres/ceres.h>
+#include "Exception.h"
 
 namespace ofxCeres {
 	template<typename SolutionType, typename ResidualType = float>
 	struct Result {
-		bool success;
-		SolutionType solution;
-		double residual;
+		Result(const ceres::Solver::Summary& summary)
+		: summary(summary) {
+			this->residual = summary.final_cost;
+		}
 
+		Result(const ceres::Solver::Summary& summary, double residual)
+			: summary(summary) {
+			this->residual = residual;
+		}
+
+		Result(const ofxCeres::Exception& exception) {
+			this->isError = true;
+			this->errorMessage = string(exception.what());
+		}
+
+		bool isConverged() const {
+			if (this->isError) {
+				return false;
+			}
+			else {
+				return this->summary.termination_type == ceres::TerminationType::CONVERGENCE;
+			}
+		}
 		ceres::Solver::Summary summary;
+		
+		SolutionType solution;
+		double residual = 0.0;
 
+		bool isError = false;
 		std::string errorMessage;
 	};
 }

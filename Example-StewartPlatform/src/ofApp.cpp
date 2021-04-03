@@ -21,7 +21,7 @@ void ofApp::setup() {
 			this->gui.add(this->stripPanel);
 		}
 
-// Add the panel for drawing 3D world
+		// Add the panel for drawing 3D world
 		{
 			this->worldPanel = ofxCvGui::Panels::makeWorld();
 			this->worldPanel->onDrawWorld += [this](ofCamera&) {
@@ -50,6 +50,23 @@ void ofApp::setup() {
 
 		// Populate the widgets
 		this->repopulateWidgets();
+	}
+
+
+	// load last save
+	{
+		if (ofFile::doesFileExist(LAST_SAVE_PATH)) {
+			std::string filePath;
+			{
+				auto file = ofFile(LAST_SAVE_PATH);
+				file >> filePath;
+				file.close();
+			}
+
+			if (ofFile::doesFileExist(filePath)) {
+				this->load(filePath);
+			}
+		}
 	}
 }
 
@@ -80,6 +97,14 @@ void ofApp::repopulateWidgets() {
 	auto inspector = this->widgetsPanel;
 	inspector->addFps();
 	inspector->addMemoryUsage();
+	inspector->addButton("Load", [this] {
+		this->load();
+	});
+	inspector->addButton("Save", [this] {
+		this->save();
+	});
+	inspector->addLiveValue(this->lastFilePath);
+
 	SA::DrawProperties::X().populateInspector(inspector);
 
 	auto drawSolved = [](const ofxCvGui::DrawArguments& drawArgs, bool solved) {
@@ -112,6 +137,45 @@ void ofApp::repopulateWidgets() {
 
 
 	inspector->addParameterGroup(this->stewartPlatform);
+}
+
+//--------------------------------------------------------------
+void ofApp::load() {
+	auto result = ofSystemLoadDialog("Save configuration");
+	if (result.bSuccess) {
+		this->load(result.filePath);
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::load(const std::string& path) {
+	nlohmann::json json;
+	ofFile file(path, ofFile::ReadOnly);
+	file >> json;
+	file.close();
+	this->stewartPlatform.deserialize(json);
+	this->lastFilePath = path;
+}
+//--------------------------------------------------------------
+void ofApp::save() {
+	auto result = ofSystemSaveDialog("stewartPlatform.json", "Save configuration");
+	if (result.bSuccess) {
+		{
+			nlohmann::json json;
+			this->stewartPlatform.serialize(json);
+			ofFile file(result.filePath, ofFile::WriteOnly);
+			file << json;
+			file.close();
+		}
+		
+		{
+			ofFile file(LAST_SAVE_PATH, ofFile::WriteOnly);
+			file << result.filePath;
+			file.close();
+		}
+
+		this->lastFilePath = result.filePath;
+	}
 }
 
 //--------------------------------------------------------------

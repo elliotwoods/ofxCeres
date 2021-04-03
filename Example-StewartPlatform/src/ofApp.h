@@ -5,6 +5,8 @@
 #include "ofxCeres.h"
 #include "Data/StewartPlatform.h"
 
+#define LAST_SAVE_PATH "lastSave.txt"
+
 class ofApp : public ofBaseApp {
 public:
 	void setup();
@@ -13,6 +15,10 @@ public:
 	void drawWorld();
 	void solve();
 	void repopulateWidgets();
+
+	void load();
+	void load(const std::string &);
+	void save();
 
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -32,4 +38,6 @@ public:
 	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
 
 	Data::StewartPlatform stewartPlatform;
+
+	ofParameter<string> lastFilePath{ "Last file path", "" };
 };

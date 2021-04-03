@@ -141,21 +141,13 @@ namespace ofxCeres {
 						}
 					};
 
-					Result result{
-						true
-						, solution
-						, sqrt(summary.final_cost / (double)size)
-						, summary
-					};
+					Result result(summary, sqrt(summary.final_cost / (double)size));
 					return result;
 				}
 			}
 			catch (const Exception & e) {
-				Result result;
-				result.success = false;
-				result.errorMessage = string(e.what());
+				Result result(e);
 				ofLogError("ofxCeres") << result.errorMessage;
-
 				return result;
 			}
 		}

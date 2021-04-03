@@ -102,8 +102,8 @@ namespace Solvers
 				parameters[1] = (double)stewartPlatform.transform.translate.y.get();
 				parameters[2] = (double)stewartPlatform.transform.translate.z.get();
 				parameters[3] = (double)stewartPlatform.transform.rotate.x.get();
-				parameters[4] = (double)stewartPlatform.transform.rotate.x.get();
-				parameters[5] = (double)stewartPlatform.transform.rotate.x.get();
+				parameters[4] = (double)stewartPlatform.transform.rotate.y.get();
+				parameters[5] = (double)stewartPlatform.transform.rotate.z.get();
 			}
 
 			// Check for NaN's
@@ -134,8 +134,8 @@ namespace Solvers
 			stewartPlatform.transform.translate.y.set(parameters[1]);
 			stewartPlatform.transform.translate.z.set(parameters[2]);
 			stewartPlatform.transform.rotate.x.set(parameters[3]);
-			stewartPlatform.transform.rotate.x.set(parameters[4]);
-			stewartPlatform.transform.rotate.x.set(parameters[5]);
+			stewartPlatform.transform.rotate.y.set(parameters[4]);
+			stewartPlatform.transform.rotate.z.set(parameters[5]);
 
 			// Construct and return result
 			{
@@ -144,21 +144,13 @@ namespace Solvers
 				solution.translation = (glm::vec3)vectors[0];
 				solution.rotationVector = (glm::vec3)vectors[1];
 
-				Result result{
-					true
-					, solution
-					, summary.final_cost
-					, summary
-				};
+				Result result(summary);
 				return result;
 			}
 		}
 		catch (const ofxCeres::Exception& e) {
-			StewartPlatformFK::Result result;
-			result.success = false;
-			result.errorMessage = string(e.what());
+			Result result(e);
 			ofLogError("ofxCeres") << result.errorMessage;
-
 			return result;
 		}
 	}

@@ -158,21 +158,13 @@ namespace Solvers {
 					, parameters
 					, sizeof(double) * 6);
 
-				StewartPlatformForces::Result result{
-					true
-					, solution
-					, summary.final_cost
-					, summary
-				};
+				Result result(summary);
 				return result;
 			}
 		}
 		catch (const ofxCeres::Exception& e) {
-			StewartPlatformForces::Result result;
-			result.success = false;
-			result.errorMessage = string(e.what());
+			Result result(e);
 			ofLogError("ofxCeres") << result.errorMessage;
-
 			return result;
 		}
 	}

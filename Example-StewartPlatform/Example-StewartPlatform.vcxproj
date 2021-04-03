@@ -57,24 +57,28 @@
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxDualSense\ofxDualSenseLib\ofxDualSense.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxDualSense\ofxDualSenseLib\ofxDualSense.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxDualSense\ofxDualSenseLib\ofxDualSense.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxDualSense\ofxDualSenseLib\ofxDualSense.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -222,6 +226,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGuiLib.vcxproj">
       <Project>{6f0ddb4f-4014-4433-919b-9d956c034bad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ofxDualSense\ofxDualSenseLib\ofxDualSense.vcxproj">
+      <Project>{45411e6a-7f70-4659-afa2-c0a3a1c319d3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ofxCeresLib\ofxCeresLib.vcxproj">
       <Project>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</Project>
