@@ -23,11 +23,10 @@ void ofApp::setup() {
 
 		// Add the panel for drawing 3D world
 		{
-			this->worldPanel = ofxCvGui::Panels::makeWorld();
+			this->worldPanel = ofxCvGui::Panels::makeWorldManaged();
 			this->worldPanel->onDrawWorld += [this](ofCamera&) {
 				this->drawWorld();
 			};
-			this->worldPanel->setGridEnabled(false);
 			{
 				auto& camera = this->worldPanel->getCamera();
 				camera.setCursorDrawEnabled(true);
@@ -83,32 +82,49 @@ void ofApp::update() {
 		if (controller->isFrameNew()) {
 			auto inputState = controller->getInputState();
 
+			auto controllerIncline = floor(inputState.gyroscope.z * 8 + 0.5f) / 8;
 			auto controllerOrientation = glm::angleAxis(
-				(inputState.gyroscope.z + 0.125f) * (float) TWO_PI * 2.0f
+				(controllerIncline + 0.125f) * (float) TWO_PI * 2.0f
 				, glm::vec3(-1, 0, 0));
 			
+			bool newTransform = false;
+
 			// Translate
 			{
 				auto analogStickLeft = ofxDualSense::applyDeadZone(inputState.analogStickLeft, 0.125f);
-				glm::vec3 translate{
-					analogStickLeft.x
-					, analogStickLeft.y
-					, 0
-				};
-				translate = controllerOrientation * translate;
-				translate *= ofGetLastFrameTime() * this->movementSpeed;
-				this->stewartPlatform.upperDeck->move(translate);
+				if(glm::length2(analogStickLeft) > 0.0f) {
+					glm::vec3 translate{
+						analogStickLeft.x
+						, analogStickLeft.y
+						, 0
+					};
+					translate = controllerOrientation * translate;
+					translate *= ofGetLastFrameTime() * this->movementSpeed;
+					this->stewartPlatform.upperDeck->move(translate);
+					this->stewartPlatform.markNewTransformMatrix();
+				}
 			}
 
 			// Rotate
 			{
 				auto analogStickRight = ofxDualSense::applyDeadZone(inputState.analogStickRight, 0.125f);
-				auto rotate = glm::rotation(
-					glm::vec3(0, 0, 1)
-					, glm::normalize(glm::vec3(analogStickRight.x, analogStickRight.y, 1)));
-				rotate = controllerOrientation * rotate * glm::inverse(controllerOrientation);
-				rotate = glm::slerp<float>(glm::quat{ 1, 0, 0, 0 }, rotate, ofGetLastFrameTime() * this->movementSpeed);
-				this->stewartPlatform.upperDeck->rotate(rotate);
+				if (glm::length2(analogStickRight) > 0.0f) {
+					auto rotate = glm::rotation(
+						glm::vec3(0, 0, 1)
+						, glm::normalize(glm::vec3(analogStickRight.x, analogStickRight.y, 1)));
+					rotate = controllerOrientation * rotate * glm::inverse(controllerOrientation);
+					rotate = glm::slerp<float>(glm::quat{ 1, 0, 0, 0 }, rotate, ofGetLastFrameTime() * this->movementSpeed);
+					this->stewartPlatform.upperDeck->rotate(rotate);
+					this->stewartPlatform.markNewTransformMatrix();
+				}
+			}
+
+			// Feedback to LED's
+			{
+				ofxDualSense::OutputState outputState;
+				outputState.lightbar = ofColor(255, 0, 0);
+				outputState.lightbar.setHueAngle(controllerIncline * 360.0f + 360.0f);
+				controller->setOutputState(outputState);
 			}
 		}
 	}

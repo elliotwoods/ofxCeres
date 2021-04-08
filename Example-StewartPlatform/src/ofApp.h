@@ -35,7 +35,7 @@ public:
 
 	ofxCvGui::Builder gui;
 	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
-	shared_ptr<ofxCvGui::Panels::World> worldPanel;
+	shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel;
 	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
 
 	Data::StewartPlatform stewartPlatform;
@@ -43,5 +43,5 @@ public:
 	ofParameter<string> lastFilePath{ "Last file path", "" };
 
 	std::vector<std::shared_ptr<ofxDualSense::Controller>> controllers;
-	ofParameter<float> movementSpeed{ "Movement speed [m/s]", 0.1, 0, 1 };
+	ofParameter<float> movementSpeed{ "Movement speed [/s]", 0.1, 0, 1 };
 };

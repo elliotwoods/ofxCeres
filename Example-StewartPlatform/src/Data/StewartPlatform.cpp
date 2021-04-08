@@ -149,6 +149,61 @@ namespace Data
 
 	//----------
 	void
+		StewartPlatform::transformFromParameters()
+	{
+		// Update the upper deck transform
+		const auto translation = glm::vec3(this->transform.translate.x.get()
+			, this->transform.translate.y.get()
+			, this->transform.translate.z.get());
+
+		const auto rotationVector = glm::vec3(this->transform.rotate.x.get() * DEG_TO_RAD
+			, this->transform.rotate.y.get() * DEG_TO_RAD
+			, this->transform.rotate.z.get() * DEG_TO_RAD);
+
+		const auto orientation = ofxCeres::VectorMath::eulerToQuat(rotationVector);
+
+		this->upperDeck->setOrientation(orientation);
+		this->upperDeck->setPosition(translation);
+
+		this->needsRebuild = true;
+		this->needsTransformFromParameters = false;
+	}
+
+	//----------
+	void
+		StewartPlatform::transformToParameters()
+	{
+		auto transform = this->upperDeck->getLocalTransformMatrix();
+
+		glm::vec3 scale, translation, skew;
+		glm::vec4 perspective;
+		glm::quat orientation;
+		glm::decompose(transform
+			, scale
+			, orientation
+			, translation
+			, skew
+			, perspective);
+
+		{
+			this->transform.translate.x = translation.x;
+			this->transform.translate.y = translation.y;
+			this->transform.translate.z = translation.z;
+		}
+
+		{
+			auto eulerAngles = glm::eulerAngles(orientation);
+			this->transform.rotate.x = eulerAngles.x * RAD_TO_DEG;
+			this->transform.rotate.y = eulerAngles.y * RAD_TO_DEG;
+			this->transform.rotate.z = eulerAngles.z * RAD_TO_DEG;
+		}
+
+		this->needsTransformFromParameters = false;
+		this->needsTransformToParameters = false;
+	}
+
+	//----------
+	void
 		StewartPlatform::Deck::rebuild()
 	{
 		this->jointAngleOffset = asin(this->jointSpacing.get() / this->diameter.get());
@@ -307,6 +362,9 @@ namespace Data
 	//----------
 	StewartPlatform::StewartPlatform()
 	{
+#ifdef _DEBUG
+		this->solveOptions.maxIterations.set(50);
+#endif
 		auto rebuildCallback = [this]() {
 			this->markNeedsRebuild();
 		};
@@ -408,7 +466,7 @@ namespace Data
 		// Listen for transform change
 		{
 			auto transformChangeCallback = [this](float&) {
-				this->markNeedsRebuild();
+				this->markNewTransformParameters();
 			};
 			this->transform.translate.changeListenerX = this->transform.translate.x.newListener(transformChangeCallback);
 			this->transform.translate.changeListenerY = this->transform.translate.y.newListener(transformChangeCallback);
@@ -451,6 +509,16 @@ namespace Data
 		if (this->weight.isDirty)
 		{
 			this->rebuildWeight();
+		}
+
+		if (this->needsTransformFromParameters)
+		{
+			this->transformFromParameters();
+		}
+
+		if (this->needsTransformToParameters)
+		{
+			this->transformToParameters();
 		}
 
 		if (this->needsRebuild)
@@ -595,24 +663,24 @@ namespace Data
 
 	//----------
 	void
+		StewartPlatform::markNewTransformMatrix()
+	{
+		this->needsTransformToParameters = true;
+		this->needsRebuild = true;
+	}
+
+	//----------
+	void
+		StewartPlatform::markNewTransformParameters()
+	{
+		this->needsTransformFromParameters = true;
+	}
+
+
+	//----------
+	void
 		StewartPlatform::rebuild(bool allowIKSolve)
 	{
-		// Update the upper deck transform
-		{
-			const auto translation = glm::vec3(this->transform.translate.x.get()
-				, this->transform.translate.y.get()
-				, this->transform.translate.z.get());
-
-			const auto rotationVector = glm::vec3(this->transform.rotate.x.get() * DEG_TO_RAD
-				, this->transform.rotate.y.get() * DEG_TO_RAD
-				, this->transform.rotate.z.get() * DEG_TO_RAD);
-
-			const auto orientation = ofxCeres::VectorMath::eulerToQuat(rotationVector);
-
-			this->upperDeck->setOrientation(orientation);
-			this->upperDeck->setPosition(translation);
-		}
-
 		// Update the joint positions on actuators + set the actuator position to its lower position
 		for (auto actuator : this->actuators.actuators)
 		{

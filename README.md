@@ -14,17 +14,17 @@ Here we exploit the feature of glm whereby all major maths functions are templat
 1. ceres doesn't play nice with swizzle, unions (e.g. x,y,z or r,g,b) and some of the other features of glm, therefore I suggest that you set `GLM_FORCE_UNRESTRICTED_GENTYPE` and `GLM_FORCE_XYZW_ONLY` project-wide. `ofxCeres.props` already includes this define.
 2. Some of the maths functions of glm aren't working well. You can find some replacement functions in the `ofxCeres::VectorMath` namespace which should work as expected. Check [https://github.com/g-truc/glm/issues/973] for notes on why this is.
 
-## Fudge to `type_quat.hpp`
+## Fudge to `openFrameworks\libs\glm\include\glm\detail\glmtype_quat.hpp`
 
-We change lines from 42 to:
+We change lines from 42-59 to:
 
 ```c++
 #		if GLM_LANG & GLM_LANG_CXXMS_FLAG
-	#		if GLM_CONFIG_XYZW_ONLY
+#			if GLM_CONFIG_XYZW_ONLY
 #				ifdef GLM_FORCE_QUAT_DATA_WXYZ
-			struct { T w, x, y, z; };
+		struct { T w, x, y, z; };
 #				else
-			struct { T x, y, z, w; };
+		struct { T x, y, z, w; };
 #				endif
 #			else
 		union
@@ -37,8 +37,17 @@ We change lines from 42 to:
 
 			typename detail::storage<4, T, detail::is_aligned<Q>::value>::type data;
 		};
+#			endif
+#		else
+#			ifdef GLM_FORCE_QUAT_DATA_WXYZ
+				T w, x, y, z;
+#			else
+				T x, y, z, w;
+#			endif
 #		endif
 ```
+
+You can find a version of the corrected file in `docs/type_quat.hpp` for GLM 0.9.9.7
 
 This is because the default constructor will be confused with the union working on Jet types
 

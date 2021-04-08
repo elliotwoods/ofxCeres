@@ -111,6 +111,8 @@ namespace Data
 		void markNeedsRebuild();
 		void markNeedsFKSolve();
 		void markNeedsForceSolve();
+		void markNewTransformMatrix();
+		void markNewTransformParameters();
 
 		void solveForces();
 		void solveIK();
@@ -148,7 +150,7 @@ namespace Data
 
 		struct : ofParameterGroup {
 			ofParameter<bool> printOutput{ "Print output", false };
-			ofParameter<int> maxIterations{ "Max iterations", 50 };
+			ofParameter<int> maxIterations{ "Max iterations", 500 };
 			ofParameter<bool> forcesWhenDirty{ "Forces when dirty", true };
 			ofParameter<bool> IKWhenRebuild{ "IK when rebuild", true };
 			ofParameter<bool> FKWhenActuatorChange{ "FK when actuator change", true };
@@ -156,6 +158,8 @@ namespace Data
 		} solveOptions;
 
 	protected:
+		void transformFromParameters();
+		void transformToParameters();
 		void resetTransform();
 		void rebuild(bool allowIKSolve);
 		void rebuildWeight();
@@ -164,6 +168,8 @@ namespace Data
 		bool needsRebuild = true;
 		bool needsFKSolve = false;
 		bool needsForceSolve = false;
+		bool needsTransformFromParameters = true;
+		bool needsTransformToParameters = false;
 
 		bool forcesSolved = false;
 		bool fkSolved = false;
