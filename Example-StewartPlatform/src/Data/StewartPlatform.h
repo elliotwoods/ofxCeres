@@ -60,14 +60,14 @@ namespace Data
 		struct Actuators : ofParameterGroup {
 			ofParameter<float> minimumLength{
 				"Minimum length [m]"
-				, 0.8
+				, 0.7
 				, 0.01
 				, 5
 			};
 
 			ofParameter<float> maximumLength{
 				"Maximum length [m]"
-				, 1.2
+				, 1.1
 				, 0.01
 				, 5
 			};

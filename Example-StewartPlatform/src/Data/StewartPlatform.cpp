@@ -556,7 +556,16 @@ namespace Data
 					: this->actuators.actuators[i]->value.getMax()
 				);
 			}
-			this->solveFK();
+			this->fkSolved = false;
+			int tries = 0;
+			while (!this->fkSolved) {
+				this->solveFK();
+				tries++;
+				if (tries > 100) {
+					this->test.cycleExtremes = false;
+					break;
+				}
+			}
 		}
 	}
 
@@ -731,7 +740,9 @@ namespace Data
 			joint.second.force = glm::vec3(0, 0, 0);
 		}
 
-		this->fkSolved = false;
+		if (allowIKSolve) {
+			this->fkSolved = false;
+		}
 		this->forcesSolved = false;
 
 		if (this->solveOptions.IKWhenRebuild && allowIKSolve) {
