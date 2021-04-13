@@ -15,6 +15,8 @@ void ofApp::setup() {
 	{
 		this->gui.init();
 
+		ofxAssets::Register::X().setDirectoryWatcherEnabled(true);
+
 		this->stripPanel = ofxCvGui::Panels::Groups::makeStrip();
 		{
 			this->stripPanel->setCellSizes({ -1, 400 });
@@ -30,7 +32,7 @@ void ofApp::setup() {
 			{
 				auto& camera = this->worldPanel->getCamera();
 				camera.setCursorDrawEnabled(true);
-				camera.setPosition({ 0, 1, 3 });
+				camera.setPosition({ 0, 2, 4 });
 				camera.lookAt({ 0, 0.0, 0 });
 				camera.setFov(20);
 			}
@@ -38,6 +40,9 @@ void ofApp::setup() {
 			this->worldPanel->onDraw += [this](ofxCvGui::DrawArguments& args) {
 				SA::DrawProperties::X().drawScaleLegend(args.localBounds);
 			};
+			this->worldPanel->parameters.grid.dark.set(true);
+			this->worldPanel->parameters.grid.roomMin.set({ -1, -1, 0 });
+			this->worldPanel->parameters.grid.roomMax.set({ 1, 1, 3 });
 			this->stripPanel->add(this->worldPanel);
 		}
 
@@ -139,7 +144,6 @@ void ofApp::draw() {
 
 //--------------------------------------------------------------
 void ofApp::drawWorld() {
-	ofDrawGrid(1, 10, true, false, true, false);
 	this->stewartPlatform.draw();
 }
 
@@ -162,6 +166,7 @@ void ofApp::repopulateWidgets() {
 	inspector->addLiveValue(this->lastFilePath);
 
 	SA::DrawProperties::X().populateInspector(inspector);
+	inspector->addParameterGroup(this->worldPanel->parameters);
 
 	auto drawSolved = [](const ofxCvGui::DrawArguments& drawArgs, bool solved) {
 		ofPushStyle();
