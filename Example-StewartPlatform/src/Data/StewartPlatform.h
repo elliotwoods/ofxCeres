@@ -60,14 +60,14 @@ namespace Data
 		struct Actuators : ofParameterGroup {
 			ofParameter<float> minimumLength{
 				"Minimum length [m]"
-				, 0.4
+				, 0.8
 				, 0.01
 				, 5
 			};
 
 			ofParameter<float> maximumLength{
 				"Maximum length [m]"
-				, 0.8
+				, 1.2
 				, 0.01
 				, 5
 			};
@@ -83,7 +83,7 @@ namespace Data
 			std::shared_ptr<Actuator> actuators[6];
 
 			ofxLiquidEvent<void> onValueChange;
-			
+
 			Actuators();
 
 			ofEventListener maxChangeListener;
@@ -107,6 +107,8 @@ namespace Data
 		void customDraw() override;
 		void serialize(nlohmann::json&);
 		void deserialize(const nlohmann::json&);
+		
+		void resetTransform();
 
 		void markNeedsRebuild();
 		void markNeedsFKSolve();
@@ -121,13 +123,14 @@ namespace Data
 		bool isForcesSolved() const;
 		bool isFKSolved() const;
 
+
 		SA::System system;
 
 		std::shared_ptr<Deck> upperDeck;
 		std::shared_ptr<Deck> lowerDeck;
 
 		struct : ofParameterGroup {
-			ofParameter<bool> reset{ "Reset", false };
+			ofParameter<bool> reset{ "Reset [r]", false };
 
 			struct : ofParameterGroup {
 				ofParameter<float> x{ "X", 0, -1, 1 };
@@ -136,7 +139,7 @@ namespace Data
 				ofEventListener changeListenerX, changeListenerY, changeListenerZ;
 				PARAM_DECLARE("Translate", x, y, z);
 			} translate;
-			
+
 			struct : ofParameterGroup {
 				ofParameter<float> x{ "X", 0, -180, 180 };
 				ofParameter<float> y{ "Y", 0, -180, 180 };
@@ -157,10 +160,15 @@ namespace Data
 			PARAM_DECLARE("Solve", printOutput, maxIterations, forcesWhenDirty, IKWhenRebuild, FKWhenActuatorChange);
 		} solveOptions;
 
+		struct : ofParameterGroup {
+			ofParameter<bool> cycleExtremes{ "Cycle extremes", false };
+			ofParameter<int> extremeIndex{ "Extreme Index", 0 };
+			PARAM_DECLARE("Test", cycleExtremes, extremeIndex);
+		} test;
+
 	protected:
 		void transformFromParameters();
 		void transformToParameters();
-		void resetTransform();
 		void rebuild(bool allowIKSolve);
 		void rebuildWeight();
 		ofxCeres::SolverSettings getDefaultSolverSettings() const;

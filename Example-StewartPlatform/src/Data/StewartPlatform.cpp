@@ -393,9 +393,11 @@ namespace Data
 		this->upperDeck->onChange += rebuildCallback;
 		this->lowerDeck->onChange += rebuildCallback;
 
+		this->lowerDeck->diameter.set(1.14f);
+
 		this->lowerDeck->rotateDeg(180, 0, 1, 0);
 		this->upperDeck->setPosition({ 0, 1, 0 });
-		this->upperDeck->diameter.set(0.7f);
+		this->upperDeck->diameter.set(1.6f);
 
 		this->add(this->solveOptions);
 		this->add(*this->upperDeck);
@@ -403,6 +405,7 @@ namespace Data
 		this->add(this->weight);
 		this->add(this->transform);
 		this->add(this->actuators);
+		this->add(this->test);
 
 		// Init system other parts
 		{
@@ -485,6 +488,8 @@ namespace Data
 			this->weight.offsetZListener = this->weight.offsetZ.newListener(weightChangeCallback);
 			this->weight.massListener = this->weight.mass.newListener(weightChangeCallback);
 		}
+
+		this->resetTransform();
 	}
 
 	//----------
@@ -496,12 +501,7 @@ namespace Data
 
 		if (this->transform.reset)
 		{
-			this->transform.translate.x.set(0);
-			this->transform.translate.y.set(1);
-			this->transform.translate.z.set(0);
-			this->transform.rotate.x.set(0);
-			this->transform.rotate.y.set(0);
-			this->transform.rotate.z.set(0);
+			this->resetTransform();
 			this->transform.reset = false;
 		}
 
@@ -544,6 +544,19 @@ namespace Data
 		for (auto& actuator : this->actuators.actuators)
 		{
 			actuator->framesSinceChange++;
+		}
+
+		if (this->test.cycleExtremes) {
+			const auto& extremeIndex = (this->test.extremeIndex.get() + 1) % (1 << 6);
+			this->test.extremeIndex.set(extremeIndex);
+			for (int i = 0; i < 6; i++) {
+				this->actuators.actuators[i]->value.set(
+					(extremeIndex >> i) & 1
+					? this->actuators.actuators[i]->value.getMin()
+					: this->actuators.actuators[i]->value.getMax()
+				);
+			}
+			this->solveFK();
 		}
 	}
 
@@ -636,6 +649,18 @@ namespace Data
 
 		this->upperDeck->deserialize(json["upperDeck"]);
 		this->lowerDeck->deserialize(json["lowerDeck"]);
+	}
+
+	//----------
+	void
+		StewartPlatform::resetTransform()
+	{
+		this->transform.translate.x.set(0);
+		this->transform.translate.y.set(0);
+		this->transform.translate.z.set(0.6);
+		this->transform.rotate.x.set(0);
+		this->transform.rotate.y.set(0);
+		this->transform.rotate.z.set(0);
 	}
 
 	//----------

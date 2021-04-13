@@ -32,8 +32,8 @@ void ofApp::setup() {
 			{
 				auto& camera = this->worldPanel->getCamera();
 				camera.setCursorDrawEnabled(true);
-				camera.setPosition({ 0, 2, 4 });
-				camera.lookAt({ 0, 0.0, 0 });
+				camera.setPosition({ 0, 4, 6 });
+				camera.lookAt({ 0, -1, 0 });
 				camera.setFov(20);
 			}
 
@@ -241,7 +241,9 @@ void ofApp::save() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-
+	if (key == 'r') {
+		this->stewartPlatform.resetTransform();
+	}
 }
 
 //--------------------------------------------------------------
