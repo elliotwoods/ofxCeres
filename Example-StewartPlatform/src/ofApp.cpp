@@ -73,7 +73,6 @@ void ofApp::setup() {
 		}
 	}
 
-
 	// setup controllers
 	{
 		this->controllers = ofxDualSense::Controller::listControllers();

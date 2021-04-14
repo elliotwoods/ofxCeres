@@ -16,6 +16,9 @@ void deserialize(const nlohmann::json& json, ofParameter<T> & parameter)
 	parameter.set(json[parameter.getName()]);
 }
 
+ofLight light;
+ofMaterial material;
+
 namespace Data
 {
 	//----------
@@ -309,12 +312,35 @@ namespace Data
 					{
 						ofMultMatrix(viewInverse);
 						ofRotateDeg(90, -1, 0, 0);
-						ofTranslate(0, bodyLength / 2.0f, 0.0f);
 						ofPushStyle();
 						{
-							auto color = ofMap(actuator->framesSinceChange, 0, 10, 0, 150, true);
-							ofSetColor(150, color, color);
-							ofDrawCylinder(0.01, bodyLength);
+							// Actuator body
+							ofPushMatrix();
+							{
+								ofTranslate(0, bodyLength / 2.0f, 0.0f);
+
+								auto gb = ofMap(actuator->framesSinceChange, 0, 10, 0, 150, true);
+								ofColor color(150, gb, gb);
+								ofSetColor(color);
+								material.setDiffuseColor(color);
+
+								light.enable();
+								material.begin();
+								ofDrawCylinder(0.01, bodyLength);
+								material.end();
+								light.disable();
+							}
+							ofPopMatrix();
+
+							// Draw limit 
+							{
+								auto maxExtension = actuator->value.getMax() - actuator->value.getMin();
+								ofTranslate(0, actuator->value.get() - maxExtension);
+								ofRotateDeg(90, 1, 0, 0);
+								ofNoFill();
+								ofDrawCircle(0, 0, 0.011);
+							}
+
 						}
 						ofPopStyle();
 					}
@@ -483,6 +509,14 @@ namespace Data
 			this->weight.offsetYListener = this->weight.offsetY.newListener(weightChangeCallback);
 			this->weight.offsetZListener = this->weight.offsetZ.newListener(weightChangeCallback);
 			this->weight.massListener = this->weight.mass.newListener(weightChangeCallback);
+		}
+
+		// Light
+		{
+			light.setDirectional();
+			light.setOrientation(glm::vec3{ 180 - 45, 0, 0 });
+			light.setAmbientColor(ofColor(100));
+			light.setDiffuseColor(ofColor(150));
 		}
 
 		this->resetTransform();
