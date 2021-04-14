@@ -273,7 +273,7 @@ namespace Data
 		// Basic setup
 		this->setName("Actuators");
 		this->add(this->minimumLength);
-		this->add(this->maximumLength);
+		this->add(this->extension);
 
 		// Initialise the actuators
 		for (int i = 0; i < 6; i++) {
@@ -326,13 +326,9 @@ namespace Data
 		// On actuator range change
 		{
 			auto changeCallback = [this](const float&) {
-				auto min = this->minimumLength.get();
-				auto max = this->maximumLength.get();
-
-				if (min > max) {
-					this->maximumLength.set(min);
-					max = min;
-				}
+				const auto & min = this->minimumLength.get();
+				const auto & extension = this->extension.get();
+				const auto max = min + extension;
 
 				for (auto actuator : this->actuators)
 				{
@@ -343,8 +339,8 @@ namespace Data
 					}
 				}
 			};
-			this->maxChangeListener = this->minimumLength.newListener(changeCallback);
-			this->minChangeListener = this->maximumLength.newListener(changeCallback);
+			this->minChangeListener = this->minimumLength.newListener(changeCallback);
+			this->extensionChangeListener = this->extension.newListener(changeCallback);
 			changeCallback(0.0f);
 		}
 

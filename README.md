@@ -53,7 +53,7 @@ This is because the default constructor will be confused with the union working 
 
 # General notes on usage
 
-* ceres.dll will be copied to your output folder. If you switch between Debug and Release, you might have the wrong version there. Re-build ofxCeresLib to fix
+* ceres.dll will be copied to your output folder. If you switch between Debug and Release, you might have the wrong version there. Re-build ofxCeresLib to fix.
 
 
 # Building ceres-solver

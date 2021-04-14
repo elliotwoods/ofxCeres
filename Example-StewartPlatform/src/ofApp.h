@@ -20,6 +20,7 @@ public:
 	void load();
 	void load(const std::string &);
 	void save();
+	void setLastFilePath(const std::string&);
 
 	void keyPressed(int key);
 	void keyReleased(int key);

@@ -63,7 +63,7 @@ void ofApp::setup() {
 			std::string filePath;
 			{
 				auto file = ofFile(LAST_SAVE_PATH);
-				file >> filePath;
+				filePath = (std::string) file.readToBuffer();
 				file.close();
 			}
 
@@ -118,7 +118,7 @@ void ofApp::update() {
 						glm::vec3(0, 0, 1)
 						, glm::normalize(glm::vec3(analogStickRight.x, analogStickRight.y, 1)));
 					rotate = controllerOrientation * rotate * glm::inverse(controllerOrientation);
-					rotate = glm::slerp<float>(glm::quat{ 1, 0, 0, 0 }, rotate, ofGetLastFrameTime() * this->movementSpeed);
+					rotate = glm::slerp<float>(glm::quat{ 1, 0, 0, 0 }, rotate, ofGetLastFrameTime() * this->movementSpeed * 5.0f);
 					this->stewartPlatform.upperDeck->rotate(rotate);
 					this->stewartPlatform.markNewTransformMatrix();
 				}
@@ -210,12 +210,15 @@ void ofApp::load() {
 
 //--------------------------------------------------------------
 void ofApp::load(const std::string& path) {
-	nlohmann::json json;
-	ofFile file(path, ofFile::ReadOnly);
-	file >> json;
-	file.close();
-	this->stewartPlatform.deserialize(json);
-	this->lastFilePath = path;
+	if (ofFile::doesFileExist(path)) {
+		nlohmann::json json;
+		ofFile file(path, ofFile::ReadOnly);
+		file >> json;
+		file.close();
+		this->stewartPlatform.deserialize(json);
+		this->lastFilePath = path;
+		this->setLastFilePath(path);
+	}
 }
 //--------------------------------------------------------------
 void ofApp::save() {
@@ -228,14 +231,19 @@ void ofApp::save() {
 			file << json;
 			file.close();
 		}
-		
-		{
-			ofFile file(LAST_SAVE_PATH, ofFile::WriteOnly);
-			file << result.filePath;
-			file.close();
-		}
 
-		this->lastFilePath = result.filePath;
+		this->setLastFilePath(result.filePath);
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::setLastFilePath(const std::string& path) {
+	this->lastFilePath = path;
+	
+	{
+		ofFile file(LAST_SAVE_PATH, ofFile::WriteOnly);
+		file << path;
+		file.close();
 	}
 }
 

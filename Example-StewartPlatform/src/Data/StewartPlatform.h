@@ -62,14 +62,14 @@ namespace Data
 				"Minimum length [m]"
 				, 0.7
 				, 0.01
-				, 5
+				, 3
 			};
 
-			ofParameter<float> maximumLength{
-				"Maximum length [m]"
-				, 1.1
+			ofParameter<float> extension{
+				"Extension [m]"
+				, 0.4
 				, 0.01
-				, 5
+				, 3
 			};
 
 			struct Actuator : SA::System::Body
@@ -86,8 +86,8 @@ namespace Data
 
 			Actuators();
 
-			ofEventListener maxChangeListener;
 			ofEventListener minChangeListener;
+			ofEventListener extensionChangeListener;
 		} actuators;
 
 		struct : ofParameterGroup
