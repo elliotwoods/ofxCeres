@@ -33,6 +33,9 @@
     <ClInclude Include="src\Procedure\SearchPlane.h">
       <Filter>Procedure</Filter>
     </ClInclude>
+    <ClInclude Include="src\kdtree\kdtree.h">
+      <Filter>kdtree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
@@ -46,6 +49,9 @@
     </Filter>
     <Filter Include="Procedure">
       <UniqueIdentifier>{35a1f1e6-94cd-4ee1-9950-00884731dc45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kdtree">
+      <UniqueIdentifier>{ef677e69-72e9-4c8f-bded-5db749ef618c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

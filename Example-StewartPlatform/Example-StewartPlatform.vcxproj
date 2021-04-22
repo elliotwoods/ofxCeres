@@ -216,6 +216,7 @@
   <ItemGroup>
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Data\StewartPlatform.h" />
+    <ClInclude Include="src\kdtree\kdtree.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\pch_ofApp.h" />
     <ClInclude Include="src\Procedure\SearchPlane.h" />
