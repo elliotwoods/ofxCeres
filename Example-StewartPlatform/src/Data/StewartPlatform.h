@@ -123,6 +123,7 @@ namespace Data
 		bool isForcesSolved() const;
 		bool isFKSolved() const;
 
+		bool isValidTransform(const glm::vec3& translation, const glm::vec3& rotation);
 
 		SA::System system;
 

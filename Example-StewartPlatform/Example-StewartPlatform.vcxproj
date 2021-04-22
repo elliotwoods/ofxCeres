@@ -209,6 +209,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Procedure\SearchPlane.cpp" />
     <ClCompile Include="src\Solvers\StewartPlatformFK.cpp" />
     <ClCompile Include="src\Solvers\StewartPlatformForces.cpp" />
   </ItemGroup>
@@ -217,6 +218,7 @@
     <ClInclude Include="src\Data\StewartPlatform.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\pch_ofApp.h" />
+    <ClInclude Include="src\Procedure\SearchPlane.h" />
     <ClInclude Include="src\Solvers\StewartPlatformFK.h" />
     <ClInclude Include="src\Solvers\StewartPlatformForces.h" />
   </ItemGroup>

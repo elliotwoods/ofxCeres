@@ -13,6 +13,9 @@
     <ClCompile Include="src\Solvers\StewartPlatformFK.cpp">
       <Filter>Solvers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Procedure\SearchPlane.cpp">
+      <Filter>Procedure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h" />
@@ -27,6 +30,9 @@
     <ClInclude Include="src\Solvers\StewartPlatformFK.h">
       <Filter>Solvers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Procedure\SearchPlane.h">
+      <Filter>Procedure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
@@ -37,6 +43,9 @@
     </Filter>
     <Filter Include="Solvers">
       <UniqueIdentifier>{6179704e-1b1c-48ea-98aa-7940573fcb98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Procedure">
+      <UniqueIdentifier>{35a1f1e6-94cd-4ee1-9950-00884731dc45}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

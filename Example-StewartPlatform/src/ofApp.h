@@ -4,6 +4,7 @@
 #include "ofxCvGui.h"
 #include "ofxCeres.h"
 #include "Data/StewartPlatform.h"
+#include "Procedure/SearchPlane.h"
 #include "ofxDualSense.h"
 
 #define LAST_SAVE_PATH "lastSave.txt"
@@ -40,6 +41,7 @@ public:
 	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
 
 	Data::StewartPlatform stewartPlatform;
+	Procedure::SearchPlane searchPlane;
 
 	ofParameter<string> lastFilePath{ "Last file path", "" };
 

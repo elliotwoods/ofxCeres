@@ -11,6 +11,8 @@ namespace SA = ofxCeres::Models::StructuralAnalysis;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	ofSetWindowTitle("Stewart Platform");
+
 	// Initialise the gui
 	{
 		this->gui.init();
@@ -144,6 +146,7 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 void ofApp::drawWorld() {
 	this->stewartPlatform.draw();
+	this->searchPlane.draw();
 }
 
 //--------------------------------------------------------------
@@ -197,6 +200,14 @@ void ofApp::repopulateWidgets() {
 
 
 	inspector->addParameterGroup(this->stewartPlatform);
+
+	inspector->addParameterGroup(this->searchPlane.parameters);
+	inspector->addButton("Search", [this]() {
+		this->searchPlane.perform(this->stewartPlatform);
+		});
+	inspector->addLiveValue<size_t>("Points found", [this]() {
+		return this->searchPlane.getPositions().size();
+		});
 }
 
 //--------------------------------------------------------------
@@ -210,13 +221,18 @@ void ofApp::load() {
 //--------------------------------------------------------------
 void ofApp::load(const std::string& path) {
 	if (ofFile::doesFileExist(path)) {
-		nlohmann::json json;
-		ofFile file(path, ofFile::ReadOnly);
-		file >> json;
-		file.close();
-		this->stewartPlatform.deserialize(json);
-		this->lastFilePath = path;
-		this->setLastFilePath(path);
+		try {
+			nlohmann::json json;
+			ofFile file(path, ofFile::ReadOnly);
+			file >> json;
+			file.close();
+			this->stewartPlatform.deserialize(json);
+			this->lastFilePath = path;
+			this->setLastFilePath(path);
+	}
+		catch (const nlohmann::json::exception& e) {
+			ofSystemAlertDialog("Load " + path + " failed:\n" + std::string(e.what()));
+		}
 	}
 }
 //--------------------------------------------------------------

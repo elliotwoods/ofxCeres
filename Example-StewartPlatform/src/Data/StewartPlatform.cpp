@@ -151,6 +151,31 @@ namespace Data
 	}
 
 	//----------
+	bool
+		StewartPlatform::isValidTransform(const glm::vec3& translation, const glm::vec3& rotation)
+	{
+		this->transform.translate.x.set(translation.x);
+		this->transform.translate.y.set(translation.y);
+		this->transform.translate.z.set(translation.z);
+
+		this->transform.rotate.x.set(rotation.x);
+		this->transform.rotate.y.set(rotation.y);
+		this->transform.rotate.z.set(rotation.z);
+
+		this->transformFromParameters();
+		this->rebuild(false);
+		this->solveIK();
+
+		for (int i = 0; i < 6; i++) {
+			const auto& value = this->actuators.actuators[i]->value;
+			if (value.get() > value.getMax() || value.get() < value.getMin()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	//----------
 	void
 		StewartPlatform::transformFromParameters()
 	{
@@ -653,7 +678,7 @@ namespace Data
 		StewartPlatform::deserialize(const nlohmann::json& json)
 	{
 		{
-			auto& jsonSolveOptions = json["solveOptions"];
+			auto& jsonSolveOptions = json.at("solveOptions");
 			::deserialize(jsonSolveOptions, this->solveOptions.printOutput);
 			::deserialize(jsonSolveOptions, this->solveOptions.maxIterations);
 			::deserialize(jsonSolveOptions, this->solveOptions.forcesWhenDirty);
@@ -662,7 +687,7 @@ namespace Data
 		}
 
 		{
-			auto& jsonTransform = json["transform"];
+			auto& jsonTransform = json.at("transform");
 			{
 				auto& jsonTranslate = jsonTransform["translate"];
 				::deserialize(jsonTranslate, this->transform.translate.x);
@@ -678,7 +703,7 @@ namespace Data
 		}
 
 		{
-			auto& jsonWeight = json["weight"];
+			auto& jsonWeight = json.at("weight");
 			{
 				::deserialize(jsonWeight, this->weight.offsetY);
 				::deserialize(jsonWeight, this->weight.offsetZ);
@@ -686,8 +711,8 @@ namespace Data
 			}
 		}
 
-		this->upperDeck->deserialize(json["upperDeck"]);
-		this->lowerDeck->deserialize(json["lowerDeck"]);
+		this->upperDeck->deserialize(json.at("upperDeck"));
+		this->lowerDeck->deserialize(json.at("lowerDeck"));
 	}
 
 	//----------
