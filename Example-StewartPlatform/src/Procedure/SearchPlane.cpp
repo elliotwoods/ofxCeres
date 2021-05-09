@@ -112,7 +112,7 @@ namespace Procedure {
 				}
 				else if(thisIsValid && thatIsValid) {
 					this->performAtPoint(stewartPlatform
-						, position + offset * 1.5
+						, position + offset * 1.5      
 						, stepSize
 						, remainingIterations);
 				}

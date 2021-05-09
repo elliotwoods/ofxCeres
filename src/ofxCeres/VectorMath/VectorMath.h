@@ -20,7 +20,7 @@ namespace ofxCeres {
 			return A.x * B.x
 				+ A.y * B.y;
 		}
-
+		
 		//----------
 		template<typename T>
 		T length2(const glm::tvec3<T> & vector) {
@@ -30,7 +30,7 @@ namespace ofxCeres {
 		//----------
 		template<typename T>
 		T length(const glm::tvec3<T> & vector) {
-			return sqrt(length(vector));
+			return sqrt(length2(vector));
 		}
 
 		//----------
@@ -197,6 +197,27 @@ namespace ofxCeres {
 			else {
 				return option2;
 			}
+		}
+
+		//----------
+		// Also page 20,21 of ReMarkable notes May 2021
+		template<typename T>
+		glm::tvec3<T> reflect(const glm::tvec3<T>& point
+			, const glm::tvec3<T>& planeNormal
+			, const T& planeD) {
+
+			// create a ray from the point with direction of the plane normal
+			const glm::tvec3<T>& rayS = point;
+			const glm::tvec3<T>& rayT = planeNormal;
+
+			// intersect the ray and the plane
+			// page 20 of ReMarkable notes May 2021
+			const T u = -(planeD + dot(rayS, planeNormal))
+				/ dot(rayT, planeNormal);
+			auto intersection = rayS + u * rayT;
+
+			// follow the ray through the plane by 2x distance to get the reflection
+			return rayS + u * (T) 2 * rayT;
 		}
 
 		//----------

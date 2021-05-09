@@ -60,7 +60,7 @@
     <None Include="..\src\ofxCeres\Models\StructuralAnalysis\System.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</ProjectGuid>
+    <ProjectGuid>{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}</ProjectGuid>
     <RootNamespace>ofxOrbbec</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

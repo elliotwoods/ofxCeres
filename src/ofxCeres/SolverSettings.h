@@ -7,6 +7,10 @@ namespace ofxCeres {
 		SolverSettings();
 		ceres::Solver::Options options;
 
+#ifdef _DEBUG
 		bool printReport = true;
+#else
+		bool printReport = false;
+#endif
 	};
 }
