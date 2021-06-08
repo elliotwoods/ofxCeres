@@ -229,5 +229,38 @@ namespace ofxCeres {
 			result4 /= result4.w;
 			return glm::tvec3<T>(result4.x, result4.y, result4.z);
 		}
+
+		//----------
+		// from ofxRay::Ray::distanceTo
+		template<typename T>
+		T distanceRayToPoint(const glm::tvec3<T> & s, const glm::tvec3<T> & t, const glm::tvec3<T> & point)
+		{
+			return length(cross(point - s, point - (s + t))) / length(t);
+		}
+
+		//----------
+		// reference : https://blog.demofox.org/2013/10/12/converting-to-and-from-polar-spherical-coordinates-made-easy/
+		// but modified
+		template<typename T>
+		glm::tvec3<T> cartesianToPolar(const glm::tvec3<T>& xyz)
+		{
+			auto r = length(xyz);
+			return {
+				r
+				, atan2(xyz.y, xyz.x)
+				, asin(xyz.z / r)
+			};
+		}
+
+		//----------
+		template<typename T>
+		glm::tvec3<T> polarToCartesian(const glm::tvec3<T>& rThetaThi)
+		{
+			return {
+				rThetaThi[0] * cos(rThetaThi[2]) * cos(rThetaThi[1])
+				, rThetaThi[0] * cos(rThetaThi[2]) * sin(rThetaThi[1])
+				, rThetaThi[0] * sin(rThetaThi[2])
+			};
+		}
 	}
 }
