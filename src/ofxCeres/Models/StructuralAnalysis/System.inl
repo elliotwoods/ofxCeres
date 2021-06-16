@@ -16,8 +16,8 @@ struct SolverError {
 		residual = (T) 0;
 
 		for (const auto & bodyIt : system.bodies) {
-			residual += bodyIt.second->getForceError();
-			residual += bodyIt.second->getTorqueError();
+			residual += glm::length2(bodyIt.second->getForceError());
+			residual += glm::length2(bodyIt.second->getTorqueError());
 		}
 		
 		return true;
@@ -55,7 +55,7 @@ namespace ofxCeres {
 
 			//----------
 			template<typename T>
-			T TSystem<T>::Body::getForceError() const {
+			glm::tvec3<T> TSystem<T>::Body::getForceError() const {
 				glm::tvec3<T> total{ 0, 0, 0 }; // Local orientation frame
 
 				auto bodyInverseRotation = glm::inverse(this->getGlobalOrientation());
@@ -72,12 +72,12 @@ namespace ofxCeres {
 					total += jointIt.second.force;
 				}
 
-				return glm::dot(total, total);
+				return total;
 			}
 
 			//----------
 			template<typename T>
-			T TSystem<T>::Body::getTorqueError() const {
+			glm::tvec3<T> TSystem<T>::Body::getTorqueError() const {
 				glm::tvec3<T> total{ 0, 0, 0 }; // Local orientation frame
 
 				auto bodyInverseRotation = glm::inverse(this->getGlobalOrientation());
@@ -93,7 +93,7 @@ namespace ofxCeres {
 					total += glm::cross((glm::tvec3<T>) jointIt.second.position, jointIt.second.force);
 				}
 
-				return glm::dot(total, total);
+				return total;
 			}
 
 			//----------

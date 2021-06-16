@@ -262,5 +262,16 @@ namespace ofxCeres {
 				, rThetaThi[0] * sin(rThetaThi[2])
 			};
 		}
+
+		//----------
+		// From GLM implementation
+		template<typename T>
+		glm::tquat<T> angleAxis(T const& angle, glm::tvec3<T> const& v)
+		{
+			T const a(angle);
+			T const s = sin(a * static_cast<T>(0.5));
+
+			return glm::tquat<T>(cos(a * static_cast<T>(0.5)), v * s);
+		}
 	}
 }

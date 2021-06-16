@@ -79,8 +79,18 @@ struct StewartPlatformForcesCost
 		this->applyParameters(upperDeckTyped, parameters);
 
 		// Calculate residual
-		residuals[0] = upperDeckTyped.getForceError();
-		residuals[1] = upperDeckTyped.getTorqueError();
+		{
+			auto residualVector = upperDeckTyped.getForceError();
+			residuals[0] = residualVector[0];
+			residuals[1] = residualVector[1];
+			residuals[2] = residualVector[2];
+		}
+		{
+			auto residualVector = upperDeckTyped.getTorqueError();
+			residuals[3] = residualVector[0];
+			residuals[4] = residualVector[1];
+			residuals[5] = residualVector[2];
+		}
 
 		return true;
 	}
@@ -88,7 +98,7 @@ struct StewartPlatformForcesCost
 	static ceres::CostFunction* 
 		Create(Data::StewartPlatform & stewartPlatform)
 	{
-		return new ceres::AutoDiffCostFunction<StewartPlatformForcesCost, 2, 6>(
+		return new ceres::AutoDiffCostFunction<StewartPlatformForcesCost, 6, 6>(
 			new StewartPlatformForcesCost(stewartPlatform)
 			);
 	}

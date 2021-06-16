@@ -75,9 +75,9 @@ namespace ofxCeres {
 						}
 					}
 
-					T getForceError() const;
+					glm::tvec3<T> getForceError() const;
 
-					T getTorqueError() const;
+					glm::tvec3<T> getTorqueError() const;
 
 					ofColor getColor() const
 					{
