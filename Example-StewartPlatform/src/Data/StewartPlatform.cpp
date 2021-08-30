@@ -16,6 +16,34 @@ void deserialize(const nlohmann::json& json, ofParameter<T> & parameter)
 	parameter.set(json[parameter.getName()]);
 }
 
+template<>
+void serialize(nlohmann::json& json, const ofParameter<glm::vec3>& parameter)
+{
+	json[parameter.getName()]["x"] = parameter.get().x;
+	json[parameter.getName()]["y"] = parameter.get().y;
+	json[parameter.getName()]["z"] = parameter.get().z;
+}
+
+template<>
+void deserialize(const nlohmann::json& json, ofParameter<glm::vec3>& parameter)
+{
+	if (!json.is_object() || json.is_null()) {
+		return;
+	}
+	glm::vec3 value = parameter.get();
+	if (json.contains("x")) {
+		value.x = json["x"];
+	}
+	if (json.contains("y")) {
+		value.z = json["y"];
+	}
+	if (json.contains("z")) {
+		value.z = json["z"];
+	}
+
+	parameter.set(value);
+}
+
 ofLight light;
 ofMaterial material;
 
@@ -258,7 +286,7 @@ namespace Data
 
 		// Apply our offset transform
 		{
-			auto rotation = ofxCeres::VectorMath::eulerToQuat(glm::vec3(this->rotationX.get() * DEG_TO_RAD, 0.0f, 0.0f ));
+			auto rotation = ofxCeres::VectorMath::eulerToQuat(glm::vec3(this->rotationX.get() * DEG_TO_RAD, 0.0f, 0.0f));
 			for (auto& joint : this->joints) {
 				joint.second.position = rotation * joint.second.position;
 			}
@@ -307,7 +335,7 @@ namespace Data
 		for (int i = 0; i < 6; i++) {
 			auto actuator = std::make_shared<Actuator>();
 			this->actuators[i] = actuator;
-			
+
 			// Parameters
 			{
 				actuator->value.setName(ofToString(i));
@@ -327,8 +355,8 @@ namespace Data
 				actuator->onDraw += [this, actuatorWeak]() {
 					auto actuator = actuatorWeak.lock();
 					auto view = glm::lookAt(actuator->joints["lower"].position
-					, actuator->joints["upper"].position
-					, glm::vec3(0, 1, 0));
+						, actuator->joints["upper"].position
+						, glm::vec3(0, 1, 0));
 					auto viewInverse = glm::inverse(view);
 
 					auto bodyLength = actuator->value.getMin();
@@ -377,8 +405,8 @@ namespace Data
 		// On actuator range change
 		{
 			auto changeCallback = [this](const float&) {
-				const auto & min = this->minimumLength.get();
-				const auto & extension = this->extension.get();
+				const auto& min = this->minimumLength.get();
+				const auto& extension = this->extension.get();
 				const auto max = min + extension;
 
 				for (auto actuator : this->actuators)
@@ -453,6 +481,7 @@ namespace Data
 		this->add(this->transform);
 		this->add(this->actuators);
 		this->add(this->test);
+		this->add(this->counterWeight);
 
 		// Init system other parts
 		{
@@ -536,6 +565,23 @@ namespace Data
 			this->weight.massListener = this->weight.mass.newListener(weightChangeCallback);
 		}
 
+		// Listen for counter weight change
+		{
+			this->counterWeight.enabledChangeListener = this->counterWeight.enabled.newListener([this](bool&) {
+				this->counterWeight.isDirty = true;
+				});
+			auto floatChange = [this](float&) {
+				this->counterWeight.isDirty = true;
+			};
+			this->counterWeight.forceChangedListener = this->counterWeight.force.newListener(floatChange);
+
+			auto vecChange = [this](glm::vec3&) {
+				this->counterWeight.isDirty = true;
+			};
+			this->counterWeight.anchorPointChangeListener = this->counterWeight.anchorPoint.newListener(vecChange);
+			this->counterWeight.upperDeckAttachmentListener = this->counterWeight.upperDeckAttachment.newListener(vecChange);
+		}
+
 		// Light
 		{
 			light.setDirectional();
@@ -564,6 +610,10 @@ namespace Data
 		if (this->weight.isDirty)
 		{
 			this->rebuildWeight();
+		}
+		if (this->counterWeight.isDirty)
+		{
+			this->rebuildCounterweight();
 		}
 
 		if (this->needsTransformFromParameters)
@@ -622,6 +672,8 @@ namespace Data
 				}
 			}
 		}
+
+		this->checkActuatorLimits();
 	}
 
 	//----------
@@ -669,6 +721,16 @@ namespace Data
 			}
 		}
 
+		{
+			auto& jsonCounterWeight = json["counterWeight"];
+			{
+				::serialize(jsonCounterWeight, this->counterWeight.enabled);
+				::serialize(jsonCounterWeight, this->counterWeight.force);
+				::serialize(jsonCounterWeight, this->counterWeight.anchorPoint);
+				::serialize(jsonCounterWeight, this->counterWeight.upperDeckAttachment);
+			}
+		}
+
 		this->upperDeck->serialize(json["upperDeck"]);
 		this->lowerDeck->serialize(json["lowerDeck"]);
 	}
@@ -708,6 +770,16 @@ namespace Data
 				::deserialize(jsonWeight, this->weight.offsetY);
 				::deserialize(jsonWeight, this->weight.offsetZ);
 				::deserialize(jsonWeight, this->weight.mass);
+			}
+		}
+
+		if (json.contains("counterWeight")) {
+			auto& jsonCounterWeight = json["counterWeight"];
+			{
+				::deserialize(jsonCounterWeight, this->counterWeight.enabled);
+				::deserialize(jsonCounterWeight, this->counterWeight.force);
+				::deserialize(jsonCounterWeight, this->counterWeight.anchorPoint);
+				::deserialize(jsonCounterWeight, this->counterWeight.upperDeckAttachment);
 			}
 		}
 
@@ -791,7 +863,7 @@ namespace Data
 		}
 
 		// Clear all forces (they will be invalid now)
-		for (auto & joint : this->upperDeck->joints) {
+		for (auto& joint : this->upperDeck->joints) {
 			joint.second.force = glm::vec3(0, 0, 0);
 		}
 
@@ -816,5 +888,49 @@ namespace Data
 		this->upperDeck->loads["Weight"].force.y = this->weight.mass * -9.81;
 		this->weight.isDirty = false;
 		this->markNeedsRebuild();
+	}
+
+	//----------
+	void
+		StewartPlatform::rebuildCounterweight()
+	{
+		if (this->counterWeight.enabled.get()) {
+			this->upperDeck->loads["Counterweight"].position = this->counterWeight.upperDeckAttachment.get();
+			auto forceDirection = glm::normalize(this->counterWeight.anchorPoint.get() - this->upperDeck->getLoadPosition("Counterweight"));
+			this->upperDeck->loads["Counterweight"].force = forceDirection * this->counterWeight.force.get();
+		}
+		else {
+			auto findCounterWeight = this->upperDeck->loads.find("Counterweight");
+			if (findCounterWeight != this->upperDeck->loads.end()) {
+				this->upperDeck->loads.erase(findCounterWeight);
+			}
+		}
+		this->counterWeight.isDirty = false;
+
+		this->markNeedsRebuild();
+	}
+
+	//----------
+	void
+		StewartPlatform::checkActuatorLimits()
+	{
+		// There are 'rounding errors' by going full loop through optimiser
+		float offsetFactor = 1e-3;
+
+		bool needsFK = false;
+		for (auto actuator : this->actuators.actuators) {
+			if (actuator->value.get() > actuator->value.getMax()) {
+				actuator->value.set(actuator->value.getMax() - offsetFactor);
+				needsFK = true;
+			}
+			if (actuator->value.get() < actuator->value.getMin()) {
+				actuator->value.set(actuator->value.getMin() + offsetFactor);
+				needsFK = true;
+			}
+		}
+
+		if (needsFK) {
+			this->solveFK();
+		}
 	}
 }

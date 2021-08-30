@@ -60,7 +60,7 @@ namespace Data
 		struct Actuators : ofParameterGroup {
 			ofParameter<float> minimumLength{
 				"Minimum length [m]"
-				, 0.7
+				, 0.787
 				, 0.01
 				, 3
 			};
@@ -167,11 +167,24 @@ namespace Data
 			PARAM_DECLARE("Test", cycleExtremes, extremeIndex);
 		} test;
 
+		struct : ofParameterGroup {
+			ofParameter<bool> enabled{ "Enabled", false };
+			ofParameter<float> force{ "Force [N]", 1000 };
+			ofParameter<glm::vec3> anchorPoint{ "Anchor", {0, 1, 0} };
+			ofParameter<glm::vec3> upperDeckAttachment{ "Upper deck attachment", {0, 0, 0} };
+			ofEventListener enabledChangeListener, forceChangedListener, anchorPointChangeListener, upperDeckAttachmentListener;
+			PARAM_DECLARE("Counter weight", enabled, force, anchorPoint, upperDeckAttachment);
+			bool isDirty = true;
+		} counterWeight;
+
 	protected:
 		void transformFromParameters();
 		void transformToParameters();
 		void rebuild(bool allowIKSolve);
 		void rebuildWeight();
+		void rebuildCounterweight();
+		void checkActuatorLimits();
+
 		ofxCeres::SolverSettings getDefaultSolverSettings() const;
 
 		bool needsRebuild = true;

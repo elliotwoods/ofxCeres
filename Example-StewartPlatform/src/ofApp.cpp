@@ -30,6 +30,21 @@ void ofApp::setup() {
 			this->worldPanel = ofxCvGui::Panels::makeWorldManaged();
 			this->worldPanel->onDrawWorld += [this](ofCamera&) {
 				this->drawWorld();
+				if (this->payloadParameters.draw.get()) {
+					auto upperDeckTransform = this->stewartPlatform.upperDeck->getGlobalTransformMatrix();
+					ofPushMatrix();
+					{
+						ofMultMatrix(upperDeckTransform);
+						ofTranslate(0, 0, this->payloadParameters.offset.get());
+						ofPushStyle();
+						{
+							ofNoFill();
+							ofDrawCircle(0, 0, this->payloadParameters.diameter.get() / 2.0f);
+						}
+						ofPopStyle();
+					}
+					ofPopMatrix();
+				}
 			};
 			{
 				auto& camera = this->worldPanel->getCamera();
@@ -136,6 +151,33 @@ void ofApp::update() {
 	}
 	SA::DrawProperties::X().updateMaxScalar();
 	this->stewartPlatform.update();
+
+	// OSC
+	{
+		// Check parameters match
+		if (this->oscSender) {
+			if (this->oscSender->getHost() != this->oscParameters.host.get()
+				|| this->oscSender->getPort() != this->oscParameters.port.get()) {
+				this->oscSender.reset();
+			}
+		}
+
+		// Rebuild osc sender if needed
+		if (!this->oscSender) {
+			this->oscSender = make_shared<ofxOscSender>();
+			this->oscSender->setup(this->oscParameters.host.get(), this->oscParameters.port.get());
+		}
+
+		// Send the message
+		if (this->oscParameters.enabled.get()) {
+			ofxOscMessage message;
+			message.setAddress("/actuators");
+			for (int i = 0; i < 6; i++) {
+				message.addFloatArg(this->stewartPlatform.actuators.actuators[i]->value.get());
+			}
+			this->oscSender->sendMessage(message);
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -166,6 +208,7 @@ void ofApp::repopulateWidgets() {
 		this->save();
 	});
 	inspector->addLiveValue(this->lastFilePath);
+	inspector->addEditableValue(this->movementSpeed);
 
 	SA::DrawProperties::X().populateInspector(inspector);
 	inspector->addParameterGroup(this->worldPanel->parameters);
@@ -208,6 +251,9 @@ void ofApp::repopulateWidgets() {
 	inspector->addLiveValue<size_t>("Points found", [this]() {
 		return this->searchPlane.getPositions().size();
 		});
+
+	inspector->addParameterGroup(this->oscParameters);
+	inspector->addParameterGroup(this->payloadParameters);
 }
 
 //--------------------------------------------------------------

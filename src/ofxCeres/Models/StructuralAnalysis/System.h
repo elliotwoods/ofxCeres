@@ -90,6 +90,12 @@ namespace ofxCeres {
 						return VectorMath::applyTransform(this->getGlobalTransformMatrix(), vec3);
 					}
 
+					glm::tvec3<T> getLoadPosition(const string& name) const
+					{
+						auto vec3 = this->loads.at(name).position;
+						return VectorMath::applyTransform(this->getGlobalTransformMatrix(), vec3);
+					}
+
 					std::map<std::string, Load> loads;
 					std::map<std::string, Joint> joints;
 

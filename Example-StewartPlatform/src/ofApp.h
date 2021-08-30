@@ -6,6 +6,7 @@
 #include "Data/StewartPlatform.h"
 #include "Procedure/SearchPlane.h"
 #include "ofxDualSense.h"
+#include "ofxOsc.h"
 
 #define LAST_SAVE_PATH "lastSave.txt"
 
@@ -46,5 +47,31 @@ public:
 	ofParameter<string> lastFilePath{ "Last file path", "" };
 
 	std::vector<std::shared_ptr<ofxDualSense::Controller>> controllers;
-	ofParameter<float> movementSpeed{ "Movement speed [/s]", 0.1, 0, 1 };
+	ofParameter<float> movementSpeed{ "Movement speed [/s]", 0.05, 0, 1 };
+
+	struct OscParameters : ofParameterGroup {
+		ofParameter<bool> enabled{ "Enabled", 7777 };
+		ofParameter<int> port{ "Port", 7777 };
+		ofParameter<string> host{ "Host", "localhost" };
+		OscParameters() {
+			this->setName("OscParameters");
+			this->add(this->enabled);
+			this->add(this->port);
+			this->add(this->host);
+		}
+	} oscParameters;
+
+	struct PayloadParameters : ofParameterGroup {
+		ofParameter<bool> draw{ "Draw", true };
+		ofParameter<float> diameter{ "Diameter", 1.8, 0, 2 };
+		ofParameter<float> offset{ "Offset", 0.12, 0, 1 };
+		PayloadParameters() {
+			this->setName("Payload");
+			this->add(this->draw);
+			this->add(this->diameter);
+			this->add(this->offset);
+		}
+	} payloadParameters;
+
+	shared_ptr<ofxOscSender> oscSender;
 };
