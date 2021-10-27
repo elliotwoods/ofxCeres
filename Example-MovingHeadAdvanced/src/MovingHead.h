@@ -3,7 +3,7 @@
 #include "Data/CalibrationPointSet.h"
 #include "Data/MovingHeadDataPoint.h"
 
-class MovingHead : public Data::Serializable {
+class MovingHead : public Data::Serializable, public ofxCvGui::IInspectable {
 public:
 	MovingHead();
 	string getTypeName() const;
@@ -14,13 +14,15 @@ public:
 
 	void serialize(nlohmann::json &);
 	void deserialize(const nlohmann::json &);
-	void populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets);
+	void populateInspector(ofxCvGui::InspectArguments&);
+
 	shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
 
 	void solve();
 	void addTestData();
 
 	glm::mat4 getTransform() const;
+	glm::vec3 getPosition() const;
 
 	glm::vec2 getPanTiltForWorldTarget(const glm::vec3 &
 		, const glm::vec2 & currentPanTiltSignal) const;
@@ -36,8 +38,6 @@ protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
 	void focusDataPointWithHighestResidual();
-
-	void debugFunction();
 
 	Data::CalibrationPointSet<Data::MovingHeadDataPoint> calibrationPoints;
 

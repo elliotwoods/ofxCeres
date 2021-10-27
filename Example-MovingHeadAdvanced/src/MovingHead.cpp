@@ -5,6 +5,10 @@
 //---------
 MovingHead::MovingHead() {
 	RULR_SERIALIZE_LISTENERS;
+
+	this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
+		this->populateInspector(args);
+	};
 }
 
 //---------
@@ -223,7 +227,8 @@ void MovingHead::deserialize(const nlohmann::json & json) {
 }
 
 //---------
-void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) {
+void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
+	auto inspector = args.inspector;
 	
 	// make the trackpad and set it up
 	{
@@ -274,18 +279,14 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 				}
 			}
 		};
-		widgets->add(trackpadWidget);
+		inspector->add(trackpadWidget);
 	}
 
-	widgets->add(make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->currentPanTiltSignal));
+	inspector->addEditableValue<glm::vec2>(this->currentPanTiltSignal);
 
-	widgets->addTitle("Data", ofxCvGui::Widgets::Title::Level::H2);
+	inspector->addTitle("Data", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		widgets->addButton("Debug", [this]() {
-			this->debugFunction();
-		});
-
-		widgets->addButton("Add new data point...", [this]() {
+		inspector->addButton("Add new data point...", [this]() {
 			auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
 			newDataPoint->name = ofSystemTextBoxDialog("Name");
 			newDataPoint->panTiltSignal = this->currentPanTiltSignal.get();
@@ -306,15 +307,15 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 			this->calibrationPoints.add(newDataPoint);
 		});
 
-		this->calibrationPoints.populateWidgets(widgets, false);
+		this->calibrationPoints.populateWidgets(inspector, false);
 
-		widgets->addButton("Add test data", [this]() {
+		inspector->addButton("Add test data", [this]() {
 			this->addTestData();
 		});
 
-		widgets->addTitle("Focused", ofxCvGui::Widgets::Title::Level::H3);
+		inspector->addTitle("Focused", ofxCvGui::Widgets::Title::Level::H3);
 		{
-			widgets->addLiveValue<string>("Name", [this]() {
+			inspector->addLiveValue<string>("Name", [this]() {
 				auto focusedDataPoint = this->focusedDataPoint.lock();
 				if (focusedDataPoint) {
 					return focusedDataPoint->name.get();
@@ -324,7 +325,7 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 				}
 			});
 
-			widgets->addToggle("Selected", [this]() {
+			inspector->addToggle("Selected", [this]() {
 				auto focusedDataPoint = this->focusedDataPoint.lock();
 				if (focusedDataPoint) {
 					return focusedDataPoint->isSelected();
@@ -337,14 +338,14 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 				}
 			})->setHotKey('s');
 
-			widgets->addButton("GO to value", [this]() {
+			inspector->addButton("GO to value", [this]() {
 				auto focusedDataPoint = this->focusedDataPoint.lock();
 				if (focusedDataPoint) {
 					focusedDataPoint->onGoValue.notifyListeners();
 				}
 			})->setHotKey('g');
 
-			widgets->addButton("GO to prediction", [this]() {
+			inspector->addButton("GO to prediction", [this]() {
 				auto focusedDataPoint = this->focusedDataPoint.lock();
 				if (focusedDataPoint) {
 					focusedDataPoint->onGoPrediction.notifyListeners();
@@ -353,28 +354,28 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 		}
 	}
 
-	widgets->addTitle("Beam parameters", ofxCvGui::Widgets::Title::Level::H2);
+	inspector->addTitle("Beam parameters", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		widgets->addSlider(this->beamParameters.focus);
+		inspector->addSlider(this->beamParameters.focus);
 	}
 
 
-	widgets->addTitle("Calibration", ofxCvGui::Widgets::Title::Level::H2);
+	inspector->addTitle("Calibration", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		widgets->addToggle(this->fitParameters.distortionEnabled);
+		inspector->addToggle(this->fitParameters.distortionEnabled);
 
-		widgets->addButton("Solve", [this]() {
+		inspector->addButton("Solve", [this]() {
 			this->solve();
 		}, OF_KEY_RETURN)->setHeight(100.0f);
 
-		widgets->addEditableValue<glm::vec3>(this->calibrationParameters.translation);
-		widgets->addEditableValue<glm::vec3>(this->calibrationParameters.rotationVector);
-		widgets->addSlider(this->calibrationParameters.tiltOffset);
-		widgets->addEditableValue<glm::vec3>(this->calibrationParameters.panDistortion);
-		widgets->addEditableValue<glm::vec3>(this->calibrationParameters.tiltDistortion);
-		widgets->addLiveValue<float>(this->calibrationParameters.residual);
+		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.translation);
+		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.rotationVector);
+		inspector->addSlider(this->calibrationParameters.tiltOffset);
+		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.panDistortion);
+		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.tiltDistortion);
+		inspector->addLiveValue<float>(this->calibrationParameters.residual);
 
-		widgets->addButton("Reset", [this]() {
+		inspector->addButton("Reset", [this]() {
 			this->calibrationParameters.translation.set(glm::vec3(0.0));
 			this->calibrationParameters.rotationVector.set(glm::vec3(0.0));
 			this->calibrationParameters.tiltOffset.set(0.0);
@@ -383,37 +384,37 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 			this->calibrationParameters.residual.set(0.0);
 		});
 
-		widgets->addButton("Focus datapoint with highest residual", [this]() {
+		inspector->addButton("Focus datapoint with highest residual", [this]() {
 			this->focusDataPointWithHighestResidual();
 		});
 	}
 
-	widgets->addTitle("Fixture settings", ofxCvGui::Widgets::Title::Level::H2);
+	inspector->addTitle("Fixture settings", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		widgets->addEditableValue<glm::vec2>(this->fixtureSettings.panRange);
-		widgets->addEditableValue<glm::vec2>(this->fixtureSettings.tiltRange);
+		inspector->addEditableValue<glm::vec2>(this->fixtureSettings.panRange);
+		inspector->addEditableValue<glm::vec2>(this->fixtureSettings.tiltRange);
 		{
-			auto selector = widgets->addMultipleChoice("DMX pan polarity");
+			auto selector = inspector->addMultipleChoice("DMX pan polarity");
 			selector->addOptions({ "Right (+)", "Left (+)" });
 			selector->entangle(this->fixtureSettings.dmxPanPolarity);
 		}
 
-		widgets->addTitle("DMX Addresses", ofxCvGui::Widgets::Title::Level::H3);
+		inspector->addTitle("DMX Addresses", ofxCvGui::Widgets::Title::Level::H3);
 		{
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.dmxStartAddress);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panCoarse);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panFine);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltCoarse);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltFine);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.brightness);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.focusCoarse);
-			widgets->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.focusFine);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.dmxStartAddress);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panCoarse);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.panFine);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltCoarse);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.tiltFine);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.brightness);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.focusCoarse);
+			inspector->addEditableValue<uint16_t>(this->fixtureSettings.dmxAddresses.focusFine);
 		}
 	}
 
-	widgets->addTitle("Data fudge", ofxCvGui::Widgets::Title::Level::H2);
+	inspector->addTitle("Data scaling", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		widgets->addButton("Scale pan values", [this]() {
+		inspector->addButton("Scale pan values", [this]() {
 			auto response = ofSystemTextBoxDialog("Scale pan values", "1.0");
 			if (!response.empty()) {
 				auto scale = ofToFloat(response);
@@ -426,7 +427,7 @@ void MovingHead::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgets) 
 			}
 		});
 
-		widgets->addButton("Scale tilt values", [this]() {
+		inspector->addButton("Scale tilt values", [this]() {
 			auto response = ofSystemTextBoxDialog("Scale tilt values", "1.0");
 			if (!response.empty()) {
 				auto scale = ofToFloat(response);
@@ -468,15 +469,20 @@ void MovingHead::solve() {
 		//--
 		// Perform fit
 		//
+
+		// Initialise the solution based on current state
 		auto priorSolution = ofxCeres::Models::DistortedMovingHead::Solution();
-		priorSolution.basicSolution = ofxCeres::Models::MovingHead::Solution{
+		{
+			priorSolution.basicSolution = ofxCeres::Models::MovingHead::Solution{
 			this->calibrationParameters.translation.get()
 				, this->calibrationParameters.rotationVector.get()
 				, this->calibrationParameters.tiltOffset.get()
-		};
+			};
 
-		// we don't initialise the distortion parameters, we always begin fit with undistorted
+			// we don't initialise the distortion parameters, we always begin fit with undistorted
+		}
 
+		// Perform the fit
 		auto result = ofxCeres::Models::DistortedMovingHead::solve(targetPoints
 			, panTiltAngles
 			, priorSolution);
@@ -718,6 +724,11 @@ glm::mat4 MovingHead::getTransform() const {
 }
 
 //---------
+glm::vec3 MovingHead::getPosition() const {
+	return this->calibrationParameters.translation.get();
+}
+
+//---------
 glm::vec2 MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
 	, const glm::vec2 & currentPanTilt) const {
 	auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
@@ -952,22 +963,4 @@ void MovingHead::focusDataPointWithHighestResidual() {
 			highestResidual = residual;
 		}
 	}
-}
-
-//----------
-void MovingHead::debugFunction() {
-	auto dataPoint = this->focusedDataPoint.lock();
-	if (!dataPoint) {
-		return;
-	}
-
-	auto targetPoint = dataPoint->targetPoint;
-	auto panTiltRecordedSignal = dataPoint->panTiltSignal;
-
-	auto panTiltIdealRecorded = this->panTiltSignalToIdeal(panTiltRecordedSignal);
-	auto panTiltSignalNavigated = this->getPanTiltForWorldTarget(targetPoint, panTiltRecordedSignal);
-
-	auto targetInObjectSpace4 = glm::inverse(this->getTransform()) * glm::vec4(targetPoint.get(), 1.0f);
-	auto targetInObjectspace = targetInObjectSpace4 / targetInObjectSpace4.w;
-	auto panTiltIdealNavigated = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace<float>(targetInObjectspace, this->calibrationParameters.tiltOffset.get());
 }

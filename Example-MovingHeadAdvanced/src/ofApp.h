@@ -3,9 +3,9 @@
 #include "ofMain.h"
 #include "ofxCvGui.h"
 
-#include "MovingHead.h"
+#include "Scene.h"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp {
 public:
 	void setup();
 	void update();
@@ -13,11 +13,6 @@ public:
 	void drawWorld();
 
 	void renderDMX();
-
-	void repopulateWidgets();
-
-	void load();
-	void save();
 
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -31,15 +26,9 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-    ofParameter<bool> drawGrid{ "Draw grid", true };		
-	ofParameter<bool> drawOtherFixtures{ "Draw other fixtures", true };
-
-	map<string, shared_ptr<MovingHead>> movingHeads;
-	string selection;
+	shared_ptr<Scene> scene = make_shared<Scene>();
 
 	ofxCvGui::Builder gui;
 	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
-	shared_ptr<ofxCvGui::Panels::World> worldPanel;
-	shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel;
-	shared_ptr<ofxCvGui::Panels::Groups::Grid> listPanelHolder;
+	shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel;
 };
