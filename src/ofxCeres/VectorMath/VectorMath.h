@@ -8,6 +8,13 @@ namespace ofxCeres {
 	namespace VectorMath {
 		//----------
 		template<typename T>
+		T dot(const glm::tvec2<T>& A, const glm::tvec2<T>& B) {
+			return A.x * B.x
+				+ A.y * B.y;
+		}
+
+		//----------
+		template<typename T>
 		T dot(const glm::tvec3<T> & A, const glm::tvec3<T> & B) {
 			return A.x * B.x
 				+ A.y * B.y
@@ -16,15 +23,20 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T dot(const glm::tvec2<T> & A, const glm::tvec2<T> & B) {
-			return A.x * B.x
-				+ A.y * B.y;
+		T length2(const glm::tvec2<T>& vector) {
+			return dot(vector, vector);
 		}
-		
+
 		//----------
 		template<typename T>
 		T length2(const glm::tvec3<T> & vector) {
 			return dot(vector, vector);
+		}
+
+		//----------
+		template<typename T>
+		T length(const glm::tvec2<T>& vector) {
+			return sqrt(length2(vector));
 		}
 
 		//----------
@@ -236,6 +248,16 @@ namespace ofxCeres {
 		T distanceRayToPoint(const glm::tvec3<T> & s, const glm::tvec3<T> & t, const glm::tvec3<T> & point)
 		{
 			return length(cross(point - s, point - (s + t))) / length(t);
+		}
+
+		//----------
+		template<typename T>
+		T distanceLineToPoint(const glm::tvec3<T>& abc, const glm::tvec2<T>& point)
+		{
+			auto& a = abc[0];
+			auto& b = abc[1];
+			auto& c = abc[2];
+			return abs(a * point.x + b * point.y + c) / sqrt(a * a + b * b);
 		}
 
 		//----------
