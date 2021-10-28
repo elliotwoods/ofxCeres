@@ -6,15 +6,17 @@ struct MovingHeadError {
 		, panTiltValues(panTiltValues) {}
 
 	template <typename T>
-	bool operator()(const T * const transformParameters
+	bool operator()(const T * const translationParameters
+		, const T* const rotationParameters
+		, const T* const tiltOffsetParameters
 		, T * residuals) const {
 
 		//--
 		//Extract parameters
-		glm::tvec3<T> translation(transformParameters[0], transformParameters[1], transformParameters[2]);
-		glm::tvec3<T> rotationVector(transformParameters[3], transformParameters[4], transformParameters[5]);
+		glm::tvec3<T> translation(translationParameters[0], translationParameters[1], translationParameters[2]);
+		glm::tvec3<T> rotationVector(rotationParameters[0], rotationParameters[1], rotationParameters[2]);
 
-		T tiltOffset = transformParameters[6];
+		T tiltOffset = tiltOffsetParameters[0];
 
 		auto transform = ofxCeres::VectorMath::createTransform(translation, rotationVector);
 		//
@@ -58,7 +60,7 @@ struct MovingHeadError {
 	}
 
 	static ceres::CostFunction * Create(const glm::tvec3<double> & targetPoint, const glm::tvec2<double> & panTiltValues) {
-		return new ceres::AutoDiffCostFunction<MovingHeadError, 1, 7>(
+		return new ceres::AutoDiffCostFunction<MovingHeadError, 1, 3, 3, 1>(
 			new MovingHeadError(targetPoint, panTiltValues)
 			);
 	}

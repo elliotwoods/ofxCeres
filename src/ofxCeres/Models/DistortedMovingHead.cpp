@@ -32,6 +32,7 @@ namespace ofxCeres {
 			SolverSettings solverSettings;
 
 			// if we want to add some specific options for this solver, do so here
+			solverSettings.options.max_num_iterations = 1000;
 
 			return solverSettings;
 		}
@@ -90,12 +91,12 @@ namespace ofxCeres {
 						, panDistortionParameters
 						, tiltDistortionParameters);
 				}
-				problem.AddResidualBlock(DistortionBias::Create()
-					, NULL
-					, panDistortionParameters);
-				problem.AddResidualBlock(DistortionBias::Create()
-					, NULL
-					, tiltDistortionParameters);
+				//problem.AddResidualBlock(DistortionBias::Create()
+				//	, NULL
+				//	, panDistortionParameters);
+				//problem.AddResidualBlock(DistortionBias::Create()
+				//	, NULL
+				//	, tiltDistortionParameters);
 				//
 				//--
 
@@ -122,7 +123,9 @@ namespace ofxCeres {
 
 					auto tiltOffset = (float)basicParameters[6];
 
-					Solution solution{
+					Result result(summary, sqrt(summary.final_cost / (double)size));
+
+					result.solution = {
 						{
 							translation
 							, rotationVector
@@ -141,7 +144,6 @@ namespace ofxCeres {
 						}
 					};
 
-					Result result(summary, sqrt(summary.final_cost / (double)size));
 					return result;
 				}
 			}

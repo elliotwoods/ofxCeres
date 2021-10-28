@@ -13,30 +13,15 @@ namespace Data {
 	}
 
 	//----------
-	void MovingHeadDataPoint::drawWorld() const {
-		ofPushStyle();
-		{
-			ofSetColor(this->color);
-			ofDrawSphere(this->targetPoint.get(), 0.03);
-
-			ofSetColor(255);
-			ofDrawBitmapString(this->name, this->targetPoint.get());
-		}
-		ofPopStyle();
-	}
-
-	//----------
 	void MovingHeadDataPoint::serialize(nlohmann::json & json) {
-		json << this->name;
 		json << this->panTiltSignal;
-		json << this->targetPoint;
+		json << this->marker;
 	}
 
 	//----------
 	void MovingHeadDataPoint::deserialize(const nlohmann::json & json) {
-		json >> this->name;
 		json >> this->panTiltSignal;
-		json >> this->targetPoint;
+		json >> this->marker;
 	}
 
 	//----------
@@ -44,15 +29,20 @@ namespace Data {
 		auto element = ofxCvGui::makeElement();
 
 		auto children = vector<ofxCvGui::ElementPtr>({
-			make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->name)
-			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltSignal)
-			, make_shared<ofxCvGui::Widgets::EditableValue<glm::vec3>>(this->targetPoint)
+			make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltSignal)
+			, make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->marker)
 		});
 
 		{
-			auto residualWidget = make_shared<ofxCvGui::Widgets::LiveValue<float>>("Residual", [this]() {
+			auto residualWidget = make_shared<ofxCvGui::Widgets::LiveValue<float>>("Residual [degrees]", [this]() {
 				if (this->getResidualFunction) {
-					return this->getResidualFunction(this);
+					try {
+						return this->getResidualFunction(this);
+					}
+					catch (...) {
+						// e.g. if this marker doesn't exist any more
+						return 0.0f;
+					}
 				}
 				else {
 					return 0.0f;
@@ -106,12 +96,21 @@ namespace Data {
 		});
 
 		addButton("GO Prediction", [this] {
-			this->onGoPrediction.notifyListeners();
+			try {
+				this->onGoPrediction.notifyListeners();
+			}
+			CATCH_TO_ALERT;
 		});
 
 		addButton("TAKE Current", [this] {
 			this->onTakeCurrent.notifyListeners();
 		});
+
+		// Expand height if needs be
+		auto height = y;
+		if (height > element->getHeight()) {
+			element->setHeight(height);
+		}
 
 		element->onDraw += [this](ofxCvGui::DrawArguments & args) {
 			if (this->isFocused) {

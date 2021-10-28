@@ -23,23 +23,35 @@ namespace ofxCeres {
 				}
 
 				// Initialize parameters
-				double parameters[7] = {
+				double translationParameters[3] = {
 					initialSolution.translation[0]
 					, initialSolution.translation[1]
 					, initialSolution.translation[2]
-					, initialSolution.rotationVector[0]
+				};
+				double rotationParameters[3] = {
+					initialSolution.rotationVector[0]
 					, initialSolution.rotationVector[1]
 					, initialSolution.rotationVector[2]
-					, initialSolution.tiltOffset
+				};
+				double tiltOffsetParameters[1] = {
+					initialSolution.tiltOffset
 				};
 
 				ceres::Problem problem;
 				size_t size = targetPoints.size();
 				for (size_t i = 0; i < size; i++) {
-					ceres::CostFunction * costFunction = MovingHeadError::Create(targetPoints[i], panTiltValues[i]);
+					ceres::CostFunction * costFunction = MovingHeadError::Create(targetPoints[i]
+						, panTiltValues[i]);
 					problem.AddResidualBlock(costFunction
 						, NULL
-						, parameters);
+						, translationParameters
+						, rotationParameters
+						, tiltOffsetParameters);
+				}
+
+				{
+					//problem.SetParameterLowerBound(tiltOffsetParameters, 0, -20 * DEG_TO_RAD);
+					//problem.SetParameterLowerBound(tiltOffsetParameters, 0, 20 * DEG_TO_RAD);
 				}
 
 				ceres::Solver::Summary summary;
@@ -51,19 +63,20 @@ namespace ofxCeres {
 
 				// construct result
 				{
-					glm::vec3 translation(parameters[0], parameters[1], parameters[2]);
-					glm::vec3 rotationVector(parameters[3], parameters[4], parameters[5]);
+					glm::vec3 translation(translationParameters[0], translationParameters[1], translationParameters[2]);
+					glm::vec3 rotationVector(rotationParameters[0], rotationParameters[1], rotationParameters[2]);
 
-					auto tiltOffset = (float)parameters[6];
+					auto tiltOffset = (float)tiltOffsetParameters[0];
 
-					Solution solution{
+					Result result(summary, sqrt(summary.final_cost / (double)size));
+
+					result.solution = {
 						translation
 						, rotationVector
 						, tiltOffset
 						, ofxCeres::VectorMath::createTransform(translation, rotationVector)
 					};
 
-					Result result(summary, sqrt(summary.final_cost / (double)size));
 					return result;
 				}
 			}

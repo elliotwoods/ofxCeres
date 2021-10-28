@@ -4,8 +4,17 @@
 #include "ofxCeres.h"
 
 //--------------------------------------------------------------
-void ofApp::setup() {
-	// Initialise the gui
+void
+ofApp::setup()
+{
+	// Init the gui
+	this->gui.init();
+
+	// Initialise the scene
+	this->scene = make_shared<Scene>(); // We want to do this after gui is init setup so we load graphics correctly
+	this->scene->load();
+
+	// Setup the gui
 	{
 		this->gui.init();
 
@@ -17,11 +26,7 @@ void ofApp::setup() {
 
 		// Add the panel for drawing 3D world
 		{
-			this->worldPanel = ofxCvGui::Panels::makeWorldManaged();
-			this->worldPanel->onDrawWorld += [this](ofCamera &) {
-				this->drawWorld();
-			};
-			this->stripPanel->add(this->worldPanel);
+			this->stripPanel->add(this->scene->getPanel());
 		}
 
 		// Add the inspector and focus this to start with
@@ -32,9 +37,6 @@ void ofApp::setup() {
 			ofxCvGui::inspect(this->scene);
 		}
 	}
-
-	// Load for json file
-	this->scene->load();
 
 	// look at moving head #1 to start with
 	{
@@ -48,23 +50,24 @@ void ofApp::setup() {
 }
 
 //--------------------------------------------------------------
-void ofApp::update() {
+void
+ofApp::update()
+{
 	this->renderDMX();
 	this->scene->update();
 }
 
 //--------------------------------------------------------------
-void ofApp::draw() {
+void
+ofApp::draw()
+{
 
 }
 
 //--------------------------------------------------------------
-void ofApp::drawWorld() {
-	this->scene->drawWorld();
-}
-
-//--------------------------------------------------------------
-void ofApp::renderDMX() {
+void
+ofApp::renderDMX()
+{
 	// dmx values have addersses starting with 1, so we keep these addresses and throw away the first value
 	vector<uint8_t> dmxValues(513, 0);
 	this->scene->renderDMX(dmxValues);
@@ -77,59 +80,4 @@ void ofApp::renderDMX() {
 
 	//
 	//--
-}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button) {
-	
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::windowResized(int w, int h) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo) {
-
 }

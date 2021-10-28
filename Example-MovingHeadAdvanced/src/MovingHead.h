@@ -2,10 +2,11 @@
 
 #include "Data/CalibrationPointSet.h"
 #include "Data/MovingHeadDataPoint.h"
+#include "Markers.h"
 
 class MovingHead : public Data::Serializable, public ofxCvGui::IInspectable {
 public:
-	MovingHead();
+	MovingHead(shared_ptr<Markers>);
 	string getTypeName() const;
 
 	void update();
@@ -13,7 +14,7 @@ public:
 	void drawWorld(bool selected);
 
 	void serialize(nlohmann::json &);
-	void deserialize(const nlohmann::json &);
+	void deserialize(const nlohmann::json &, bool isImport = false);
 	void populateInspector(ofxCvGui::InspectArguments&);
 
 	shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
@@ -23,23 +24,25 @@ public:
 
 	glm::mat4 getTransform() const;
 	glm::vec3 getPosition() const;
+	void applyRotation(const glm::quat&);
 
 	glm::vec2 getPanTiltForWorldTarget(const glm::vec3 &
 		, const glm::vec2 & currentPanTiltSignal) const;
 	void navigateToWorldTarget(const glm::vec3 &);
 
-	void setWorldCursorPosition(const glm::vec3 &);
-
 	void renderDMX(vector<uint8_t> & dmxValues) const;
 
 	glm::vec2 panTiltIdealToSignal(const glm::vec2 &) const;
 	glm::vec2 panTiltSignalToIdeal(const glm::vec2 &) const;
+
+	shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>> getCalibrationPoints();
+
 protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
 	void focusDataPointWithHighestResidual();
 
-	Data::CalibrationPointSet<Data::MovingHeadDataPoint> calibrationPoints;
+	shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>> calibrationPoints = make_shared< Data::CalibrationPointSet<Data::MovingHeadDataPoint>>();
 
 	struct {
 		ofParameter<float> focus{ "Focus", 0.5f, 0.0f, 1.0f };
@@ -80,4 +83,7 @@ protected:
 	weak_ptr<Data::MovingHeadDataPoint> focusedDataPoint;
 
 	glm::vec3 lastWorldPosition;
+
+	// Reference to the database of markers so that we can use locally
+	shared_ptr<Markers> markers;
 };

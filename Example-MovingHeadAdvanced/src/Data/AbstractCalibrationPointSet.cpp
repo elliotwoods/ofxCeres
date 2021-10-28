@@ -8,11 +8,12 @@ using namespace ofxCvGui;
 namespace Data {
 #pragma mark AbstractCalibrationPointSet
 	//----------
-	AbstractCalibrationPointSet::AbstractCalibrationPointSet() {
+	AbstractCalibrationPointSet::AbstractCalibrationPointSet()
+	{
 		RULR_SERIALIZE_LISTENERS;
 
 		this->listPanel = Panels::makeWidgets();
-		this->listPanel->setHeight(400.0f);
+		this->listPanel->setHeight(800.0f);
 		this->listPanel->onUpdate += [this](ofxCvGui::UpdateArguments &) {
 			if (this->viewDirty) {
 				this->listPanel->clear();
@@ -32,16 +33,23 @@ namespace Data {
 			ofPopStyle();
 		};
 		this->listPanel->setScissorEnabled(true);
+
+		this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
+			this->populateInspector(args);
+		};
 	}
 
 	//----------
-	AbstractCalibrationPointSet::~AbstractCalibrationPointSet() {
+	AbstractCalibrationPointSet::~AbstractCalibrationPointSet()
+	{
 		this->isDeleting = true;
 		this->clear();
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::add(shared_ptr<AbstractCalibrationPoint> capture) {
+	void
+	AbstractCalibrationPointSet::add(shared_ptr<AbstractCalibrationPoint> capture)
+	{
 		if (find(this->captures.begin(), this->captures.end(), capture) != this->captures.end()) {
 			return;
 		}
@@ -93,7 +101,9 @@ namespace Data {
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::remove(shared_ptr<AbstractCalibrationPoint> capture) {
+	void
+	AbstractCalibrationPointSet::remove(shared_ptr<AbstractCalibrationPoint> capture)
+	{
 		auto findCapture = find(this->captures.begin(), this->captures.end(), capture);
 		if (findCapture != this->captures.end()) {
 			if (capture) {
@@ -107,7 +117,9 @@ namespace Data {
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::clear() {
+	void
+	AbstractCalibrationPointSet::clear()
+	{
 		this->listPanel->clear();
 		while (!this->captures.empty()) {
 			this->remove(*this->captures.begin());
@@ -116,40 +128,70 @@ namespace Data {
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::select(shared_ptr<AbstractCalibrationPoint> capture) {
+	void
+		AbstractCalibrationPointSet::clearUnselected()
+	{
+		this->listPanel->clear();
+
+		// Make a copy since we'll be editing this->captures
+		auto captures = this->captures;
+
+		// Remove them one-by-one
+		for(auto capture : captures) {
+			if (!capture->isSelected()) {
+				this->remove(capture);
+			}
+		}
+		this->viewDirty = true;
+	}
+
+	//----------
+	void
+	AbstractCalibrationPointSet::select(shared_ptr<AbstractCalibrationPoint> capture)
+	{
 		capture->setSelected(true);
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::selectAll() {
+	void
+	AbstractCalibrationPointSet::selectAll()
+	{
 		for (auto capture : this->captures) {
 			capture->setSelected(true);
 		}
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::selectNone() {
+	void
+	AbstractCalibrationPointSet::selectNone()
+	{
 		for (auto capture : this->captures) {
 			capture->setSelected(false);
 		}
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets> widgetsPanel, bool addListPanel) {
-		if (addListPanel) {
-			widgetsPanel->add(this->listPanel);
-		}
+	void
+	AbstractCalibrationPointSet::populateInspector(ofxCvGui::InspectArguments& args)
+	{
+		auto inspector = args.inspector;
 
-		widgetsPanel->addLiveValue<int>("Count", [this]() {
+		inspector->add(this->listPanel);
+
+		inspector->addLiveValue<int>("Count", [this]() {
 			return this->captures.size();
 		});
 
-		widgetsPanel->addButton("Clear", [this]() {
+		inspector->addButton("Clear", [this]() {
 			this->clear();
 		});
+		
+		inspector->addButton("Clear unselected", [this]() {
+			this->clearUnselected();
+			});
 
 		{
-			auto selectionSelector = widgetsPanel->addMultipleChoice("Selection", { "All", "None" });
+			auto selectionSelector = inspector->addMultipleChoice("Selection", { "All", "None" });
 			selectionSelector->setAllowNullSelection(true);
 			selectionSelector->onValueChange += [this](int selectionIndex) {
 				switch (selectionIndex) {
@@ -193,16 +235,20 @@ namespace Data {
 			};
 		}
 
-		widgetsPanel->addSpacer();
+		inspector->addSpacer();
 	}
 
 	//----------
-	shared_ptr<ofxCvGui::Panels::Widgets> AbstractCalibrationPointSet::getListPanel() {
+	shared_ptr<ofxCvGui::Panels::Widgets>
+	AbstractCalibrationPointSet::getListPanel()
+	{
 		return this->listPanel;
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::serialize(nlohmann::json & json) {
+	void
+	AbstractCalibrationPointSet::serialize(nlohmann::json & json)
+	{
 		nlohmann::json jsonCaptures;
 		int index = 0;
 		for (auto capture : this->captures) {
@@ -214,7 +260,9 @@ namespace Data {
 	}
 
 	//----------
-	void AbstractCalibrationPointSet::deserialize(const nlohmann::json & json) {
+	void
+	AbstractCalibrationPointSet::deserialize(const nlohmann::json & json)
+	{
 		this->captures.clear();
 		if (json.count("captures") != 0) {
 			const auto & jsonCaptures = json["captures"];
@@ -232,7 +280,9 @@ namespace Data {
 	}
 
 	//----------
-	vector<shared_ptr<AbstractCalibrationPoint>> AbstractCalibrationPointSet::getSelectionUntyped() const {
+	vector<shared_ptr<AbstractCalibrationPoint>>
+	AbstractCalibrationPointSet::getSelectionUntyped() const
+	{
 		auto selection = this->captures;
 		for (auto it = selection.begin(); it != selection.end(); ) {
 			if (!(*it)->isSelected()) {
@@ -246,12 +296,16 @@ namespace Data {
 	}
 
 	//----------
-	vector<shared_ptr<AbstractCalibrationPoint>> AbstractCalibrationPointSet::getAllCapturesUntyped() const {
+	vector<shared_ptr<AbstractCalibrationPoint>>
+	AbstractCalibrationPointSet::getAllCapturesUntyped() const
+	{
 		return this->captures;
 	}
 
 	//----------
-	size_t AbstractCalibrationPointSet::size() const {
+	size_t
+	AbstractCalibrationPointSet::size() const
+	{
 		return this->captures.size();
 	}
 }

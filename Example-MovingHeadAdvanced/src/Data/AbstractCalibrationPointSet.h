@@ -3,7 +3,7 @@
 #include "AbstractCalibrationPoint.h"
 
 namespace Data {
-	class AbstractCalibrationPointSet : public Serializable {
+	class AbstractCalibrationPointSet : public Serializable, public ofxCvGui::IInspectable {
 	public:
 		AbstractCalibrationPointSet();
 		virtual ~AbstractCalibrationPointSet();
@@ -11,12 +11,13 @@ namespace Data {
 		void add(shared_ptr<AbstractCalibrationPoint>);
 		void remove(shared_ptr<AbstractCalibrationPoint>);
 		void clear();
+		void clearUnselected();
 
 		void select(shared_ptr<AbstractCalibrationPoint>);
 		void selectAll();
 		void selectNone();
 
-		void populateWidgets(shared_ptr<ofxCvGui::Panels::Widgets>, bool addListPanel = true);
+		void populateInspector(ofxCvGui::InspectArguments&);
 		shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
 
 		void serialize(nlohmann::json &);

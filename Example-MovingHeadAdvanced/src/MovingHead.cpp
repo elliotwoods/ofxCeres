@@ -3,7 +3,9 @@
 #include "Widgets/PanTiltTrackpad.h"
 
 //---------
-MovingHead::MovingHead() {
+MovingHead::MovingHead(shared_ptr<Markers> markers)
+	: markers(markers)
+{
 	RULR_SERIALIZE_LISTENERS;
 
 	this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
@@ -12,30 +14,27 @@ MovingHead::MovingHead() {
 }
 
 //---------
-string MovingHead::getTypeName() const {
+string
+MovingHead::getTypeName() const
+{
 	return "MovingHead";
 }
 
 //---------
-void MovingHead::update() {
+void
+MovingHead::update()
+{
 	// Update the range of pan-tilt
 	this->currentPanTiltSignal.setMin({ this->fixtureSettings.panRange.get().x, this->fixtureSettings.tiltRange.get().x });
 	this->currentPanTiltSignal.setMax({ this->fixtureSettings.panRange.get().y, this->fixtureSettings.tiltRange.get().y });
 }
 
 //---------
-void MovingHead::drawWorld(bool selected) {
+void
+MovingHead::drawWorld(bool selected)
+{
 	ofPushStyle();
 	{
-		auto calibrationPoints = this->calibrationPoints.getSelection();
-
-		//draw target points
-		if (selected) {
-			for (auto calibrationPoint : calibrationPoints) {
-				calibrationPoint->drawWorld();
-			}
-		}
-
 		auto transform = this->getTransform();
 
 		//draw moving head body
@@ -54,6 +53,18 @@ void MovingHead::drawWorld(bool selected) {
 				ofDrawBox(glm::vec3(0, -0.35, 0), 0.5, 0.1, 0.4);
 
 				auto panTiltIdeal = this->panTiltSignalToIdeal(this->currentPanTiltSignal);
+
+				// arrow
+				static ofMesh arrow;
+				if (arrow.getNumVertices() == 0) {
+					arrow.addVertices(
+						{
+							{ -0.05, -0.3, 0.3 },
+							{ +0.05, -0.3, 0.3 },
+							{ 0, -0.3, 0.4 }
+						});
+				}
+				arrow.drawWireframe();
 
 				// Axis 1
 				ofPushMatrix();
@@ -94,38 +105,40 @@ void MovingHead::drawWorld(bool selected) {
 		ofPopMatrix();
 
 		if (selected) {
-			//draw selected data point
-			auto focusedDataPoint = this->focusedDataPoint.lock();
-			if (focusedDataPoint) {
-				ofPushStyle();
-				{
-					ofNoFill();
-					ofSetColor(255);
-					ofDrawCircle(focusedDataPoint->targetPoint.get(), 0.05f);
-				}
-				ofPopStyle();
-			}
-
 			//draw rays and residuals
+			auto calibrationPoints = this->calibrationPoints->getSelection();
 			ofPushStyle();
 			{
 				for (const auto & calibrationPoint : calibrationPoints) {
+					auto marker = this->markers->getMarkerByName(calibrationPoint->marker);
+					if (!marker) {
+						// Don't draw the rays for missing markers
+						continue;
+					}
+
 					ofSetColor(calibrationPoint->color);
 
 					auto idealPanTilt = this->panTiltSignalToIdeal(calibrationPoint->panTiltSignal.get());
 					auto transmissionObject = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(idealPanTilt
 						, this->calibrationParameters.tiltOffset.get());
 
+					
+					// Set length to distance of marker to moving head
+					auto distance = glm::distance(marker->position.get(), this->getPosition());
+					transmissionObject *= distance;
+
 					auto transmissionWorld4 = transform * glm::vec4(transmissionObject, 1.0f);
 					auto transmissionWorld = (glm::vec3) (transmissionWorld4 / transmissionWorld4.w);
 
 					ofSetLineWidth(2.0f);
 					ofDrawLine(this->calibrationParameters.translation.get(), transmissionWorld);
-					ofDrawBitmapString(calibrationPoint->name.get(), transmissionWorld);
 
-					ofSetLineWidth(1.0f);
-					ofSetColor(100);
-					ofDrawLine(transmissionWorld, calibrationPoint->targetPoint);
+					if (marker) {
+						ofSetLineWidth(1.0f);
+						ofSetColor(100);
+						ofDrawLine(transmissionWorld, marker->position);
+					}
+					
 				}
 			}
 			ofPopStyle();
@@ -135,9 +148,11 @@ void MovingHead::drawWorld(bool selected) {
 }
 
 //---------
-void MovingHead::serialize(nlohmann::json & json) {
+void
+MovingHead::serialize(nlohmann::json & json)
+{
 	nlohmann::json jsonCalibrationPoints;
-	this->calibrationPoints.serialize(jsonCalibrationPoints);
+	this->calibrationPoints->serialize(jsonCalibrationPoints);
 	json["calibrationPoints"] = jsonCalibrationPoints;
 	
 	{
@@ -178,12 +193,43 @@ void MovingHead::serialize(nlohmann::json & json) {
 }
 
 //---------
-void MovingHead::deserialize(const nlohmann::json & json) {
+void
+MovingHead::deserialize(const nlohmann::json & json, bool isImport)
+{
+	// If isImport is true, then calibrationPoints will be in the old format when we didn't have a shared database of Markers
+
 	if (json.count("calibrationPoints") != 0) {
-		this->calibrationPoints.deserialize(json["calibrationPoints"]);
+		if (isImport) {
+			this->calibrationPoints->clear();
+
+			const auto& jsonCalibrationPoints = json["calibrationPoints"];
+			if (jsonCalibrationPoints.contains("captures")) {
+				const auto& jsonCaptures = jsonCalibrationPoints["captures"];
+				for (const auto& jsonCapture : jsonCaptures) {
+					auto capture = make_shared<Data::MovingHeadDataPoint>();
+
+					// Get out the timestamp, color, pan tilt angles
+					capture->deserialize(jsonCapture);
+
+					if (!jsonCapture.contains("Name")) {
+						// Ignore if not in old format (where we had a Name)
+						continue;
+					}
+					capture->marker.set(jsonCapture["Name"].get<string>());
+					this->calibrationPoints->add(capture);
+
+					if (jsonCapture.contains("Selected")) {
+						capture->setSelected(jsonCapture["Selected"].get<bool>());
+					}
+				}
+			}
+		}
+		else {
+			this->calibrationPoints->deserialize(json["calibrationPoints"]);
+		}
 
 		// Setup callbacks
-		auto calibrationPoints = this->calibrationPoints.getAllCaptures();
+		auto calibrationPoints = this->calibrationPoints->getAllCaptures();
 		for (auto calibrationPoint : calibrationPoints) {
 			this->prepareDataPoint(calibrationPoint);
 		}
@@ -227,7 +273,9 @@ void MovingHead::deserialize(const nlohmann::json & json) {
 }
 
 //---------
-void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
+void
+MovingHead::populateInspector(ofxCvGui::InspectArguments& args)
+{
 	auto inspector = args.inspector;
 	
 	// make the trackpad and set it up
@@ -242,7 +290,7 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 			ofMesh pointsPreview;
 			pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_POINTS);
 
-			auto calibrationPoints = this->calibrationPoints.getSelection();
+			auto calibrationPoints = this->calibrationPoints->getSelection();
 			for (auto calibrationPoint : calibrationPoints) {
 				pointsPreview.addColor(calibrationPoint->color.get());
 				pointsPreview.addVertex(glm::vec3(trackpadWidget->toXY(calibrationPoint->panTiltSignal.get()), 0.0f));
@@ -267,7 +315,7 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 
 				// search for closest dataPoint
 				auto minDistance2 = std::numeric_limits<float>::max();
-				auto calibrationPoints = this->calibrationPoints.getSelection();
+				auto calibrationPoints = this->calibrationPoints->getSelection();
 
 				for (auto calibrationPoint : calibrationPoints) {
 					auto drawnPosition = trackpadWidget->toXY(calibrationPoint->panTiltSignal.get());
@@ -286,28 +334,37 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 
 	inspector->addTitle("Data", ofxCvGui::Widgets::Title::Level::H2);
 	{
+		inspector->addButton("Calibration points >>", [this]() {
+			ofxCvGui::inspect(this->calibrationPoints);
+			});
+
 		inspector->addButton("Add new data point...", [this]() {
-			auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
-			newDataPoint->name = ofSystemTextBoxDialog("Name");
-			newDataPoint->panTiltSignal = this->currentPanTiltSignal.get();
+			try {
+				auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
+				newDataPoint->panTiltSignal = this->currentPanTiltSignal.get();
 
-			auto targetPoint = this->lastWorldPosition;
-			{
-				auto response = ofSystemTextBoxDialog("Target point in world [" + ofToString(targetPoint) + "]", ofToString(targetPoint));
+				auto targetPoint = this->lastWorldPosition;
+				{
+					auto response = ofSystemTextBoxDialog("Target point in world [" + ofToString(targetPoint) + "]", ofToString(targetPoint));
 
-				if (!response.empty()) {
-					stringstream ss(response);
-					ss >> targetPoint;
+					if (!response.empty()) {
+						stringstream ss(response);
+						ss >> targetPoint;
+					}
 				}
+
+				auto markerClosestToCursor = this->markers->getFocusedMarker();
+				if (!markerClosestToCursor) {
+					throw(Exception("There is no marker close to the mouse cursor"));
+				}
+
+				newDataPoint->marker = markerClosestToCursor->name.get();
+
+				this->prepareDataPoint(newDataPoint);
+				this->calibrationPoints->add(newDataPoint);
 			}
-
-			newDataPoint->targetPoint = targetPoint;
-
-			this->prepareDataPoint(newDataPoint);
-			this->calibrationPoints.add(newDataPoint);
+			CATCH_TO_ALERT;
 		});
-
-		this->calibrationPoints.populateWidgets(inspector, false);
 
 		inspector->addButton("Add test data", [this]() {
 			this->addTestData();
@@ -315,16 +372,6 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 
 		inspector->addTitle("Focused", ofxCvGui::Widgets::Title::Level::H3);
 		{
-			inspector->addLiveValue<string>("Name", [this]() {
-				auto focusedDataPoint = this->focusedDataPoint.lock();
-				if (focusedDataPoint) {
-					return focusedDataPoint->name.get();
-				}
-				else {
-					return (string) "";
-				}
-			});
-
 			inspector->addToggle("Selected", [this]() {
 				auto focusedDataPoint = this->focusedDataPoint.lock();
 				if (focusedDataPoint) {
@@ -385,7 +432,10 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 		});
 
 		inspector->addButton("Focus datapoint with highest residual", [this]() {
-			this->focusDataPointWithHighestResidual();
+			try {
+				this->focusDataPointWithHighestResidual();
+			}
+			CATCH_TO_ALERT;
 		});
 	}
 
@@ -418,7 +468,7 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 			auto response = ofSystemTextBoxDialog("Scale pan values", "1.0");
 			if (!response.empty()) {
 				auto scale = ofToFloat(response);
-				auto calibrationPoints = this->calibrationPoints.getSelection();
+				auto calibrationPoints = this->calibrationPoints->getSelection();
 				for (auto calibrationPoint : calibrationPoints) {
 					auto panTiltValue = calibrationPoint->panTiltSignal.get();
 					panTiltValue.x *= scale;
@@ -431,7 +481,7 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 			auto response = ofSystemTextBoxDialog("Scale tilt values", "1.0");
 			if (!response.empty()) {
 				auto scale = ofToFloat(response);
-				auto calibrationPoints = this->calibrationPoints.getSelection();
+				auto calibrationPoints = this->calibrationPoints->getSelection();
 				for (auto calibrationPoint : calibrationPoints) {
 					auto panTiltValue = calibrationPoint->panTiltSignal.get();
 					panTiltValue.y *= scale;
@@ -443,13 +493,17 @@ void MovingHead::populateInspector(ofxCvGui::InspectArguments& args) {
 }
 
 //---------
-shared_ptr<ofxCvGui::Panels::Widgets> MovingHead::getListPanel() {
-	return this->calibrationPoints.getListPanel();
+shared_ptr<ofxCvGui::Panels::Widgets>
+MovingHead::getListPanel()
+{
+	return this->calibrationPoints->getListPanel();
 }
 
 
 //---------
-void MovingHead::solve() {
+void
+MovingHead::solve()
+{
 	
 	//--
 	// Prepare data
@@ -457,9 +511,17 @@ void MovingHead::solve() {
 	vector<glm::vec3> targetPoints;
 	vector<glm::vec2> panTiltAngles;
 
-	auto calibrationPoints = this->calibrationPoints.getSelection();
+	auto calibrationPoints = this->calibrationPoints->getSelection();
 	for (auto calibrationPoint : calibrationPoints) {
-		targetPoints.push_back(calibrationPoint->targetPoint);
+		auto marker = this->markers->getMarkerByName(calibrationPoint->marker);
+
+		if (!marker) {
+			// If the marker doesn't exist - deselect it and ignore it
+			calibrationPoint->setSelected(false);
+			continue;
+		}
+
+		targetPoints.push_back(marker->position);
 		panTiltAngles.push_back(calibrationPoint->panTiltSignal);
 	}
 	//
@@ -549,7 +611,9 @@ void MovingHead::solve() {
 }
 
 //---------
-void MovingHead::addTestData() {
+void
+MovingHead::addTestData()
+{
 	vector<string> names({
 		"A"
 		, "C"
@@ -707,30 +771,56 @@ void MovingHead::addTestData() {
 
 	for (size_t i = 0; i < names.size(); i++) {
 		auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
-		newDataPoint->name = names[i];
 		newDataPoint->panTiltSignal = panTiltAngles[i];
-		newDataPoint->targetPoint = targetPoints[i];
+
+		auto marker = markers->addNewMarker(names[i], targetPoints[i], true);
+		newDataPoint->marker = marker->name.get();
 
 		this->prepareDataPoint(newDataPoint);
 
-		this->calibrationPoints.add(newDataPoint);
+		this->calibrationPoints->add(newDataPoint);
 	}
 }
 
 //---------
-glm::mat4 MovingHead::getTransform() const {
+glm::mat4
+MovingHead::getTransform() const
+{
 	return ofxCeres::VectorMath::createTransform(this->calibrationParameters.translation.get()
 		, this->calibrationParameters.rotationVector.get());
 }
 
 //---------
-glm::vec3 MovingHead::getPosition() const {
+glm::vec3
+MovingHead::getPosition() const
+{
 	return this->calibrationParameters.translation.get();
 }
 
 //---------
-glm::vec2 MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
-	, const glm::vec2 & currentPanTilt) const {
+void
+MovingHead::applyRotation(const glm::quat& rotation)
+{
+	{
+		auto translation = this->calibrationParameters.translation.get();
+		translation = rotation * translation;
+		this->calibrationParameters.translation.set(translation);
+	}
+
+	{
+		auto rotationVector = this->calibrationParameters.rotationVector.get();
+		auto rotationPre = ofxCeres::VectorMath::eulerToQuat(rotationVector);
+		auto rotationPost = rotation * rotationPre;
+		rotationVector = glm::eulerAngles(rotationPost);
+		this->calibrationParameters.rotationVector.set(rotationVector);
+	}
+}
+
+//---------
+glm::vec2
+MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
+	, const glm::vec2 & currentPanTilt) const
+{
 	auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
 	auto objectSpacePosition = (glm::vec3) (objectSpacePosition4 / objectSpacePosition4.w);
 
@@ -783,7 +873,9 @@ glm::vec2 MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
 }
 
 //---------
-void MovingHead::navigateToWorldTarget(const glm::vec3 & world) {
+void
+MovingHead::navigateToWorldTarget(const glm::vec3 & world)
+{
 	// Navigate pan-tilt values
 	auto panTiltAngles = this->getPanTiltForWorldTarget(world, this->currentPanTiltSignal.get());
 	this->currentPanTiltSignal.set(panTiltAngles);
@@ -810,23 +902,9 @@ void MovingHead::navigateToWorldTarget(const glm::vec3 & world) {
 }
 
 //---------
-void MovingHead::setWorldCursorPosition(const glm::vec3 & position) {
-	// Focus the data point close to the world cursor
-	auto minDistance2 = numeric_limits<float>::max();
-	auto dataPoints = this->calibrationPoints.getSelection();
-	for (auto dataPoint : dataPoints) {
-		auto distance2 = glm::distance2(dataPoint->targetPoint.get(), position);
-
-		// take the point as the focus if it's closest to the cursor so far (within 30cm)
-		if (distance2 < minDistance2 && sqrt(distance2) < 0.3f) {
-			this->focusedDataPoint = dataPoint;
-			minDistance2 = distance2;
-		}
-	}
-}
-
-//---------
-void MovingHead::renderDMX(vector<uint8_t> & dmxValues) const {
+void
+MovingHead::renderDMX(vector<uint8_t> & dmxValues) const
+{
 	auto panSignalValue = (uint16_t) ofMap(this->currentPanTiltSignal.get().x
 		, this->currentPanTiltSignal.getMin().x
 		, this->currentPanTiltSignal.getMax().x
@@ -866,7 +944,9 @@ void MovingHead::renderDMX(vector<uint8_t> & dmxValues) const {
 }
 
 //---------
-glm::vec2 MovingHead::panTiltIdealToSignal(const glm::vec2 & ideal) const {
+glm::vec2
+MovingHead::panTiltIdealToSignal(const glm::vec2 & ideal) const
+{
 	auto panOptions = ofxCeres::VectorMath::powerSeries2Inverse(ideal.x, (float*)& this->calibrationParameters.panDistortion.get());
 	auto tiltOptions = ofxCeres::VectorMath::powerSeries2Inverse(ideal.y, (float*)& this->calibrationParameters.tiltDistortion.get());
 
@@ -880,7 +960,9 @@ glm::vec2 MovingHead::panTiltIdealToSignal(const glm::vec2 & ideal) const {
 }
 
 //---------
-glm::vec2 MovingHead::panTiltSignalToIdeal(const glm::vec2 & signal) const {
+glm::vec2
+MovingHead::panTiltSignalToIdeal(const glm::vec2 & signal) const 
+{
 	return {
 		ofxCeres::VectorMath::powerSeries2(signal.x, (float*)& this->calibrationParameters.panDistortion.get())
 		, ofxCeres::VectorMath::powerSeries2(signal.y, (float*)& this->calibrationParameters.tiltDistortion.get())
@@ -888,7 +970,16 @@ glm::vec2 MovingHead::panTiltSignalToIdeal(const glm::vec2 & signal) const {
 }
 
 //---------
-void MovingHead::prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint> dataPoint) {
+shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>>
+MovingHead::getCalibrationPoints()
+{
+	return this->calibrationPoints;
+}
+
+//---------
+void
+MovingHead::prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint> dataPoint)
+{
 	auto getResidualFunction = [this](Data::MovingHeadDataPoint * dataPoint) {
 		return this->getResidualOnDataPoint(dataPoint);
 	};
@@ -909,7 +1000,8 @@ void MovingHead::prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint> dataPoin
 
 	dataPoint->onGoPrediction += [dataPointWeak, this]() {
 		auto dataPoint = dataPointWeak.lock();
-		this->navigateToWorldTarget(dataPoint->targetPoint.get());
+		auto marker = this->markers->getMarkerByName(dataPoint->marker);
+		this->navigateToWorldTarget(marker->position.get());
 	};
 
 	dataPoint->onRequestFocus += [dataPointWeak, this]() {
@@ -922,15 +1014,23 @@ void MovingHead::prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint> dataPoin
 	};
 }
 //---------
-float MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) const {
+float
+MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) const
+{
 	auto transform = this->getTransform();
 
 	//--
 	//World -> Object space
 	//
 
+	//get marker position
+	auto marker = this->markers->getMarkerByName(dataPoint->marker);
+	if (!marker) {
+		throw(Exception("Marker " + dataPoint->marker.get() + " does not exist"));
+	}
+
 	//apply rigid body transform
-	auto targetInViewSpace4 = glm::inverse(transform) * glm::vec4(dataPoint->targetPoint.get(), 1.0);
+	auto targetInViewSpace4 = glm::inverse(transform) * glm::vec4(marker->position.get(), 1.0);
 	targetInViewSpace4 /= targetInViewSpace4.w;
 	auto targetInViewSpace = glm::vec3(targetInViewSpace4);
 
@@ -952,9 +1052,11 @@ float MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) 
 }
 
 //----------
-void MovingHead::focusDataPointWithHighestResidual() {
+void
+MovingHead::focusDataPointWithHighestResidual() 
+{
 	float highestResidual = 0.0f;
-	auto dataPoints = this->calibrationPoints.getSelection();
+	auto dataPoints = this->calibrationPoints->getSelection();
 
 	for (auto dataPoint : dataPoints) {
 		auto residual = this->getResidualOnDataPoint(dataPoint.get());
