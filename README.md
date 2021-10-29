@@ -58,5 +58,20 @@ This is because the default constructor will be confused with the union working 
 
 # Building ceres-solver
 
-For Visual Studio, we rely on [https://github.com/tbennun/ceres-windows/].
+For Visual Studio, please use [https://github.com/elliotwoods/ceres-windows/] branch `v2` which is configured for:
+Note that the submodules seem broken (and we already spent a tonne of time on recompiling ceres for windows). A working building folder can be found at https://www.dropbox.com/s/czuo6zpktsjrbuw/ceres-windows%2020211029.zip?dl=0
 
+* Use CXSPARSE for sparse maths library
+* v2.0 of ceres-solver
+* ceres built as shared library
+* No tests, benchmarks, samples, etc (library only)
+* glog (not miniglog)
+* CXSPARSE_VERSION set manually
+* /bigobj for x64 builds
+* add `int FLAGS_v = 2;` to line 45 of `wall_time.cc` otherwise it prints out (+performs?) extra 5 lines of profile info at every iteration
+	* Note : this is the only change within the `ceres-solver` repo itself. We don't have/use our own fork for that
+
+You need to:
+
+1. Clone recursively
+2. Build Debug/Release x Win32/x64

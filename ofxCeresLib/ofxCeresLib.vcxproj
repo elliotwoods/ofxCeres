@@ -135,7 +135,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ceres.lib;CXSparse.lib;glog.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
@@ -156,7 +156,7 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ceres.lib;CXSparse.lib;glog.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
@@ -182,7 +182,7 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ceres.lib;CXSparse.lib;glog.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
@@ -208,7 +208,7 @@ if errorlevel 1 exit 0 else exit %errorlevel%</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>ceres.lib;libglog_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ceres.lib;CXSparse.lib;glog.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>..\libs\ceres\lib\VS\$(PlatformToolset)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>

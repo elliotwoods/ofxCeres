@@ -1,5 +1,5 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2015 Google Inc. All rights reserved.
+// Copyright 2019 Google Inc. All rights reserved.
 // http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,10 @@
 #ifndef CERES_PUBLIC_GRADIENT_PROBLEM_H_
 #define CERES_PUBLIC_GRADIENT_PROBLEM_H_
 
-#include "ceres/internal/macros.h"
+#include <memory>
+
+#include "ceres/first_order_function.h"
 #include "ceres/internal/port.h"
-#include "ceres/internal/scoped_ptr.h"
 #include "ceres/local_parameterization.h"
 
 namespace ceres {
@@ -104,22 +105,19 @@ class CERES_EXPORT GradientProblem {
   bool Evaluate(const double* parameters, double* cost, double* gradient) const;
   bool Plus(const double* x, const double* delta, double* x_plus_delta) const;
 
- private:
-  internal::scoped_ptr<FirstOrderFunction> function_;
-  internal::scoped_ptr<LocalParameterization> parameterization_;
-  internal::scoped_array<double> scratch_;
-};
+  const FirstOrderFunction* function() const { return function_.get(); }
+  FirstOrderFunction* mutable_function() { return function_.get(); }
+  const LocalParameterization* parameterization() const {
+    return parameterization_.get();
+  }
+  LocalParameterization* mutable_parameterization() {
+    return parameterization_.get();
+  }
 
-// A FirstOrderFunction object implements the evaluation of a function
-// and its gradient.
-class CERES_EXPORT FirstOrderFunction {
- public:
-  virtual ~FirstOrderFunction() {}
-  // cost is never NULL. gradient may be null.
-  virtual bool Evaluate(const double* const parameters,
-                        double* cost,
-                        double* gradient) const = 0;
-  virtual int NumParameters() const = 0;
+ private:
+  std::unique_ptr<FirstOrderFunction> function_;
+  std::unique_ptr<LocalParameterization> parameterization_;
+  std::unique_ptr<double[]> scratch_;
 };
 
 }  // namespace ceres
