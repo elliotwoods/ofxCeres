@@ -77,7 +77,7 @@ MovingHead::drawWorld(bool selected)
 					// Axis 2
 					ofPushMatrix();
 					{
-						ofRotateDeg(panTiltIdeal.y + this->calibrationParameters.tiltOffset.get(), 1, 0, 0);
+						ofRotateDeg(panTiltIdeal.y, 1, 0, 0);
 
 						// head
 						ofPushMatrix();
@@ -119,8 +119,7 @@ MovingHead::drawWorld(bool selected)
 					ofSetColor(calibrationPoint->color);
 
 					auto idealPanTilt = this->panTiltSignalToIdeal(calibrationPoint->panTiltSignal.get());
-					auto transmissionObject = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(idealPanTilt
-						, this->calibrationParameters.tiltOffset.get());
+					auto transmissionObject = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(idealPanTilt);
 
 					
 					// Set length to distance of marker to moving head
@@ -166,7 +165,6 @@ MovingHead::serialize(nlohmann::json & json)
 	{
 		json["calibrationParameters"] << this->calibrationParameters.translation;
 		json["calibrationParameters"] << this->calibrationParameters.rotationVector;
-		json["calibrationParameters"] << this->calibrationParameters.tiltOffset;
 		json["calibrationParameters"] << this->calibrationParameters.panDistortion;
 		json["calibrationParameters"] << this->calibrationParameters.tiltDistortion;
 		json["calibrationParameters"] << this->calibrationParameters.residual;
@@ -246,7 +244,6 @@ MovingHead::deserialize(const nlohmann::json & json, bool isImport)
 	if (json.count("calibrationParameters") != 0) {
 		json["calibrationParameters"] >> this->calibrationParameters.translation;
 		json["calibrationParameters"] >> this->calibrationParameters.rotationVector;
-		json["calibrationParameters"] >> this->calibrationParameters.tiltOffset;
 		json["calibrationParameters"] >> this->calibrationParameters.panDistortion;
 		json["calibrationParameters"] >> this->calibrationParameters.tiltDistortion;
 		json["calibrationParameters"] >> this->calibrationParameters.residual;
@@ -417,7 +414,6 @@ MovingHead::populateInspector(ofxCvGui::InspectArguments& args)
 
 		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.translation);
 		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.rotationVector);
-		inspector->addSlider(this->calibrationParameters.tiltOffset);
 		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.panDistortion);
 		inspector->addEditableValue<glm::vec3>(this->calibrationParameters.tiltDistortion);
 		inspector->addLiveValue<float>(this->calibrationParameters.residual);
@@ -425,7 +421,6 @@ MovingHead::populateInspector(ofxCvGui::InspectArguments& args)
 		inspector->addButton("Reset", [this]() {
 			this->calibrationParameters.translation.set(glm::vec3(0.0));
 			this->calibrationParameters.rotationVector.set(glm::vec3(0.0));
-			this->calibrationParameters.tiltOffset.set(0.0);
 			this->calibrationParameters.panDistortion.set({ 0, 1, 0 });
 			this->calibrationParameters.tiltDistortion.set({ 0, 1, 0 });
 			this->calibrationParameters.residual.set(0.0);
@@ -538,7 +533,6 @@ MovingHead::solve()
 			priorSolution.basicSolution = ofxCeres::Models::MovingHead::Solution{
 			this->calibrationParameters.translation.get()
 				, this->calibrationParameters.rotationVector.get()
-				, this->calibrationParameters.tiltOffset.get()
 			};
 
 			// we don't initialise the distortion parameters, we always begin fit with undistorted
@@ -558,7 +552,6 @@ MovingHead::solve()
 		//
 		this->calibrationParameters.translation = result.solution.basicSolution.translation;
 		this->calibrationParameters.rotationVector = result.solution.basicSolution.rotationVector;
-		this->calibrationParameters.tiltOffset = result.solution.basicSolution.tiltOffset;
 		this->calibrationParameters.panDistortion.set({
 			result.solution.panDistortion[0]
 			, result.solution.panDistortion[1]
@@ -586,7 +579,6 @@ MovingHead::solve()
 		auto priorSolution = ofxCeres::Models::MovingHead::Solution{
 			this->calibrationParameters.translation.get()
 				, this->calibrationParameters.rotationVector.get()
-				, this->calibrationParameters.tiltOffset.get()
 		};
 
 		auto result = ofxCeres::Models::MovingHead::solve(targetPoints
@@ -595,7 +587,6 @@ MovingHead::solve()
 
 		this->calibrationParameters.translation = result.solution.translation;
 		this->calibrationParameters.rotationVector = result.solution.rotationVector;
-		this->calibrationParameters.tiltOffset = result.solution.tiltOffset;
 		this->calibrationParameters.panDistortion.set({
 			0
 			, 1
@@ -824,39 +815,38 @@ MovingHead::getPanTiltForWorldTarget(const glm::vec3 & world
 	auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
 	auto objectSpacePosition = (glm::vec3) (objectSpacePosition4 / objectSpacePosition4.w);
 
-	auto panTiltObject = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(objectSpacePosition, 0.0f);
-	glm::vec2 axisOffset = glm::vec2(0, -this->calibrationParameters.tiltOffset.get());
-
+	auto panTiltObject = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(objectSpacePosition);
+	
 	// build up the options
 	vector<glm::vec2> panTiltOptions;
 	{
 		// basic option
-		panTiltOptions.push_back(panTiltObject + axisOffset);
+		panTiltOptions.push_back(panTiltObject);
 
 		// alternative pan options
 		{
 			for (float pan = panTiltObject.x - 360.0f; pan >= this->fixtureSettings.panRange.get().x; pan -= 360.0f) {
-				panTiltOptions.push_back(glm::vec2(pan, panTiltObject.y) + axisOffset);
+				panTiltOptions.push_back(glm::vec2(pan, panTiltObject.y));
 			}
 			for (float pan = panTiltObject.x + 360.0f; pan <= this->fixtureSettings.panRange.get().y; pan += 360.0f) {
-				panTiltOptions.push_back(glm::vec2(pan, panTiltObject.y) + axisOffset);
+				panTiltOptions.push_back(glm::vec2(pan, panTiltObject.y));
 			}
 		}
 
 		// flipped tilt options
 		{
 			for (float pan = panTiltObject.x - 180.0f; pan >= this->fixtureSettings.panRange.get().x; pan -= 360.0f) {
-				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) - axisOffset);
+				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y));
 			}
 			for (float pan = panTiltObject.x + 180.0f; pan <= this->fixtureSettings.panRange.get().y; pan += 360.0f) {
-				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y) - axisOffset);
+				panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y));
 			}
 		}
 	}
 	
 	// search through options for closest one
 	auto minDistance2 = std::numeric_limits<float>::max();
-	glm::vec2 bestOption = panTiltObject + axisOffset;
+	glm::vec2 bestOption = panTiltObject;
 	for (const auto & panTiltOption : panTiltOptions) {
 		auto distance2 = glm::distance2(panTiltOption, currentPanTilt);
 		if (distance2 < minDistance2) {
@@ -1029,7 +1019,7 @@ MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) const
 		throw(Exception("Marker " + dataPoint->marker.get() + " does not exist"));
 	}
 
-	//apply rigid body transform
+	//apply rigid body transform (marker into the object space of the moving head)
 	auto targetInViewSpace4 = glm::inverse(transform) * glm::vec4(marker->position.get(), 1.0);
 	targetInViewSpace4 /= targetInViewSpace4.w;
 	auto targetInViewSpace = glm::vec3(targetInViewSpace4);
@@ -1042,7 +1032,7 @@ MovingHead::getResidualOnDataPoint(Data::MovingHeadDataPoint * dataPoint) const
 	//--
 
 	// get ideal angles for target points
-	auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace, this->calibrationParameters.tiltOffset.get());
+	auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace);
 
 	auto dataPointPanTiltIdeal = this->panTiltSignalToIdeal(dataPoint->panTiltSignal);
 

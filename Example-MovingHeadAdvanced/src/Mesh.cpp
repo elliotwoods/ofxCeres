@@ -59,4 +59,6 @@ Mesh::populateInspector(ofxCvGui::InspectArguments& args)
 			this->parameters.filename.set(std::filesystem::path(result.filePath));
 		}
 		});
+
+	inspector->addEditableValue<float>(this->parameters.scale);
 }

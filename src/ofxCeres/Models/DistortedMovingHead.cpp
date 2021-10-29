@@ -64,7 +64,6 @@ namespace ofxCeres {
 					, resultFromBasicFit.solution.rotationVector[0]
 					, resultFromBasicFit.solution.rotationVector[1]
 					, resultFromBasicFit.solution.rotationVector[2]
-					, resultFromBasicFit.solution.tiltOffset
 				};
 
 				double panDistortionParameters[3];
@@ -121,15 +120,12 @@ namespace ofxCeres {
 					glm::vec3 translation(basicParameters[0], basicParameters[1], basicParameters[2]);
 					glm::vec3 rotationVector(basicParameters[3], basicParameters[4], basicParameters[5]);
 
-					auto tiltOffset = (float)basicParameters[6];
-
 					Result result(summary, sqrt(summary.final_cost / (double)size));
 
 					result.solution = {
 						{
 							translation
 							, rotationVector
-							, tiltOffset
 							, ofxCeres::VectorMath::createTransform(translation, rotationVector)
 						}
 						, {

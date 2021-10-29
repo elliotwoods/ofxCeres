@@ -14,7 +14,6 @@ namespace ofxCeres {
 				//parameters
 				glm::vec3 translation;
 				glm::vec3 rotationVector;
-				float tiltOffset; // this is to be added to any calculated panTilt value before sending to fixture
 
 				//cached
 				glm::mat4x4 transform;

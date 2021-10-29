@@ -55,7 +55,6 @@ protected:
 	struct {
 		ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };
 		ofParameter<glm::vec3> rotationVector{ "Rotation vector", glm::vec3(0, -PI / 2, 0), glm::vec3(-PI / 2), glm::vec3(+PI / 2) };
-		ofParameter<float> tiltOffset{ "Tilt offset", 0, -180, 180 };
 		ofParameter<glm::vec3> panDistortion{ "Pan distortion", {0, 1, 0} };
 		ofParameter<glm::vec3> tiltDistortion{ "Tilt distortion", {0, 1, 0} };
 		ofParameter<float> residual{ "Residual", 0 };

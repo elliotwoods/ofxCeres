@@ -17,8 +17,6 @@ struct DistortedMovingHeadError {
 		glm::tvec3<T> translation(transformParameters[0], transformParameters[1], transformParameters[2]);
 		glm::tvec3<T> rotationVector(transformParameters[3], transformParameters[4], transformParameters[5]);
 		auto transform = ofxCeres::VectorMath::createTransform(translation, rotationVector);
-
-		T tiltOffset = transformParameters[6];
 		//
 		//--
 
@@ -47,7 +45,7 @@ struct DistortedMovingHeadError {
 		
 
 		// Get ideal angles
-		auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace, tiltOffset);
+		auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace);
 		glm::tvec2<T> idealAnglesFromCapture{
 			ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.x, panDistortionParameters)
 			, ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.y, tiltDistortionParameters)

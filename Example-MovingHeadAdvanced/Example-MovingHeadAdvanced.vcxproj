@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxGrabCam\src;$(OF_ROOT)addons\ofxGui\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -118,8 +118,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -130,7 +130,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxGrabCam\src;$(OF_ROOT)addons\ofxGui\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -141,8 +141,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -152,7 +152,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxGrabCam\src;$(OF_ROOT)addons\ofxGui\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -166,8 +166,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -177,7 +177,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxGrabCam\src;$(OF_ROOT)addons\ofxGui\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -190,17 +190,45 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpAnimation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpTexture.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Data\AbstractCalibrationPoint.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPointSet.cpp" />
     <ClCompile Include="src\Data\MovingHeadDataPoint.cpp" />
     <ClCompile Include="src\Data\Serializable.cpp" />
+    <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Marker.cpp" />
+    <ClCompile Include="src\Markers.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MovingHead.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\pch_ofApp.cpp">
@@ -209,17 +237,68 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Widgets\PanTiltTrackpad.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\ai_assert.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\anim.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\camera.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\cexport.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\cfileio.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\cimport.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\color4.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\config.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Defines.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\defs.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Exporter.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Importer.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\importerdesc.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\IOStream.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\light.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Logger.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\LogStream.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\material.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix3x3.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix4x4.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\mesh.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\metadata.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\postprocess.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\quaternion.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\scene.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\texture.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\types.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector2.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector3.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\version.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpAnimation.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpModelLoader.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpTexture.h" />
+    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpUtils.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPoint.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPointSet.h" />
     <ClInclude Include="src\Data\CalibrationPointSet.h" />
     <ClInclude Include="src\Data\MovingHeadDataPoint.h" />
     <ClInclude Include="src\Data\Serializable.h" />
+    <ClInclude Include="src\Exception.h" />
+    <ClInclude Include="src\Marker.h" />
+    <ClInclude Include="src\Markers.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MovingHead.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\pch_ofApp.h" />
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Widgets\PanTiltTrackpad.h" />
   </ItemGroup>
   <ItemGroup>
@@ -239,6 +318,16 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\color4.inl" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\config.h.in" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\material.inl" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix3x3.inl" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix4x4.inl" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\quaternion.inl" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector2.inl" />
+    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector3.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

@@ -113,8 +113,7 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T> & objectSpacePoint
-			, T tiltOffset = (T) 0.0) {
+		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T> & objectSpacePoint) {
 
 			// Left (+) corresponds with positive atan, so we switch since professional fixtures are Right (+)
 			auto pan = - atan2(objectSpacePoint.x, objectSpacePoint.z) * (T) RAD_TO_DEG;
@@ -125,17 +124,15 @@ namespace ofxCeres {
 
 			T distance = sqrt(distance2);
 
-			auto actualTilt = acos(objectSpacePoint.y / distance) * (T)RAD_TO_DEG;
+			auto tilt = acos(objectSpacePoint.y / distance) * (T)RAD_TO_DEG;
 
-			auto tiltCommand = actualTilt - tiltOffset;
-
-			return glm::tvec2<T>(pan, tiltCommand);
+			return glm::tvec2<T>(pan, tilt);
 		}
 
 		//----------
 		template<typename T>
-		glm::tvec3<T> getObjectSpaceRayForPanTilt(const glm::tvec2<T> & panTiltAngle, T tiltOffset) {
-			auto actualTilt = panTiltAngle.y + tiltOffset;
+		glm::tvec3<T> getObjectSpaceRayForPanTilt(const glm::tvec2<T> & panTiltAngle) {
+			auto actualTilt = panTiltAngle.y;
 
 			// Left (+) corresponds with positive atan, so we switch since professional fixtures are Right (+)
 			glm::tvec3<T> transmission(
@@ -181,8 +178,8 @@ namespace ofxCeres {
 		//----------
 		template<typename T>
 		T sphericalPolarDistance(const glm::tvec2<T> & panTilt1, const glm::tvec2<T> & panTilt2) {
-			auto projected1 = getObjectSpaceRayForPanTilt(panTilt1, (T) 0.0);
-			auto projected2 = getObjectSpaceRayForPanTilt(panTilt2, (T) 0.0);
+			auto projected1 = getObjectSpaceRayForPanTilt(panTilt1);
+			auto projected2 = getObjectSpaceRayForPanTilt(panTilt2);
 
 			auto dotProduct = dot(projected1, projected2);
 			auto angleBetweenResults = acos(dotProduct / (length(projected1) * length(projected2)));

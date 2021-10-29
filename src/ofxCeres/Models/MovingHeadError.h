@@ -8,15 +8,12 @@ struct MovingHeadError {
 	template <typename T>
 	bool operator()(const T * const translationParameters
 		, const T* const rotationParameters
-		, const T* const tiltOffsetParameters
 		, T * residuals) const {
 
 		//--
 		//Extract parameters
 		glm::tvec3<T> translation(translationParameters[0], translationParameters[1], translationParameters[2]);
 		glm::tvec3<T> rotationVector(rotationParameters[0], rotationParameters[1], rotationParameters[2]);
-
-		T tiltOffset = tiltOffsetParameters[0];
 
 		auto transform = ofxCeres::VectorMath::createTransform(translation, rotationVector);
 		//
@@ -45,7 +42,7 @@ struct MovingHeadError {
 		//
 		//--
 
-		glm::tvec3<T> rayCastForPanTiltValues = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt<T>(this->panTiltValues, tiltOffset);
+		glm::tvec3<T> rayCastForPanTiltValues = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt<T>(this->panTiltValues);
 
 		//--
 		//Get the disparity between the real and actual object space rays
@@ -60,7 +57,7 @@ struct MovingHeadError {
 	}
 
 	static ceres::CostFunction * Create(const glm::tvec3<double> & targetPoint, const glm::tvec2<double> & panTiltValues) {
-		return new ceres::AutoDiffCostFunction<MovingHeadError, 1, 3, 3, 1>(
+		return new ceres::AutoDiffCostFunction<MovingHeadError, 1, 3, 3>(
 			new MovingHeadError(targetPoint, panTiltValues)
 			);
 	}
