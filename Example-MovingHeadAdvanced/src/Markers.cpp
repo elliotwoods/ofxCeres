@@ -73,6 +73,7 @@ Markers::addNewMarker(const string& name, const glm::vec3& position, bool useExi
 						marker = make_shared<Marker>();
 						marker->name.set(transformedName);
 						marker->position.set(position);
+						break;
 					}
 				}
 			}
