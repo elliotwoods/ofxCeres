@@ -107,6 +107,9 @@
     <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.cpp">
       <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ofxCeres\Models\MovingHeadGroup.cpp">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

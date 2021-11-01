@@ -87,6 +87,8 @@ protected:
 
 	} fixtureSettings;
 
+	ofxCeres::ParameterisedSolverSettings solverSettings;
+
 	ofParameter<glm::vec2> currentPanTiltSignal{ "Current Pan Tilt", glm::vec2(0, 0) };
 	weak_ptr<Data::MovingHeadDataPoint> focusedDataPoint;
 

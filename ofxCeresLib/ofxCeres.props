@@ -6,7 +6,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxCeres\src;$(OF_ROOT)addons\ofxCeres\libs\ceres\include-vs;..\..\..\addons\ofxCeres\libs\ceres\include-vs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLM_FORCE_UNRESTRICTED_GENTYPE;GLM_FORCE_XYZW_ONLY;CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS;CERES_USE_CXX_THREADS;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLM_FORCE_UNRESTRICTED_GENTYPE;GLM_FORCE_XYZW_ONLY;CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS;CERES_USE_CXX_THREADS;CERES_NO_SUITESPARSE;CERES_NO_ACCELERATE_SPARSE;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>

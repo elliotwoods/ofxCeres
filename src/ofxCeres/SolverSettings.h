@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ceres/ceres.h>
+#include "ofParameter.h"
 
 namespace ofxCeres {
 	struct SolverSettings {
@@ -12,5 +13,18 @@ namespace ofxCeres {
 #else
 		bool printReport = false;
 #endif
+	};
+
+	class ParameterisedSolverSettings : public ofParameterGroup {
+	public:
+		ParameterisedSolverSettings();
+		SolverSettings getSolverSettings();
+
+		ofParameter<bool> printReport{ "Print report", true };
+		ofParameter<bool> printEachStep{ "Print each step", true };
+		ofParameter<int> maxIterations{ "Max iterations", 100 };
+		ofParameter<float> functionTolerance{ "Function tolerance", 1e-6 };
+		ofParameter<float> gradientTolerance{ "Gradient tolerance", 1e-10 };
+		ofParameter<float> parameterTolerance{ "Parameter tolerance", 1e-8 };
 	};
 }

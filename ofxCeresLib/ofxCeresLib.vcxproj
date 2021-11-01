@@ -43,6 +43,7 @@
     <ClCompile Include="..\src\ofxCeres\Models\DistortedMovingHead.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\InverseKinematics\System.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\MovingHead.cpp" />
+    <ClCompile Include="..\src\ofxCeres\Models\MovingHeadGroup.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp" />
     <ClCompile Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.cpp" />
     <ClCompile Include="..\src\ofxCeres\SolverSettings.cpp" />

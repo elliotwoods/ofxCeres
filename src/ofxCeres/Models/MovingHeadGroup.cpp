@@ -1,4 +1,4 @@
-#include "pch_ofApp.h"
+#include "pch_ofxCeres.h"
 #include "MovingHeadGroup.h"
 #include "ofxCeres/VectorMath/VectorMath.h"
 
@@ -51,32 +51,43 @@ struct MovingHeadGroupError {
 		//--
 
 		//--
-		// Calculate the distance betwen the ray and the target position (choose one method)
+		// Calculate the delta (choose one method from below and set the appropriate residual count in Create below)
 		//
 		
 		// 1. Calculate the distsnce between moving head and target point (given current translation
 		//const auto& position = translation; // This is true for ofxCeres::VectorMath::createTransform
 		//auto distance = ofxCeres::VectorMath::distanceRayToPoint(position, rayTransmissionInWorldspace, targetPosition);
+		//residuals[0] = distance;
 		
 		// 2. Unproject the ray at the distance
 		//auto distanceToTarget = ofxCeres::VectorMath::distance(translation, targetPosition);
 		//auto rayNearTarget = rayTransmissionInWorldspace * distanceToTarget / ofxCeres::VectorMath::length(rayTransmissionInWorldspace) + translation;
 		//auto delta = rayNearTarget - targetPosition;
+		//residuals[0] = delta[0];
+		//residuals[1] = delta[1];
+		//residuals[2] = delta[2];
 		 
 		// 3. Difference between the ray transmissions
-		auto delta = glm::normalize(targetPosition - translation) - glm::normalize(rayTransmissionInWorldspace);
+		//auto delta = glm::normalize(targetPosition - translation) - glm::normalize(rayTransmissionInWorldspace);
+		//residuals[0] = delta[0];
+		//residuals[1] = delta[1];
+		//residuals[2] = delta[2];
+
+		// 4. Take difference between ray angles
+		const auto& movingHeadPosition = translation;
+		const auto directionTowardsPoint = ofxCeres::VectorMath::normalize(targetPosition - movingHeadPosition);
+		auto angleBetween = acos(ofxCeres::VectorMath::dot(directionTowardsPoint, rayTransmissionInWorldspace));
+
+		residuals[0] = angleBetween * angleBetween;
 		//
 		//--
 
-		residuals[0] = delta[0];
-		residuals[1] = delta[1];
-		residuals[2] = delta[2];
 
 		return true;
 	}
 
 	static ceres::CostFunction* Create(const glm::tvec2<double>& panTiltSignal) {
-		return new ceres::AutoDiffCostFunction<MovingHeadGroupError, 3, 3, 3, 3, 3, 3>(
+		return new ceres::AutoDiffCostFunction<MovingHeadGroupError, 1, 3, 3, 3, 3, 3>(
 			new MovingHeadGroupError(panTiltSignal)
 			);
 	}
@@ -147,6 +158,7 @@ namespace ofxCeres {
 
 				// Build up the problem, cost functions
 				ceres::Problem problem;
+				set<int> activeMarkerIndices;
 				for (size_t movingHeadIndex = 0; movingHeadIndex < images.size(); movingHeadIndex++) {
 					const auto& image = images[movingHeadIndex];
 					auto size = image.panTiltSignal.size();
@@ -160,12 +172,14 @@ namespace ofxCeres {
 							, tiltDistortionParameters[movingHeadIndex].data()
 							, markerPositionParameters[image.markerIndex[i]].data()
 						);
+						activeMarkerIndices.insert(image.markerIndex[i]);
 					}
 				}
 
 				// Fix the appropriate target point parameters
 				for (size_t markerPositionIndex = 0; markerPositionIndex < initialSolution.markerPositions.size(); markerPositionIndex++) {
-					if (fixMarkerPositions[markerPositionIndex]) {
+					auto hasMarker = activeMarkerIndices.find(markerPositionIndex) != activeMarkerIndices.end();
+					if (fixMarkerPositions[markerPositionIndex] && hasMarker) {
 						problem.SetParameterBlockConstant(markerPositionParameters[markerPositionIndex].data());
 					}
 				}

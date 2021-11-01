@@ -424,6 +424,10 @@ MovingHead::populateInspector(ofxCvGui::InspectArguments& args)
 			};
 		}
 
+		inspector->addButton("Solver settings...", [this]() {
+			ofxCvGui::inspectParameterGroup(this->solverSettings);
+			});
+
 		inspector->addButton("Solve", [this]() {
 			try{
 				this->solve();
@@ -545,10 +549,11 @@ MovingHead::solveBasic()
 		this->calibrationParameters.translation.get()
 			, this->calibrationParameters.rotationVector.get()
 	};
-
+	
 	auto result = ofxCeres::Models::MovingHead::solve(targetPoints
 		, panTiltSignal
-		, priorSolution);
+		, priorSolution
+		, this->solverSettings.getSolverSettings());
 
 	this->calibrationParameters.translation = result.solution.translation;
 	this->calibrationParameters.rotationVector = result.solution.rotationVector;
@@ -594,7 +599,8 @@ MovingHead::solveDistorted()
 	// Perform the fit
 	auto result = ofxCeres::Models::DistortedMovingHead::solve(targetPoints
 		, panTiltSignal
-		, priorSolution);
+		, priorSolution
+		, this->solverSettings.getSolverSettings());
 	//
 	//--
 
@@ -684,10 +690,18 @@ MovingHead::solveGroup()
 		image.markerIndex.push_back(getIndexForMarkerName(calibrationPoint->marker.get()));
 	}
 
+	// Create options (let's just keep defaults for this one - since it's not real group solve)
+	ofxCeres::Models::MovingHeadGroup::Options options;
+	{
+		options.noDistortion = false;
+	}
+
 	// Solve
 	auto result = ofxCeres::Models::MovingHeadGroup::solve(vector<ofxCeres::Models::MovingHeadGroup::Image>(1, image)
 		, priorSolution
-		, fixMarkerPositions);
+		, fixMarkerPositions
+		, options
+		, this->solverSettings.getSolverSettings());
 
 	// Convert residual into meters
 	{
