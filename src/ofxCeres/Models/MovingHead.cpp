@@ -57,7 +57,7 @@ namespace ofxCeres {
 					glm::vec3 translation(translationParameters[0], translationParameters[1], translationParameters[2]);
 					glm::vec3 rotationVector(rotationParameters[0], rotationParameters[1], rotationParameters[2]);
 
-					Result result(summary, sqrt(summary.final_cost / (double)size));
+					Result result(summary, summary.final_cost);
 
 					result.solution = {
 						translation

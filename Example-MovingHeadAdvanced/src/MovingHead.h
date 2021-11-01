@@ -4,6 +4,10 @@
 #include "Data/MovingHeadDataPoint.h"
 #include "Markers.h"
 
+MAKE_ENUM(SolveType
+	, (Basic, Distorted, Group)
+	, ("Basic", "Distorted", "Group"));
+
 class MovingHead : public Data::Serializable, public ofxCvGui::IInspectable {
 public:
 	MovingHead(shared_ptr<Markers>);
@@ -20,6 +24,12 @@ public:
 	shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
 
 	void solve();
+	void solveBasic();
+	void solveDistorted();
+	void solveGroup();
+
+	void getCalibrationData(vector<glm::vec3>& targetPoints, vector<glm::vec2>& panTiltSignal) const;
+
 	void addTestData();
 
 	glm::mat4 getTransform() const;
@@ -36,7 +46,6 @@ public:
 	glm::vec2 panTiltSignalToIdeal(const glm::vec2 &) const;
 
 	shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>> getCalibrationPoints();
-
 protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;
@@ -45,12 +54,12 @@ protected:
 	shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>> calibrationPoints = make_shared< Data::CalibrationPointSet<Data::MovingHeadDataPoint>>();
 
 	struct {
-		ofParameter<float> focus{ "Focus", 0.5f, 0.0f, 1.0f };
-	} beamParameters;
+		ofParameter<SolveType> solveType{ "Solve type", SolveType::Basic };
+	} solveParameters;
 
 	struct {
-		ofParameter<bool> distortionEnabled{ "Distortion enabled", true };
-	} fitParameters;
+		ofParameter<float> focus{ "Focus", 0.5f, 0.0f, 1.0f };
+	} beamParameters;
 
 	struct {
 		ofParameter<glm::vec3> translation{ "Translation", glm::vec3(2.08, 0.78, 4.24), glm::vec3(-10), glm::vec3(+10) };

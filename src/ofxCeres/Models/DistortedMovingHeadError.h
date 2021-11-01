@@ -12,7 +12,7 @@ struct DistortedMovingHeadError {
 		, T * residuals) const {
 
 		//--
-		//Extract parameters
+		// Extract parameters
 		//
 		glm::tvec3<T> translation(transformParameters[0], transformParameters[1], transformParameters[2]);
 		glm::tvec3<T> rotationVector(transformParameters[3], transformParameters[4], transformParameters[5]);
@@ -32,19 +32,17 @@ struct DistortedMovingHeadError {
 
 
 		//--
-		//World -> Object space
+		// World -> Object space
 		//
-
-		//apply rigid body transform
+		// Apply rigid body transform
 		glm::tvec4<T> targetInViewSpace4 = glm::inverse(transform) * glm::tvec4<T>(this->targetPoint, 1.0);
 		targetInViewSpace4 /= targetInViewSpace4.w;
 		auto targetInViewSpace = glm::tvec3<T>(targetInViewSpace4);
-
 		//
 		//--
 		
 
-		// Get ideal angles
+		// Gather ideal angles
 		auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace);
 		glm::tvec2<T> idealAnglesFromCapture{
 			ofxCeres::VectorMath::powerSeries2((T)this->panTiltValuesSignal.x, panDistortionParameters)

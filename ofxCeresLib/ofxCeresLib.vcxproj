@@ -26,6 +26,7 @@
     <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHead.h" />
     <ClInclude Include="..\src\ofxCeres\Models\DistortedMovingHeadError.h" />
     <ClInclude Include="..\src\ofxCeres\Models\InverseKinematics\System.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\MovingHeadGroup.h" />
     <ClInclude Include="..\src\ofxCeres\Models\MovingHeadError.h" />
     <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.h" />
     <ClInclude Include="..\src\ofxCeres\Result.h" />

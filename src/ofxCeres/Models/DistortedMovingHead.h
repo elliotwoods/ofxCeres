@@ -3,6 +3,9 @@
 #include "Base.h"
 #include <glm/glm.hpp>
 #include <vector>
+#include "MovingHead.h"
+
+#define OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT 3
 
 namespace ofxCeres {
 	namespace Models {
@@ -11,8 +14,8 @@ namespace ofxCeres {
 			struct Solution {
 				MovingHead::Solution basicSolution;
 
-				double panDistortion[3]{ 0, 1, 0 };
-				double tiltDistortion[3]{ 0, 1, 0 };
+				double panDistortion[OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT]{ 0, 1, 0 };
+				double tiltDistortion[OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT]{ 0, 1, 0 };
 			};
 
 			static SolverSettings defaultSolverSettings();

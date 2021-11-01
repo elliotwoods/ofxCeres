@@ -72,6 +72,9 @@
     <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.h">
       <Filter>src\ofxCeres\Models\StructuralAnalysis</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\MovingHeadGroup.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">

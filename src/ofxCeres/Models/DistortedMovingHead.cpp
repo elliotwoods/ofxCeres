@@ -47,23 +47,17 @@ namespace ofxCeres {
 					throw(ofxCeres::Exception("targetPoints.size() != panTiltValues.size()"));
 				}
 
-				// Start by performing a basic fit
-				auto resultFromBasicFit = MovingHead::solve(targetPoints
-					, panTiltValues
-					, initialSolution.basicSolution
-					, solverSettings);
-
 				//--
 				// Initialize parameters
 				//--
 				//
 				double basicParameters[7] = {
-					resultFromBasicFit.solution.translation[0]
-					, resultFromBasicFit.solution.translation[1]
-					, resultFromBasicFit.solution.translation[2]
-					, resultFromBasicFit.solution.rotationVector[0]
-					, resultFromBasicFit.solution.rotationVector[1]
-					, resultFromBasicFit.solution.rotationVector[2]
+					initialSolution.basicSolution.translation[0]
+					, initialSolution.basicSolution.translation[1]
+					, initialSolution.basicSolution.translation[2]
+					, initialSolution.basicSolution.rotationVector[0]
+					, initialSolution.basicSolution.rotationVector[1]
+					, initialSolution.basicSolution.rotationVector[2]
 				};
 
 				double panDistortionParameters[3];
@@ -90,15 +84,8 @@ namespace ofxCeres {
 						, panDistortionParameters
 						, tiltDistortionParameters);
 				}
-				//problem.AddResidualBlock(DistortionBias::Create()
-				//	, NULL
-				//	, panDistortionParameters);
-				//problem.AddResidualBlock(DistortionBias::Create()
-				//	, NULL
-				//	, tiltDistortionParameters);
 				//
 				//--
-
 
 				//--
 				// Solve
