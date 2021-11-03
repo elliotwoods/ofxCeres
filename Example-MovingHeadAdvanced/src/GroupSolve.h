@@ -14,9 +14,17 @@ public:
 	void deserialize(const nlohmann::json&);
 	void populateInspector(ofxCvGui::InspectArguments&);
 
-	void selectOnlyMultiUseMarkers();
+	void prepareMarkers();
 	void solve();
 protected:
 	Scene& scene;
 	ofxCeres::ParameterisedSolverSettings solverSettings;
+
+	struct Parameters : ofParameterGroup {
+		ofParameter<bool> noDistortion{ "No distortion", false };
+		Parameters(){
+			this->setName("GroupSolve");
+			this->add(this->noDistortion);
+		}
+	} parameters;
 };

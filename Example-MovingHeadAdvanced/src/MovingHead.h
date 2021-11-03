@@ -46,6 +46,9 @@ public:
 	glm::vec2 panTiltSignalToIdeal(const glm::vec2 &) const;
 
 	shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>> getCalibrationPoints();
+
+	ofxCeres::Models::DistortedMovingHead::Solution getDistortedMovingHeadSolution() const;
+	void setDistortedMovingHeadSolution(const ofxCeres::Models::DistortedMovingHead::Solution&);
 protected:
 	void prepareDataPoint(shared_ptr<Data::MovingHeadDataPoint>);
 	float getResidualOnDataPoint(Data::MovingHeadDataPoint *) const;

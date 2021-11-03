@@ -21,10 +21,8 @@ Marker::getGlyphForConstraint(const Constraint& constraint)
 	switch (constraint.get()) {
 	case Constraint::Free:
 		return "";
-	case Constraint::Origin:
-		return u8"\uf05b";
 	case Constraint::Fixed:
-		return u8"\uf13d";
+		return u8"\uf05b";
 	case Constraint::Plane:
 		return u8"\uf853";
 	}

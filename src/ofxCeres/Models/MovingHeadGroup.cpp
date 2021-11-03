@@ -95,6 +95,27 @@ struct MovingHeadGroupError {
 	const glm::tvec2<double> panTiltSignal;
 };
 
+struct PointInPlaneError {
+	PointInPlaneError(const glm::tvec4<double>& plane)
+		: plane(plane) {}
+
+	template <typename T>
+	bool operator()(const T* const pointPosition
+		, T* residuals) const {
+		glm::tvec4<T> vec4(pointPosition[0], pointPosition[1], pointPosition[2], 1.0);
+		residuals[0] = glm::dot(vec4, (glm::tvec4<T>) this->plane);
+		return true;
+	}
+
+	static ceres::CostFunction* Create(const glm::tvec4<double>& plane) {
+		return new ceres::AutoDiffCostFunction<PointInPlaneError, 1, 3>(
+			new PointInPlaneError(plane)
+			);
+	}
+
+	const glm::tvec4<double> plane;
+};
+
 
 namespace ofxCeres {
 	namespace Models {
@@ -102,14 +123,11 @@ namespace ofxCeres {
 		MovingHeadGroup::Result
 			MovingHeadGroup::solve(const std::vector<Image>& images
 				, const Solution& initialSolution
-				, const std::vector<bool>& fixMarkerPositions
+				, const std::vector<shared_ptr<Constraint>>& constraints
 				, const Options& options
 				, const SolverSettings& solverSettings) {
 			try {
 				// Check some errors
-				if (initialSolution.markerPositions.size() != fixMarkerPositions.size()) {
-					throw(ofxCeres::Exception("markerPositions.size() != fixMarkerPositions.size()"));
-				}
 				if (initialSolution.movingHeads.size() != images.size()) {
 					throw(ofxCeres::Exception("initialSolution.movingHeads.size() != images.size()"));
 				}
@@ -176,11 +194,33 @@ namespace ofxCeres {
 					}
 				}
 
-				// Fix the appropriate target point parameters
-				for (size_t markerPositionIndex = 0; markerPositionIndex < initialSolution.markerPositions.size(); markerPositionIndex++) {
-					auto hasMarker = activeMarkerIndices.find(markerPositionIndex) != activeMarkerIndices.end();
-					if (fixMarkerPositions[markerPositionIndex] && hasMarker) {
-						problem.SetParameterBlockConstant(markerPositionParameters[markerPositionIndex].data());
+				// Apply constraints
+				for (auto constraint : constraints) {
+					// Check that the marker is part of the problem before applying the constriant
+					auto markerIsActive = activeMarkerIndices.find(constraint->markerIndex) != activeMarkerIndices.end();
+					if (!markerIsActive) {
+						continue;
+					}
+					auto markerPositionParameter = markerPositionParameters[constraint->markerIndex].data();
+
+					{
+						auto fixedMarkerConstraint = dynamic_pointer_cast<FixedMarkerConstraint>(constraint);
+						if (fixedMarkerConstraint) {
+							problem.SetParameterBlockConstant(markerPositionParameter);
+							continue;
+						}
+					}
+
+					{
+						auto markerInPlaneConstraint = dynamic_pointer_cast<MarkerInPlaneConstraint>(constraint);
+						if (markerInPlaneConstraint) {
+							auto costFunction = PointInPlaneError::Create((glm::tvec4<double>) markerInPlaneConstraint->abcd);
+							problem.AddResidualBlock(
+								costFunction
+								, NULL
+								, markerPositionParameter);
+							continue;
+						}
 					}
 				}
 

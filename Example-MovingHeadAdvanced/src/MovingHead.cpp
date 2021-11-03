@@ -581,20 +581,7 @@ MovingHead::solveDistorted()
 	this->getCalibrationData(targetPoints, panTiltSignal);
 
 	// Initialise the solution based on current state
-	auto priorSolution = ofxCeres::Models::DistortedMovingHead::Solution();
-	{
-		priorSolution.basicSolution = ofxCeres::Models::MovingHead::Solution{
-		this->calibrationParameters.translation.get()
-			, this->calibrationParameters.rotationVector.get()
-		};
-
-		const auto& panDistortion = this->calibrationParameters.panDistortion.get();
-		const auto& tiltDistortion = this->calibrationParameters.tiltDistortion.get();
-		for (int i = 0; i < OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT; i++) {
-			priorSolution.panDistortion[i] = panDistortion[i];
-			priorSolution.tiltDistortion[i] = tiltDistortion[i];
-		}
-	}
+	auto priorSolution = this->getDistortedMovingHeadSolution();
 
 	// Perform the fit
 	auto result = ofxCeres::Models::DistortedMovingHead::solve(targetPoints
@@ -609,18 +596,7 @@ MovingHead::solveDistorted()
 	//--
 	// Load solution into local parameters
 	//
-	this->calibrationParameters.translation = result.solution.basicSolution.translation;
-	this->calibrationParameters.rotationVector = result.solution.basicSolution.rotationVector;
-	this->calibrationParameters.panDistortion.set({
-		result.solution.panDistortion[0]
-		, result.solution.panDistortion[1]
-		, result.solution.panDistortion[2]
-		});
-	this->calibrationParameters.tiltDistortion.set({
-		result.solution.tiltDistortion[0]
-		, result.solution.tiltDistortion[1]
-		, result.solution.tiltDistortion[2]
-		});
+	this->setDistortedMovingHeadSolution(result.solution);
 
 	{
 		// Convert residual into degrees
@@ -652,25 +628,16 @@ MovingHead::solveGroup()
 		}
 
 		// Add this moving head
-		priorSolution.movingHeads.push_back(ofxCeres::Models::DistortedMovingHead::Solution());
-		auto& movingHeadPrior = priorSolution.movingHeads.front();
-		{
-			movingHeadPrior.basicSolution = ofxCeres::Models::MovingHead::Solution{
-			this->calibrationParameters.translation.get()
-				, this->calibrationParameters.rotationVector.get()
-			};
-
-			const auto& panDistortion = this->calibrationParameters.panDistortion.get();
-			const auto& tiltDistortion = this->calibrationParameters.tiltDistortion.get();
-			for (int i = 0; i < OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT; i ++) {
-				movingHeadPrior.panDistortion[i] = panDistortion[i];
-				movingHeadPrior.tiltDistortion[i] = tiltDistortion[i];
-			}
-		}
+		priorSolution.movingHeads.push_back(this->getDistortedMovingHeadSolution());
 	}
 
-	// Set all markers as fixed
-	vector<bool> fixMarkerPositions(priorSolution.markerPositions.size(), true);
+	// Create fixed constraints for all markers
+	vector<shared_ptr<ofxCeres::Models::MovingHeadGroup::Constraint>> constraints;
+	for (int i = 0; i < priorSolution.markerPositions.size(); i++) {
+		auto constraint = make_shared<ofxCeres::Models::MovingHeadGroup::FixedMarkerConstraint>();
+		constraint->markerIndex = i;
+		constraints.push_back(constraint);
+	}
 
 	// A function to convert marker names into the index in our vector of selected markers
 	auto getIndexForMarkerName = [&selectedMarkers](const string& name) {
@@ -699,7 +666,7 @@ MovingHead::solveGroup()
 	// Solve
 	auto result = ofxCeres::Models::MovingHeadGroup::solve(vector<ofxCeres::Models::MovingHeadGroup::Image>(1, image)
 		, priorSolution
-		, fixMarkerPositions
+		, constraints
 		, options
 		, this->solverSettings.getSolverSettings());
 
@@ -712,18 +679,7 @@ MovingHead::solveGroup()
 	
 	// Unpack the solution
 	{
-		this->calibrationParameters.translation = result.solution.movingHeads[0].basicSolution.translation;
-		this->calibrationParameters.rotationVector = result.solution.movingHeads[0].basicSolution.rotationVector;
-		this->calibrationParameters.panDistortion.set({
-			result.solution.movingHeads[0].panDistortion[0]
-			, result.solution.movingHeads[0].panDistortion[1]
-			, result.solution.movingHeads[0].panDistortion[2]
-			});
-		this->calibrationParameters.tiltDistortion.set({
-			result.solution.movingHeads[0].tiltDistortion[0]
-			, result.solution.movingHeads[0].tiltDistortion[1]
-			, result.solution.movingHeads[0].tiltDistortion[2]
-			});
+		this->setDistortedMovingHeadSolution(result.solution.movingHeads[0]);
 	}
 }
 
@@ -1109,6 +1065,45 @@ shared_ptr<Data::CalibrationPointSet<Data::MovingHeadDataPoint>>
 MovingHead::getCalibrationPoints()
 {
 	return this->calibrationPoints;
+}
+
+//---------
+ofxCeres::Models::DistortedMovingHead::Solution
+MovingHead::getDistortedMovingHeadSolution() const
+{
+	ofxCeres::Models::DistortedMovingHead::Solution solution;
+
+	solution.basicSolution = ofxCeres::Models::MovingHead::Solution{
+	this->calibrationParameters.translation.get()
+		, this->calibrationParameters.rotationVector.get()
+	};
+
+	const auto& panDistortion = this->calibrationParameters.panDistortion.get();
+	const auto& tiltDistortion = this->calibrationParameters.tiltDistortion.get();
+	for (int i = 0; i < OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT; i++) {
+		solution.panDistortion[i] = panDistortion[i];
+		solution.tiltDistortion[i] = tiltDistortion[i];
+	}
+
+	return solution;
+}
+
+//---------
+void
+MovingHead::setDistortedMovingHeadSolution(const ofxCeres::Models::DistortedMovingHead::Solution& solution)
+{
+	this->calibrationParameters.translation = solution.basicSolution.translation;
+	this->calibrationParameters.rotationVector = solution.basicSolution.rotationVector;
+	this->calibrationParameters.panDistortion.set({
+		solution.panDistortion[0]
+		, solution.panDistortion[1]
+		, solution.panDistortion[2]
+		});
+	this->calibrationParameters.tiltDistortion.set({
+		solution.tiltDistortion[0]
+		, solution.tiltDistortion[1]
+		, solution.tiltDistortion[2]
+		});
 }
 
 //---------

@@ -6,8 +6,8 @@
 class Marker : public Data::AbstractCalibrationPoint {
 public:
 	MAKE_ENUM(Constraint
-		, (Free, Origin, Fixed, Plane)
-		, ("Free", "Origin", "Fixed", "Plane")
+		, (Free, Fixed, Plane)
+		, ("Free", "Fixed", "Plane")
 	);
 
 	Marker();

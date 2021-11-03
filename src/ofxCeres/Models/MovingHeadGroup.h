@@ -26,10 +26,29 @@ namespace ofxCeres {
 				bool noDistortion;
 			};
 
+			struct Constraint {
+				virtual string getTypeName() const = 0;
+				int markerIndex;
+			};
+
+			struct FixedMarkerConstraint : public Constraint {
+				string getTypeName() const override {
+					return "FixedMarkerConstraint";
+				}
+			};
+
+			struct MarkerInPlaneConstraint : public Constraint {
+				string getTypeName() const override {
+					return "MarkerInPlaneConstraint";
+				}
+
+				glm::vec4 abcd;
+			};
+
 			typedef ofxCeres::Result<Solution> Result;
 			static Result solve(const std::vector<Image>& images
 				, const Solution& initialSolution
-				, const std::vector<bool>& fixMarkerPositions
+				, const std::vector<shared_ptr<Constraint>>& constraints
 				, const Options& options = Options()
 				, const SolverSettings& solverSettings = SolverSettings());
 		};
