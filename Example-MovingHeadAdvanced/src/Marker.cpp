@@ -15,6 +15,22 @@ Marker::getTypeName() const
 }
 
 //----------
+string
+Marker::getGlyphForConstraint(const Constraint& constraint)
+{
+	switch (constraint.get()) {
+	case Constraint::Free:
+		return "";
+	case Constraint::Origin:
+		return u8"\uf05b";
+	case Constraint::Fixed:
+		return u8"\uf13d";
+	case Constraint::Plane:
+		return u8"\uf853";
+	}
+}
+
+//----------
 ofxCvGui::ElementPtr
 Marker::getDataDisplay()
 {
@@ -23,12 +39,13 @@ Marker::getDataDisplay()
 	// setup the multiple choice
 	auto selectConstraint = make_shared<ofxCvGui::Widgets::MultipleChoice>(this->constraint.getName(), this->constraint.get().getOptionStrings());
 	{
-		selectConstraint->onValueChange += [this](const int& index) {
-			auto constraint = this->constraint.get();
-			constraint.fromIndex(index);
-			this->constraint.set(constraint);
-		};
-		vector<string> glyphs{ u8"\uF31E", u8"\uf05b", u8"\uf13d", u8"\uf424"};
+		selectConstraint->entangleManagedEnum(this->constraint);
+
+		vector<string> glyphs;
+		auto optionsCount = this->constraint.get().getOptionStrings().size();
+		for (size_t i = 0; i < optionsCount; i++) {
+			glyphs.push_back(Marker::getGlyphForConstraint((Constraint::Options) i));
+		}
 		selectConstraint->setGlyphs(glyphs);
 	}
 

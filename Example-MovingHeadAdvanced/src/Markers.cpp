@@ -97,31 +97,35 @@ Markers::drawWorld()
 {
 	auto markers = this->getSelection();
 
-	// prepare all glyphs
-	map<Marker::Constraint::Options, string> glyphs{
-		{ Marker::Constraint::Free, u8"\uF31E"}
-		, {Marker::Constraint::Origin, u8"\uf13d"}
-		, {Marker::Constraint::Fixed, u8"\uf05b"}
-		, {Marker::Constraint::Direction, u8"\uf424"}
-	};
-
 	for (auto marker : markers) {
 		auto constraint = marker->constraint.get();
-		auto glyph = glyphs[marker->constraint.get().get()];
 
-		auto glyphBounds = ofRectangle(0, 0, 25, 25);
-		auto textBounds = ofxCvGui::Utils::drawText(marker->name, 25, 5, false, 20, 0, false, ofColor(0), ofxCvGui::getDefaultTypeface(), true);
+		// Check if constraint is free or other
+		if (constraint == Marker::Constraint::Free) {
+			// Draw using normal text annotation
+			ofxCvGui::Utils::drawTextAnnotation(marker->name.get()
+				, marker->position.get()
+				, marker->color.get());
+		}
+		else {
+			// Draw with glyph
+			auto glyph = Marker::getGlyphForConstraint(marker->constraint.get());
 
-		auto totalBounds = glyphBounds;
-		totalBounds.growToInclude(textBounds);
+			auto glyphBounds = ofRectangle(0, 0, 25, 25);
+			auto textBounds = ofxCvGui::Utils::drawText(marker->name, 25, 5, false, 20, 0, false, ofColor(0), ofxCvGui::getDefaultTypeface(), true);
 
-		ofxCvGui::Utils::drawGraphicAnnotation([marker, glyph, glyphBounds, totalBounds]() {
+			auto totalBounds = glyphBounds;
+			totalBounds.growToInclude(textBounds);
+
+			ofxCvGui::Utils::drawGraphicAnnotation([marker, glyph, glyphBounds, totalBounds]() {
 				// draw contents
 				ofxCvGui::Utils::drawGlyph(glyph, glyphBounds);
 				ofxCvGui::Utils::drawText(marker->name, 25, 5, false);
-			}
-			, totalBounds
-			, marker->position.get()
-			, marker->color.get());
+				}
+				, totalBounds
+				, marker->position.get()
+				, marker->color.get());
+		}
+
 	}
 }

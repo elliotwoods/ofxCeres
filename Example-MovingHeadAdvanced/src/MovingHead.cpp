@@ -464,7 +464,7 @@ MovingHead::populateInspector(ofxCvGui::InspectArguments& args)
 		{
 			auto selector = inspector->addMultipleChoice("DMX pan polarity");
 			selector->addOptions({ "Right (+)", "Left (+)" });
-			selector->entangle(this->fixtureSettings.dmxPanPolarity);
+			selector->entangleBasicEnum(this->fixtureSettings.dmxPanPolarity);
 		}
 
 		inspector->addTitle("DMX Addresses", ofxCvGui::Widgets::Title::Level::H3);

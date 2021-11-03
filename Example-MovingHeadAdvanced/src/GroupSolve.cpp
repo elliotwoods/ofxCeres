@@ -101,5 +101,6 @@ GroupSolve::selectOnlyMultiUseMarkers()
 void
 GroupSolve::solve()
 {
+	// Check we have the right set of constraints
 
 }
