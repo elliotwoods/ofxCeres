@@ -225,6 +225,7 @@
     <ClCompile Include="src\Data\MovingHeadDataPoint.cpp" />
     <ClCompile Include="src\Data\Serializable.cpp" />
     <ClCompile Include="src\Exception.cpp" />
+    <ClCompile Include="src\GroupSolve.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Marker.cpp" />
     <ClCompile Include="src\Markers.cpp" />
@@ -292,6 +293,7 @@
     <ClInclude Include="src\Data\MovingHeadDataPoint.h" />
     <ClInclude Include="src\Data\Serializable.h" />
     <ClInclude Include="src\Exception.h" />
+    <ClInclude Include="src\GroupSolve.h" />
     <ClInclude Include="src\Marker.h" />
     <ClInclude Include="src\Markers.h" />
     <ClInclude Include="src\Mesh.h" />

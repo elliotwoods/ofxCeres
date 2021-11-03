@@ -45,11 +45,7 @@ Scene::drawWorld()
 		}
 	}
 
-	// Draw the markers
-	auto markers = this->markers->getSelection();
-	for (auto marker : markers) {
-		ofxCvGui::Utils::drawTextAnnotation(marker->name, marker->position, marker->color);
-	}
+	this->markers->drawWorld();
 
 	// Draw the mesh
 	this->mesh->drawWorld();
@@ -147,6 +143,12 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addSpacer();
 
+	inspector->addButton("Group Solve >>", [this]() {
+		ofxCvGui::inspect(this->groupSolve);
+		});
+
+	inspector->addSpacer();
+
 	inspector->addButton("Mesh >>", [this]() {
 		ofxCvGui::inspect(this->mesh);
 		});
@@ -192,6 +194,13 @@ map<string, shared_ptr<MovingHead>>&
 Scene::getMovingHeads()
 {
 	return this->movingHeads;
+}
+
+//--------------------------------------------------------------
+shared_ptr<Markers>
+Scene::getMarkers()
+{
+	return this->markers;
 }
 
 //--------------------------------------------------------------

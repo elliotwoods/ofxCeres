@@ -11,6 +11,8 @@ public:
 	shared_ptr<Marker> addNewMarker(const string& name
 		, const glm::vec3& position
 		, bool useExistingIfWeHaveAMatch);
+
+	void drawWorld();
 protected:
 	shared_ptr<Marker> focusedMarker;
 };

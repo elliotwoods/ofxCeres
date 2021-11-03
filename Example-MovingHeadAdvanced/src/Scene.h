@@ -3,6 +3,7 @@
 #include "MovingHead.h"
 #include "Marker.h"
 #include "Mesh.h"
+#include "GroupSolve.h"
 
 #include "Data/CalibrationPointSet.h"
 
@@ -34,6 +35,7 @@ protected:
 	map<string, shared_ptr<MovingHead>> movingHeads;
 	shared_ptr<Markers> markers = make_shared<Markers>();
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
+	shared_ptr<GroupSolve> groupSolve = make_shared<GroupSolve>(*this);
 
 	string selection = "";
 	ofParameter<bool> drawOtherFixtures{ "Draw other fixtures", true };
