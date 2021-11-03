@@ -23,15 +23,23 @@ namespace Data {
 				this->viewDirty = false;
 			}
 		};
-		this->listPanel->onDraw += [this](DrawArguments & args) {
-			ofPushStyle();
-			{
-				ofNoFill();
-				ofSetLineWidth(1.0f);
-				ofDrawRectangle(args.localBounds);
-			}
-			ofPopStyle();
-		};
+		// draw an outline
+		{
+			auto outline = make_shared<ofxCvGui::Element>();
+			this->listPanel->addChild(outline);
+			outline->onDraw += [this](DrawArguments& args) {
+				ofPushStyle();
+				{
+					ofNoFill();
+					ofSetLineWidth(1.0f);
+					ofDrawRectangle(args.localBounds);
+				}
+				ofPopStyle();
+			};
+			this->listPanel->onBoundsChange += [outline](ofxCvGui::BoundsChangeArguments& args) {
+				outline->setBounds(args.localBounds);
+			};
+		}
 		this->listPanel->setScissorEnabled(true);
 
 		this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
