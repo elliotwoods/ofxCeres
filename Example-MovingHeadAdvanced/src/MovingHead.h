@@ -8,6 +8,10 @@ MAKE_ENUM(SolveType
 	, (Basic, Distorted, Group)
 	, ("Basic", "Distorted", "Group"));
 
+MAKE_ENUM(Filter
+	, (PanLeft, PanRight, TiltUp, TiltDown)
+	, ("Pan Left", "Pan Right", "Tilt Up", "Tilt Down"));
+
 class MovingHead : public Data::Serializable, public ofxCvGui::IInspectable {
 public:
 	MovingHead(shared_ptr<Markers>);

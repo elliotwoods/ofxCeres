@@ -6,6 +6,7 @@
 #include "GroupSolve.h"
 
 #include "Data/CalibrationPointSet.h"
+#include "DMX/Sharpy.h"
 
 class Scene : public ofxCvGui::IInspectable {
 public:
@@ -41,4 +42,5 @@ protected:
 	ofParameter<bool> drawOtherFixtures{ "Draw other fixtures", true };
 
 	shared_ptr<ofxCvGui::Panels::WorldManaged> panel;
+	shared_ptr<DMX::Sharpy> testMovingHead = make_shared<DMX::Sharpy>();
 };

@@ -48,12 +48,15 @@ GroupSolve::populateInspector(ofxCvGui::InspectArguments& args)
 		this->prepareMarkers();
 		});
 
+	inspector->addButton("Solver Settings >>", [this]() {
+		ofxCvGui::inspectParameterGroup(this->solverSettings);
+		});
 	inspector->addButton("Solve", [this]() {
 		try {
 			this->solve();
 		}
 		CATCH_TO_ALERT;
-		});
+		}, OF_KEY_RETURN)->setHeight(100.0f);
 
 }
 

@@ -58,6 +58,24 @@
     <ClCompile Include="src\GroupSolve.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\DMX\Channel.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DMX\Fixture.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DMX\MovingHead.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DMX\Sharpy.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxDmx\src\ofxDmx.cpp">
+      <Filter>addons\ofxDmx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DMX\EntecUSBPro.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -92,6 +110,12 @@
     </Filter>
     <Filter Include="addons\ofxAssimpModelLoader\libs\assimp\include\assimp\Compiler">
       <UniqueIdentifier>{a90f9e08-bd91-42ff-8ec8-69f0cc01c473}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\DMX">
+      <UniqueIdentifier>{493d3037-0c96-40be-b99f-7af456d13334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxDmx">
+      <UniqueIdentifier>{906c4f32-5129-4dbc-ab8b-02a485769c0e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +298,27 @@
     </ClInclude>
     <ClInclude Include="src\GroupSolve.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\Channel.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\Fixture.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\Types.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\MovingHead.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\Sharpy.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxDmx\src\ofxDmx.h">
+      <Filter>addons\ofxDmx</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\EntecUSBPro.h">
+      <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

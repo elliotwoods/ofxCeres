@@ -22,6 +22,8 @@ Scene::update()
 	for (const auto& movingHead : this->movingHeads) {
 		movingHead.second->update();
 	}
+
+	this->testMovingHead->update();
 }
 
 //----------
@@ -31,18 +33,17 @@ Scene::drawWorld()
 	auto sceneIsSelected = this->isBeingInspected();
 
 	// Draw the moving heads
+	auto groupSolveSelected = this->groupSolve->isBeingInspected();
 	for (auto& movingHead : this->movingHeads) {
 		bool isSelected = movingHead.first == this->selection;
-		if (isSelected) {
+		if (isSelected || groupSolveSelected) {
 			movingHead.second->drawWorld(true);
 		}
 		else if (this->drawOtherFixtures) {
 			movingHead.second->drawWorld(false);
 		}
 
-		if (sceneIsSelected) {
-			ofxCvGui::Utils::drawTextAnnotation(movingHead.first, movingHead.second->getPosition());
-		}
+		ofxCvGui::Utils::drawTextAnnotation(movingHead.first, movingHead.second->getPosition());
 	}
 
 	this->markers->drawWorld();
@@ -130,9 +131,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		inspector->addLiveValue<size_t>("Active markers", [this]() {
 			return this->markers->getSelection().size();
 			});
-		inspector->addButton("Markers >>", [this]() {
-			ofxCvGui::inspect(this->markers);
-			});
+		inspector->addSubMenu("Markers", this->markers);
 		inspector->addButton("Merge markers", [this]() {
 			try {
 				this->mergeMarkers();
@@ -143,21 +142,20 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addSpacer();
 
-	inspector->addButton("Group Solve >>", [this]() {
-		ofxCvGui::inspect(this->groupSolve);
-		});
+	inspector->addSubMenu("Group Solve", this->groupSolve);
 
 	inspector->addSpacer();
 
-	inspector->addButton("Mesh >>", [this]() {
-		ofxCvGui::inspect(this->mesh);
-		});
+	inspector->addSubMenu("Mesh", this->mesh);
+
 	inspector->addButton("Fit world grid", [this]() {
 		this->fitWorldGrid();
 		})->addToolTip("Change the room min/max to match all data");
 	inspector->addButton("Rotate scene", [this]() {
 		this->rotateScene();
 		})->addToolTip("Rotate around +x axis by 90 degrees");
+
+	inspector->addSubMenu("Sharpy", this->testMovingHead);
 }
 
 //--------------------------------------------------------------
