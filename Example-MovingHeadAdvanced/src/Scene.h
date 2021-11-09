@@ -1,12 +1,12 @@
 #pragma once
 
-#include "MovingHead.h"
 #include "Marker.h"
+#include "Markers.h"
 #include "Mesh.h"
 #include "GroupSolve.h"
 
 #include "Data/CalibrationPointSet.h"
-#include "DMX/Sharpy.h"
+#include "DMX/MovingHead.h"
 #include "DMX/EnttecUSBPro.h"
 
 class Scene : public ofxCvGui::IInspectable {
@@ -16,33 +16,37 @@ public:
 	void drawWorld();
 	void renderDMX();
 
+	void serialize(nlohmann::json&);
+	void deserialize(const nlohmann::json&);
 	void populateInspector(ofxCvGui::InspectArguments&);
-	void load();
-	void save();
+	void load(const string& path);
+	void save(string& path);
 
-	map<string, shared_ptr<MovingHead>> & getMovingHeads();
+	map<string, shared_ptr<DMX::MovingHead>> & getMovingHeads();
+	void deleteMovingHead(const string&);
+
 	shared_ptr<Markers> getMarkers();
-
-	shared_ptr<MovingHead> addMovingHead(const string & name);
-	void addMovingHead(const string& name, shared_ptr<MovingHead>);
-	void deleteMovingHead(const string& name);
-	void importMovingHead();
 
 	void mergeMarkers();
 	void fitWorldGrid();
 	void rotateScene();
 
 	shared_ptr<ofxCvGui::Panels::WorldManaged> getPanel();
+
+	static string getDefaultFilename();
 protected:
-	map<string, shared_ptr<MovingHead>> movingHeads;
+	static shared_ptr<DMX::MovingHead> makeMovingHead(const string & typeName);
+
+	map<string, shared_ptr<DMX::MovingHead>> movingHeads;
 	shared_ptr<Markers> markers = make_shared<Markers>();
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
 	shared_ptr<GroupSolve> groupSolve = make_shared<GroupSolve>(*this);
 	shared_ptr<DMX::EnttecUSBPro> enttecUSBPro = make_shared<DMX::EnttecUSBPro>();
 
-	string selection = "";
-	ofParameter<bool> drawOtherFixtures{ "Draw other fixtures", true };
-
 	shared_ptr<ofxCvGui::Panels::WorldManaged> panel;
-	shared_ptr<DMX::Sharpy> testMovingHead = make_shared<DMX::Sharpy>();
+
+	struct {
+		ofParameter<string> name{ "Name", "1" };
+	} newMovingHead;
+
 };

@@ -261,7 +261,7 @@ namespace Data {
 		int index = 0;
 		for (auto capture : this->captures) {
 			nlohmann::json captureJson;
-			capture->serialize(captureJson);
+			capture->notifySerialize(captureJson);
 			jsonCaptures.emplace_back(move(captureJson));
 		}
 		json["captures"] = jsonCaptures;
@@ -277,7 +277,7 @@ namespace Data {
 			for (const auto & jsonCapture : jsonCaptures) {
 				try {
 					auto capture = this->makeEmpty();
-					capture->deserialize(jsonCapture);
+					capture->notifyDeserialize(jsonCapture);
 					this->add(capture); //ensure event listeners are attached
 				}
 				catch (const std::exception & e) {

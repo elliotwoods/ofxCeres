@@ -73,6 +73,18 @@
     <ClCompile Include="src\DMX\EnttecUSBPro.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
+    <ClCompile Include="src\Calibration\Model.cpp">
+      <Filter>src\Calibration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Calibration\Solver.cpp">
+      <Filter>src\Calibration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Calibration\DataPoint.cpp">
+      <Filter>src\Calibration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DMX\FixtureFactory.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -110,6 +122,9 @@
     </Filter>
     <Filter Include="src\DMX">
       <UniqueIdentifier>{493d3037-0c96-40be-b99f-7af456d13334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Calibration">
+      <UniqueIdentifier>{0e9bba16-1665-4fd9-9b3b-bca70e777a40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +324,18 @@
       <Filter>src\DMX</Filter>
     </ClInclude>
     <ClInclude Include="src\DMX\EnttecUSBPro.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Calibration\Model.h">
+      <Filter>src\Calibration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Calibration\Solver.h">
+      <Filter>src\Calibration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Calibration\DataPoint.h">
+      <Filter>src\Calibration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\FixtureFactory.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>

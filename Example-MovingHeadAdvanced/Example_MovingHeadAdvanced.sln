@@ -1,14 +1,16 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.106
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example-MovingHeadAdvanced", "Example-MovingHeadAdvanced.vcxproj", "{7FD42DF7-442E-479A-BA76-D0022F99702A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example_MovingHeadAdvanced", "Example_MovingHeadAdvanced.vcxproj", "{7FD42DF7-442E-479A-BA76-D0022F99702A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCeresLib", "..\ofxCeresLib\ofxCeresLib.vcxproj", "{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCeresLib", "..\ofxCeresLib\ofxCeresLib.vcxproj", "{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCvGuiLib", "..\..\ofxCvGui\ofxCvGuiLib\ofxCvGuiLib.vcxproj", "{6F0DDB4F-4014-4433-919B-9D956C034BAD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxPluginLib", "..\..\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj", "{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,14 +36,14 @@ Global
 		{5837595D-ACA9-485C-8E76-729040CE4B0B}.Release|Win32.Build.0 = Release|Win32
 		{5837595D-ACA9-485C-8E76-729040CE4B0B}.Release|x64.ActiveCfg = Release|x64
 		{5837595D-ACA9-485C-8E76-729040CE4B0B}.Release|x64.Build.0 = Release|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|Win32.Build.0 = Debug|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|x64.ActiveCfg = Debug|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Debug|x64.Build.0 = Debug|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|Win32.ActiveCfg = Release|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|Win32.Build.0 = Release|Win32
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|x64.ActiveCfg = Release|x64
-		{6891A0B0-AD9E-4042-909D-1B5FDB4A3E39}.Release|x64.Build.0 = Release|x64
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Debug|Win32.Build.0 = Debug|Win32
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Debug|x64.ActiveCfg = Debug|x64
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Debug|x64.Build.0 = Debug|x64
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Release|Win32.ActiveCfg = Release|Win32
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Release|Win32.Build.0 = Release|Win32
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Release|x64.ActiveCfg = Release|x64
+		{C42C2AF8-BB13-4FE4-81A5-41CD314F4FDE}.Release|x64.Build.0 = Release|x64
 		{6F0DDB4F-4014-4433-919B-9D956C034BAD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6F0DDB4F-4014-4433-919B-9D956C034BAD}.Debug|Win32.Build.0 = Debug|Win32
 		{6F0DDB4F-4014-4433-919B-9D956C034BAD}.Debug|x64.ActiveCfg = Debug|x64
@@ -50,6 +52,14 @@ Global
 		{6F0DDB4F-4014-4433-919B-9D956C034BAD}.Release|Win32.Build.0 = Release|Win32
 		{6F0DDB4F-4014-4433-919B-9D956C034BAD}.Release|x64.ActiveCfg = Release|x64
 		{6F0DDB4F-4014-4433-919B-9D956C034BAD}.Release|x64.Build.0 = Release|x64
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Debug|Win32.Build.0 = Debug|Win32
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Debug|x64.ActiveCfg = Debug|x64
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Debug|x64.Build.0 = Debug|x64
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|Win32.ActiveCfg = Release|Win32
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|Win32.Build.0 = Release|Win32
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|x64.ActiveCfg = Release|x64
+		{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

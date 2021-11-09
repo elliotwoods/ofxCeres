@@ -15,7 +15,7 @@ MAKE_ENUM(Filter
 class MovingHead : public Data::Serializable, public ofxCvGui::IInspectable {
 public:
 	MovingHead(shared_ptr<Markers>);
-	string getTypeName() const;
+	string getTypeName() const override;
 
 	void update();
 

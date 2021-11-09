@@ -115,16 +115,16 @@ namespace DMX {
 
 	//----------
 	void
-	EnttecUSBPro::serialize(nlohmann::json&)
+	EnttecUSBPro::serialize(nlohmann::json& json)
 	{
-
+		Data::serialize(json, this->parameters);
 	}
 
 	//----------
 	void
 	EnttecUSBPro::deserialize(const nlohmann::json& json)
 	{
-
+		Data::deserialize(json, this->parameters);
 	}
 
 	//----------

@@ -75,7 +75,7 @@ GroupSolve::prepareMarkers()
 		set<int> movingHeadsThatSeeMarker;
 		uint32_t movingHeadIndex = 0;
 		for (auto movingHead : movingHeads) {
-			auto calibrationPoints = movingHead.second->getCalibrationPoints()->getSelection();
+			auto calibrationPoints = movingHead.second->getSolver()->getCalibrationPoints()->getSelection();
 			for (auto calibrationPoint : calibrationPoints) {
 				if (calibrationPoint->marker.get() == markerName) {
 					movingHeadsThatSeeMarker.insert(movingHeadIndex);
@@ -106,7 +106,7 @@ GroupSolve::solve()
 	map<int, set<int>> whereMarkersSeen; // <MarkerIndex, set<MovingHeadIndex>>
 
 	// Gather moving heads
-	vector<shared_ptr<MovingHead>> movingHeads;
+	vector<shared_ptr<DMX::MovingHead>> movingHeads;
 	{
 		const auto& movingHeadsByName = this->scene.getMovingHeads();
 		for (auto it : movingHeadsByName) {
@@ -133,7 +133,7 @@ GroupSolve::solve()
 		int movingHeadIndex = 0;
 		for (const auto& movingHead : movingHeads) {
 			ofxCeres::Models::MovingHeadGroup::Image image;
-			auto calibrationPoints = movingHead->getCalibrationPoints()->getSelection();
+			auto calibrationPoints = movingHead->getSolver()->getCalibrationPoints()->getSelection();
 			for (auto calibrationPoint : calibrationPoints) {
 				auto markerIndex = getIndexForMarkerName(calibrationPoint->marker.get());
 				if (markerIndex != -1) {
@@ -157,7 +157,7 @@ GroupSolve::solve()
 			initialSolution.markerPositions.push_back(marker->position.get());
 		}
 		for (const auto& movingHead : movingHeads) {
-			initialSolution.movingHeads.push_back(movingHead->getDistortedMovingHeadSolution());
+			initialSolution.movingHeads.push_back(movingHead->getModel()->getDistortedMovingHeadSolution());
 		}
 	}
 
@@ -175,7 +175,7 @@ GroupSolve::solve()
 				// If it's free, we have to check that it's seen in at least 2 views
 				uint32_t countOfMovingHeadsThatSawThisPoint = 0;
 				for (const auto & movingHead : movingHeads) {
-					auto calibrationPoints = movingHead->getCalibrationPoints()->getSelection();
+					auto calibrationPoints = movingHead->getSolver()->getCalibrationPoints()->getSelection();
 					bool seenInThisMovingHead = false;
 					for (auto calibrationPoint : calibrationPoints) {
 						if (calibrationPoint->marker.get() == marker->name.get()) {
@@ -282,7 +282,7 @@ GroupSolve::solve()
 	// Unpack the solution
 	{
 		for (int i = 0; i < movingHeads.size(); i++) {
-			movingHeads[i]->setDistortedMovingHeadSolution(result.solution.movingHeads[i]);
+			movingHeads[i]->getModel()->setDistortedMovingHeadSolution(result.solution.movingHeads[i]);
 		}
 		for (int i = 0; i < markers.size(); i++) {
 			markers[i]->position.set(result.solution.markerPositions[i]);

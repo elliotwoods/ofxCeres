@@ -1,6 +1,7 @@
 #include "pch_ofApp.h"
 #include "Scene.h"
 #include "Exception.h"
+#include "DMX/FixtureFactory.h"
 
 //----------
 Scene::Scene()
@@ -23,7 +24,6 @@ Scene::update()
 		movingHead.second->update();
 	}
 
-	this->testMovingHead->update();
 	this->enttecUSBPro->update();
 
 	this->renderDMX();
@@ -38,15 +38,8 @@ Scene::drawWorld()
 	// Draw the moving heads
 	auto groupSolveSelected = this->groupSolve->isBeingInspected();
 	for (auto& movingHead : this->movingHeads) {
-		bool isSelected = movingHead.first == this->selection;
-		if (isSelected || groupSolveSelected) {
-			movingHead.second->drawWorld(true);
-		}
-		else if (this->drawOtherFixtures) {
-			movingHead.second->drawWorld(false);
-		}
-
-		ofxCvGui::Utils::drawTextAnnotation(movingHead.first, movingHead.second->getPosition());
+		movingHead.second->drawWorld();
+		ofxCvGui::Utils::drawTextAnnotation(movingHead.first, movingHead.second->getModel()->getPosition());
 	}
 
 	this->markers->drawWorld();
@@ -61,11 +54,78 @@ Scene::renderDMX()
 {
 	vector<DMX::Value> dmxValues(513, 0);
 	for (auto& movingHead : this->movingHeads) {
-		movingHead.second->renderDMX(dmxValues);
+		movingHead.second->getDMX(dmxValues);
 	}
-	this->testMovingHead->getDMX(dmxValues);
 	this->enttecUSBPro->send(dmxValues);
 }
+
+//----------
+void
+Scene::serialize(nlohmann::json& json)
+{
+	// Save the static modules
+	this->markers->notifySerialize(json["markers"]);
+	this->mesh->notifySerialize(json["mesh"]);
+	this->groupSolve->notifySerialize(json["groupSolve"]);
+	this->enttecUSBPro->notifySerialize(json["enttecUSBPro"]);
+
+	// Save the fixtures
+	{
+		auto& jsonMovingHeads = json["movingHeads"];
+
+		for (auto it : this->movingHeads) {
+			nlohmann::json jsonMovingHead;
+
+			jsonMovingHead["typeName"] = it.second->getTypeName();
+			jsonMovingHead["name"] = it.first;
+			auto& content = jsonMovingHead["content"];
+			it.second->notifySerialize(content);
+			jsonMovingHeads.push_back(jsonMovingHead);
+		}
+	}
+}
+
+//----------
+void
+Scene::deserialize(const nlohmann::json& json)
+{
+	// Load the static modules
+	if (json.contains("markers")) {
+		this->markers->notifyDeserialize(json["markers"]);
+	}
+	if (json.contains("mesh")) {
+		this->mesh->notifyDeserialize(json["mesh"]);
+	}
+	if (json.contains("groupSolve")) {
+		this->groupSolve->notifyDeserialize(json["groupSolve"]);
+	}
+	if (json.contains("enttecUSBPro")) {
+		this->enttecUSBPro->notifyDeserialize(json["enttecUSBPro"]);
+	}
+
+	// Load the fixtures
+	{
+		// clear existing
+		this->movingHeads.clear();
+
+		const auto& jsonMovingHeads = json["movingHeads"];
+
+		for (const auto& jsonMovingHead : jsonMovingHeads) {
+			auto typeName = jsonMovingHead["typeName"].get<string>();
+			auto name = jsonMovingHead["name"].get<string>();
+			auto content = jsonMovingHead["content"];
+
+			try {
+				auto movingHead = Scene::makeMovingHead(typeName);
+				movingHead->notifyDeserialize(content);
+				this->movingHeads.emplace(name, movingHead);
+			}
+			CATCH_TO_ALERT;
+		}
+	}
+}
+
+
 
 //--------------------------------------------------------------
 void
@@ -75,50 +135,40 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addFps();
 	inspector->addButton("Save all", [this]() {
-		this->save();
+		this->save(Scene::getDefaultFilename());
+		});
+	inspector->addButton("Save as...", [this]() {
+		auto result = ofSystemSaveDialog(Scene::getDefaultFilename(), "Save json...");
+		if (result.bSuccess) {
+			this->save(result.filePath);
+		}
+		});
+	inspector->addButton("Load...", [this]() {
+		auto result = ofSystemLoadDialog("Load json...");
+		if (result.bSuccess) {
+			this->load(result.filePath);
+		}
 		});
 
 	inspector->addSpacer();
 
 	inspector->addTitle("Moving heads", ofxCvGui::Widgets::Title::Level::H2);
 	{
-		inspector->addButton("Add moving head...", [this]() {
-			auto response = ofSystemTextBoxDialog("Moving head name");
-			if (!response.empty()) {
-				try {
-					this->addMovingHead(response);
-				}
-				CATCH_TO_ALERT;
-			}
-			});
-		{
-			auto button = make_shared<ofxCvGui::Widgets::Button>("Import moving head...", [this]() {
-				try {
-					this->importMovingHead();
-				}
-				CATCH_TO_ALERT;
-				});
-			button->addToolTip("Import from older version of software");
-			inspector->add(button);
-		}
-
 		if (!this->movingHeads.empty()) {
 			inspector->addTitle("Select a moving head:", ofxCvGui::Widgets::Title::Level::H3);
 		}
 
 		// Selection buttons for moving heads
 		for (auto& it : this->movingHeads) {
-			auto button = make_shared<ofxCvGui::Widgets::Button>(it.first + " >>", [it, this]() {
-				this->selection = it.first;
-				ofxCvGui::inspect(this->movingHeads[this->selection]);
-				});
-
+			auto button = inspector->addSubMenu(it.first, this->movingHeads[it.first]);
+			button->setHeight(75.0f);
 			auto deleteButton = make_shared<ofxCvGui::Widgets::Button>("X", [it, this]() {
 				this->deleteMovingHead(it.first);
 				});
+			deleteButton->addToolTip("Delete");
 			button->onBoundsChange += [deleteButton](ofxCvGui::BoundsChangeArguments& args) {
 				ofRectangle bounds(
-					args.localBounds.width - 45
+					args.localBounds.width - 45 - 30
 					, 5
 					, 40
 					, args.localBounds.height - 10
@@ -126,9 +176,54 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 				deleteButton->setBounds(bounds);
 			};
 			button->addChild(deleteButton);
-			inspector->add(button);
 		}
 	}
+	inspector->addSubMenu("Add moving head", [this](ofxCvGui::InspectArguments& args) {
+		auto hasName = [this](const string& name) {
+			auto findName = this->movingHeads.find(name);
+			return findName != this->movingHeads.end();
+		};
+
+		// Setup the name for new moving head
+		{
+			auto name = this->newMovingHead.name;
+			if (name.get().empty() || hasName(name)) {
+				for (int i = 1; ; i++) {
+					auto name = ofToString(i);
+					if (!hasName(name)) {
+						this->newMovingHead.name = name;
+						break;
+					}
+				}
+			}
+		}
+
+		auto inspector = args.inspector;
+		inspector->addEditableValue(this->newMovingHead.name);
+
+		auto typeSelector = inspector->addMultipleChoice("Type");
+		{
+			auto fixtureFactory = DMX::FixtureFactory::X();
+			for (auto it : fixtureFactory) {
+				typeSelector->addOption(it.first);
+			}
+		}
+		inspector->addButton("Add", [this, hasName, typeSelector]() {
+			try {
+				auto name = this->newMovingHead.name.get();
+				if (hasName(name)) {
+					throw(Exception("Cannot add another moving head with same name '" + name + "'"));
+				}
+
+				auto movingHead = this->makeMovingHead(typeSelector->getSelection());
+
+				this->movingHeads.emplace(name, movingHead);
+
+				ofxCvGui::InspectController::X().back();
+			}
+			CATCH_TO_ALERT;
+			}, OF_KEY_RETURN)->setHeight(100.0f);
+		});
 
 	inspector->addSpacer();
 
@@ -148,6 +243,10 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addSpacer();
 
+	inspector->addButton("Rotate scnee", [this]() {
+		this->rotateScene();
+		});
+
 	inspector->addSubMenu("Group Solve", this->groupSolve);
 
 	inspector->addSpacer();
@@ -157,45 +256,48 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 	inspector->addButton("Fit world grid", [this]() {
 		this->fitWorldGrid();
 		})->addToolTip("Change the room min/max to match all data");
-	inspector->addButton("Rotate scene", [this]() {
-		this->rotateScene();
-		})->addToolTip("Rotate around +x axis by 90 degrees");
 
-	inspector->addSubMenu("Sharpy", this->testMovingHead);
 	inspector->addSubMenu("Enttec USB Pro", this->enttecUSBPro);
 }
 
 //--------------------------------------------------------------
 void
-Scene::load()
+Scene::load(const string& path)
 {
-	for (const auto& it : this->movingHeads) {
-		ofFile file;
-		file.open(it.first + ".json");
-		if (file.exists()) {
-			nlohmann::json json;
-			file >> json;
-			it.second->deserialize(json);
-		}
+	ofFile file;
+	file.open(path);
+	if (file.exists()) {
+		// Load the json
+		nlohmann::json json;
+		file >> json;
+
+		this->deserialize(json);
 	}
 }
 
 //--------------------------------------------------------------
 void
-Scene::save()
+Scene::save(string& path)
 {
-	for (const auto& it : this->movingHeads) {
-		nlohmann::json json;
-		it.second->serialize(json);
+	ofFile file;
+	file.open(path, ofFile::Mode::WriteOnly);
 
-		ofFile file;
-		file.open(it.first + ".json", ofFile::Mode::WriteOnly);
-		file << std::setw(4) << json;
+	// check extension
+	{
+		auto extension = ofToLower(ofFilePath::getFileExt(path));
+		if (extension != "json") {
+			path = path + ".json";
+		}
 	}
+
+	// put json
+	nlohmann::json json;
+	this->serialize(json);
+	file << std::setw(4) << json;
 }
 
 //--------------------------------------------------------------
-map<string, shared_ptr<MovingHead>>&
+map<string, shared_ptr<DMX::MovingHead>>&
 Scene::getMovingHeads()
 {
 	return this->movingHeads;
@@ -209,32 +311,6 @@ Scene::getMarkers()
 }
 
 //--------------------------------------------------------------
-shared_ptr<MovingHead>
-Scene::addMovingHead(const string& name)
-{
-	//Check if same name already exists
-	for (const auto& movingHead : this->movingHeads) {
-		if (movingHead.first == name) {
-			throw(Exception(name + " already exists. Cannot add 2 moving heads with same name"));
-		}
-	}
-
-	auto movingHead = make_shared<MovingHead>(this->markers);
-
-	this->addMovingHead(name, movingHead);
-	
-	return movingHead;
-}
-
-//--------------------------------------------------------------
-void
-Scene::addMovingHead(const string& name, shared_ptr<MovingHead> movingHead)
-{
-	this->movingHeads.emplace(name, movingHead);
-	ofxCvGui::InspectController::X().refresh(this);
-}
-
-//--------------------------------------------------------------
 void
 Scene::deleteMovingHead(const string& name)
 {
@@ -245,52 +321,6 @@ Scene::deleteMovingHead(const string& name)
 	this->movingHeads.erase(findMovingHead);
 
 	ofxCvGui::InspectController::X().refresh(this);
-}
-
-//--------------------------------------------------------------
-void
-Scene::importMovingHead()
-{
-	auto result = ofSystemLoadDialog("Load moving head...");
-	if (!result.bSuccess) {
-		return;
-	}
-
-	ofFile file;
-	file.open(result.filePath);
-	if (!file.is_open()) {
-		throw(Exception("Couldn't open file " + result.filePath));
-	}
-
-	auto movingHead = make_shared<MovingHead>(this->markers);
-	auto name = ofFilePath::getBaseName(result.filePath);
-
-	nlohmann::json json;
-	file >> json;
-	movingHead->deserialize(json, true);
-
-	// Bring all the calibration points into the markers
-	if (json.contains("calibrationPoints")) {
-		const auto& jsonCalibrationPoints = json["calibrationPoints"];
-		if (jsonCalibrationPoints.contains("captures")) {
-			const auto& jsonCaptures = jsonCalibrationPoints["captures"];
-			for (const auto& jsonCapture : jsonCaptures) {
-				// Use standard deserialisation (i.e. dummy parameters) to get the data out
-				ofParameter<glm::vec3> position{ "Target point", {0, 0, 0} };
-				ofParameter<string> name{ "Name", "" };
-				jsonCapture >> position;
-				jsonCapture >> name;
-
-				auto marker = this->markers->addNewMarker(name, position, true);
-				this->markers->add(marker);
-			}
-		}
-	}
-
-	this->addMovingHead(name, movingHead);
-
-	// Fit the world grid to accomodate the new data
-	this->fitWorldGrid();
 }
 
 //----------
@@ -331,7 +361,7 @@ Scene::mergeMarkers()
 			
 			// Edit all moving heads calibration points that reference this marker to use the merged marker instead
 			for (auto& movingHead : this->movingHeads) {
-				auto calibrationPoints = movingHead.second->getCalibrationPoints()->getAllCaptures();
+				auto calibrationPoints = movingHead.second->getSolver()->getCalibrationPoints()->getAllCaptures();
 				for (auto& calibrationPoint : calibrationPoints) {
 					if (calibrationPoint->marker.get() == markerToMerge->name.get()) {
 						// We have a match for the marker that is being deleted
@@ -360,7 +390,7 @@ Scene::fitWorldGrid()
 		positions.push_back(marker->position);
 	}
 	for (const auto& movingHead : this->movingHeads) {
-		positions.push_back(movingHead.second->getPosition());
+		positions.push_back(movingHead.second->getModel()->getPosition());
 	}
 
 	// Now expand our min and max
@@ -400,7 +430,7 @@ Scene::rotateScene()
 	// Rotate moving heads
 	{
 		for (const auto& movingHead : this->movingHeads) {
-			movingHead.second->applyRotation(rotation);
+			movingHead.second->getModel()->applyRotation(rotation);
 		}
 	}
 }
@@ -410,4 +440,29 @@ shared_ptr<ofxCvGui::Panels::WorldManaged>
 Scene::getPanel()
 {
 	return this->panel;
+}
+
+//----------
+shared_ptr<DMX::MovingHead>
+Scene::makeMovingHead(const string& typeName)
+{
+	auto findFactory = DMX::FixtureFactory::X().find(typeName);
+	if (findFactory == DMX::FixtureFactory::X().end()) {
+		throw(Exception("Factory '" + typeName + "' not found"));
+	}
+
+	auto fixture = findFactory->second->makeUntyped();
+	auto movingHead = dynamic_pointer_cast<DMX::MovingHead>(fixture);
+	if (!movingHead) {
+		throw(Exception("We can only handle moving heads right now"));
+	}
+
+	return movingHead;
+}
+
+//----------
+string
+Scene::getDefaultFilename()
+{
+	return "MovingHeads.json";
 }

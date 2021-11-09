@@ -22,6 +22,8 @@ namespace DMX {
 
 		void update();
 		void getDMX(vector<DMX::Value>&);
+
+		virtual void drawWorld() = 0;
 		
 		void serialize(nlohmann::json&);
 		void deserialize(const nlohmann::json&);

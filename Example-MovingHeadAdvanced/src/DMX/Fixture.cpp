@@ -7,10 +7,7 @@ namespace DMX {
 	Fixture::Fixture()
 	{
 		RULR_SERIALIZE_LISTENERS;
-		
-		this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
-			this->populateInspector(args);
-		};
+		RULR_INSPECTOR_LISTENER;
 
 		// Set the active command to be completed by default
 		this->activeCommand.complete = true;
@@ -66,6 +63,8 @@ namespace DMX {
 	void
 	Fixture::serialize(nlohmann::json& json)
 	{
+		json << this->channelIndex;
+
 		for (auto channel : this->channels) {
 			channel->serialize(json);
 		}
@@ -75,6 +74,8 @@ namespace DMX {
 	void
 	Fixture::deserialize(const nlohmann::json& json)
 	{
+		json >> this->channelIndex;
+
 		for (auto channel : this->channels) {
 			channel->deserialize(json);
 		}

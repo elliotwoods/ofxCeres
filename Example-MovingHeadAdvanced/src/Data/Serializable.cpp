@@ -10,12 +10,12 @@ namespace Data {
 	}
 
 	//----------
-	void Serializable::serialize(nlohmann::json & json) {
+	void Serializable::notifySerialize(nlohmann::json & json) {
 		this->onSerialize.notifyListeners(json);
 	}
 
 	//----------
-	void Serializable::deserialize(const nlohmann::json & json) {
+	void Serializable::notifyDeserialize(const nlohmann::json & json) {
 		this->onDeserialize.notifyListeners(json);
 	}
 
@@ -30,7 +30,7 @@ namespace Data {
 
 		if (filename != "") {
 			nlohmann::json json;
-			this->serialize(json);
+			this->notifySerialize(json);
 			ofFile output;
 			output.open(filename, ofFile::WriteOnly, false);
 			output << std::setw(4) << json << std::endl;
@@ -55,7 +55,7 @@ namespace Data {
 				nlohmann::json json;
 				input >> json;
 
-				this->deserialize(json);
+				this->notifyDeserialize(json);
 			}
 			catch (std::exception e) {
 				ofSystemAlertDialog(e.what());
@@ -80,7 +80,7 @@ void serializeSimple(nlohmann::json & json, const ofParameter<DataType> & parame
 
 template<typename DataType>
 void deserializeSimple(const nlohmann::json & json, ofParameter<DataType> & parameter) {
-	if (json.count(parameter.getName()) != 0) {
+	if (json.contains(parameter.getName())) {
 		auto value = json[parameter.getName()].template get<DataType>();
 		parameter.set(value);
 	}
@@ -96,7 +96,7 @@ void serializeStream(nlohmann::json & json, const ofParameter<DataType> & parame
 
 template<typename DataType>
 void deserializeStream(const nlohmann::json & json, ofParameter<DataType> & parameter) {
-	if (json.count(parameter.getName()) != 0) {
+	if (json.contains(parameter.getName())) {
         auto parameterValueString = json[parameter.getName()].template get<string>();
         
 		stringstream ss(parameterValueString);
@@ -147,3 +147,87 @@ DEFINE_DS_STREAM(glm::vec2)
 DEFINE_DS_STREAM(glm::vec3)
 DEFINE_DS_STREAM(glm::vec4)
 DEFINE_DS_STREAM(ofColor)
+
+#define TRY_SERIALIZE(Type) \
+{ \
+	auto typedParameter = dynamic_pointer_cast<ofParameter<Type>>(parameter); \
+	if (typedParameter) { \
+			jsonGroup << *typedParameter; \
+			continue; \
+	} \
+}
+
+#define TRY_DESERIALIZE(Type) \
+{ \
+	auto typedParameter = dynamic_pointer_cast<ofParameter<Type>>(parameter); \
+	if (typedParameter) { \
+			jsonGroup >> *typedParameter; \
+			continue; \
+	} \
+}
+
+namespace Data {
+	void
+	serialize(nlohmann::json& json, const ofParameterGroup& parameters) {
+		auto& jsonGroup = parameters.getName().empty()
+			? json
+			: json[parameters.getName()];
+
+		for (auto parameter : parameters) {
+			TRY_SERIALIZE(string);
+			TRY_SERIALIZE(bool);
+			TRY_SERIALIZE(uint8_t);
+			TRY_SERIALIZE(uint8_t);
+			TRY_SERIALIZE(uint16_t);
+			TRY_SERIALIZE(uint32_t);
+			TRY_SERIALIZE(uint64_t);
+			TRY_SERIALIZE(int8_t);
+			TRY_SERIALIZE(int16_t);
+			TRY_SERIALIZE(int32_t);
+			TRY_SERIALIZE(int64_t);
+			TRY_SERIALIZE(float);
+			TRY_SERIALIZE(double);
+			TRY_SERIALIZE(glm::vec2);
+			TRY_SERIALIZE(glm::vec3);
+			TRY_SERIALIZE(glm::vec4);
+			TRY_SERIALIZE(ofColor);
+
+			ofLogWarning("ofParamterGroup") << "Couldn't serialise " << parameter->getName();
+		}
+	}
+
+	void
+	deserialize(const nlohmann::json& json, ofParameterGroup& parameters) {
+		if (!parameters.getName().empty() && !json.contains(parameters.getName())) {
+			return;
+		}
+
+		const auto& jsonGroup = parameters.getName().empty()
+			? json
+			: json[parameters.getName()];
+
+		for (auto parameter : parameters) {
+			if (jsonGroup.contains(parameter->getName())) {
+				TRY_DESERIALIZE(string);
+				TRY_DESERIALIZE(bool);
+				TRY_DESERIALIZE(uint8_t);
+				TRY_DESERIALIZE(uint8_t);
+				TRY_DESERIALIZE(uint16_t);
+				TRY_DESERIALIZE(uint32_t);
+				TRY_DESERIALIZE(uint64_t);
+				TRY_DESERIALIZE(int8_t);
+				TRY_DESERIALIZE(int16_t);
+				TRY_DESERIALIZE(int32_t);
+				TRY_DESERIALIZE(int64_t);
+				TRY_DESERIALIZE(float);
+				TRY_DESERIALIZE(double);
+				TRY_DESERIALIZE(glm::vec2);
+				TRY_DESERIALIZE(glm::vec3);
+				TRY_DESERIALIZE(glm::vec4);
+				TRY_DESERIALIZE(ofColor);
+
+				ofLogWarning("ofParamterGroup") << "Couldn't deserialize " << parameter->getName();
+			}
+		}
+	}
+}

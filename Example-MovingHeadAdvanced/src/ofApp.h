@@ -15,5 +15,4 @@ public:
 
 	ofxCvGui::Builder gui;
 	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
-	shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel;
 };

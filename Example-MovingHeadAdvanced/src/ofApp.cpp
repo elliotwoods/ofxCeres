@@ -3,6 +3,9 @@
 #include "ofApp.h"
 #include "ofxCeres.h"
 
+#include "DMX/FixtureFactory.h"
+#include "DMX/Sharpy.h"
+
 //--------------------------------------------------------------
 void
 ofApp::setup()
@@ -10,9 +13,12 @@ ofApp::setup()
 	// Init the gui
 	this->gui.init();
 
+	// Register some fixture types
+	DMX::FixtureFactory::X().add<DMX::Sharpy>();
+
 	// Initialise the scene
 	this->scene = make_shared<Scene>(); // We want to do this after gui is init setup so we load graphics correctly
-	this->scene->load();
+	this->scene->load(Scene::getDefaultFilename());
 
 	// Setup the gui
 	{
@@ -42,9 +48,9 @@ ofApp::setup()
 	{
 		auto& movingHeads = this->scene->getMovingHeads();
 		if (!movingHeads.empty()) {
-			auto position4 = movingHeads.begin()->second->getTransform() * glm::vec4(0, 0, 0, 1);
-			auto position = (glm::vec3)(position4 / position4.w);
-			this->worldPanel->getCamera().lookAt(position);
+			auto position = movingHeads.begin()->second->getModel()->getPosition();
+			auto worldPanel = this->scene->getPanel();
+			worldPanel->getCamera().lookAt(position);
 		}
 	}
 }

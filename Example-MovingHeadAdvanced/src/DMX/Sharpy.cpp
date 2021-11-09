@@ -4,6 +4,10 @@
 namespace DMX {
 	//----------
 	Sharpy::Sharpy()
+	: MovingHead(Configuration{
+		-270, 270
+		, -125, 125
+		})
 	{
 		RULR_SERIALIZE_LISTENERS;
 
@@ -28,11 +32,11 @@ namespace DMX {
 				return ofMap(this->parameters.focus.get(), 0, 1, 0, 255, true);
 				})
 			, make_shared<Channel>("Pan", [this]() {
-				auto panAll = (int)ofMap(this->parameters.pan.get(), this->parameters.pan.getMin(), this->parameters.pan.getMax(), 0, std::numeric_limits<uint16_t>::max());
+				auto panAll = (int)ofMap(this->parameters.pan.get(), this->parameters.pan.getMax(), this->parameters.pan.getMin(), 0, std::numeric_limits<uint16_t>::max());
 				return (DMX::Value)(panAll >> 8);
 				})
 			, make_shared<Channel>("Pan Fine", [this]() {
-				auto panAll = (int)ofMap(this->parameters.pan.get(), this->parameters.pan.getMin(), this->parameters.pan.getMax(), 0, std::numeric_limits<uint16_t>::max());
+				auto panAll = (int)ofMap(this->parameters.pan.get(), this->parameters.pan.getMax(), this->parameters.pan.getMin(), 0, std::numeric_limits<uint16_t>::max());
 				return (DMX::Value)(panAll % 256);
 				})
 			, make_shared<Channel>("Tilt", [this]() {

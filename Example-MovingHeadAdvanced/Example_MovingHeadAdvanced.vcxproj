@@ -27,6 +27,7 @@
     <ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Example-MovingHeadAdvanced</RootNamespace>
+    <ProjectName>Example_MovingHeadAdvanced</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -57,24 +58,28 @@
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
+    <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -220,6 +225,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Calibration\DataPoint.cpp" />
+    <ClCompile Include="src\Calibration\Model.cpp" />
+    <ClCompile Include="src\Calibration\Solver.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPoint.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPointSet.cpp" />
     <ClCompile Include="src\Data\MovingHeadDataPoint.cpp" />
@@ -227,6 +235,7 @@
     <ClCompile Include="src\DMX\Channel.cpp" />
     <ClCompile Include="src\DMX\EnttecUSBPro.cpp" />
     <ClCompile Include="src\DMX\Fixture.cpp" />
+    <ClCompile Include="src\DMX\FixtureFactory.cpp" />
     <ClCompile Include="src\DMX\MovingHead.cpp" />
     <ClCompile Include="src\DMX\Sharpy.cpp" />
     <ClCompile Include="src\Exception.cpp" />
@@ -292,6 +301,9 @@
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpModelLoader.h" />
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpTexture.h" />
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpUtils.h" />
+    <ClInclude Include="src\Calibration\DataPoint.h" />
+    <ClInclude Include="src\Calibration\Model.h" />
+    <ClInclude Include="src\Calibration\Solver.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPoint.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPointSet.h" />
     <ClInclude Include="src\Data\CalibrationPointSet.h" />
@@ -300,6 +312,7 @@
     <ClInclude Include="src\DMX\Channel.h" />
     <ClInclude Include="src\DMX\EnttecUSBPro.h" />
     <ClInclude Include="src\DMX\Fixture.h" />
+    <ClInclude Include="src\DMX\FixtureFactory.h" />
     <ClInclude Include="src\DMX\MovingHead.h" />
     <ClInclude Include="src\DMX\Sharpy.h" />
     <ClInclude Include="src\DMX\Types.h" />
@@ -321,8 +334,11 @@
     <ProjectReference Include="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGuiLib.vcxproj">
       <Project>{6f0ddb4f-4014-4433-919b-9d956c034bad}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj">
+      <Project>{68b9239b-5ae6-45c0-b1cb-6fc6b58bb6ee}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ofxCeresLib\ofxCeresLib.vcxproj">
-      <Project>{6891a0b0-ad9e-4042-909d-1b5fdb4a3e39}</Project>
+      <Project>{c42c2af8-bb13-4fe4-81a5-41cd314f4fde}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

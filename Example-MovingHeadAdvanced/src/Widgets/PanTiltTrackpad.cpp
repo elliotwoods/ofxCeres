@@ -113,7 +113,7 @@ namespace Widgets {
 
 	//----------
 	void PanTiltTrackpad::mouse(MouseArguments & args) {
-		if(args.takeMousePress(this));
+		args.takeMousePress(this);
 		if (args.isDragging(this)) {
 			float speed = args.button == 2 ? 0.01f : 0.2f;
 			if (ofGetKeyPressed(OF_KEY_SHIFT)) {
