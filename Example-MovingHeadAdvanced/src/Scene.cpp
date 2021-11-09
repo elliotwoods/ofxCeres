@@ -24,6 +24,9 @@ Scene::update()
 	}
 
 	this->testMovingHead->update();
+	this->enttecUSBPro->update();
+
+	this->renderDMX();
 }
 
 //----------
@@ -54,11 +57,14 @@ Scene::drawWorld()
 
 //----------
 void
-Scene::renderDMX(vector<uint8_t>& dmxValues)
+Scene::renderDMX()
 {
+	vector<DMX::Value> dmxValues(513, 0);
 	for (auto& movingHead : this->movingHeads) {
 		movingHead.second->renderDMX(dmxValues);
 	}
+	this->testMovingHead->getDMX(dmxValues);
+	this->enttecUSBPro->send(dmxValues);
 }
 
 //--------------------------------------------------------------
@@ -156,6 +162,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		})->addToolTip("Rotate around +x axis by 90 degrees");
 
 	inspector->addSubMenu("Sharpy", this->testMovingHead);
+	inspector->addSubMenu("Enttec USB Pro", this->enttecUSBPro);
 }
 
 //--------------------------------------------------------------

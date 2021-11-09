@@ -11,8 +11,6 @@ public:
 	void update();
 	void draw();
 
-	void renderDMX();
-
 	shared_ptr<Scene> scene;
 
 	ofxCvGui::Builder gui;

@@ -53,7 +53,6 @@ ofApp::setup()
 void
 ofApp::update()
 {
-	this->renderDMX();
 	this->scene->update();
 }
 
@@ -62,22 +61,4 @@ void
 ofApp::draw()
 {
 
-}
-
-//--------------------------------------------------------------
-void
-ofApp::renderDMX()
-{
-	// dmx values have addersses starting with 1, so we keep these addresses and throw away the first value
-	vector<uint8_t> dmxValues(513, 0);
-	this->scene->renderDMX(dmxValues);
-
-	//--
-	// HERE YOU NEED TO SEND DMX OUT
-	//--
-	//
-	//
-
-	//
-	//--
 }

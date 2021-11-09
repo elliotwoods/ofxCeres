@@ -11,8 +11,5 @@ namespace DMX {
 		void deserialize(const nlohmann::json&);
 		void populateInspector(ofxCvGui::InspectArguments&);
 	protected:
-		struct : ofParameterGroup {
-
-		};
 	};
 }

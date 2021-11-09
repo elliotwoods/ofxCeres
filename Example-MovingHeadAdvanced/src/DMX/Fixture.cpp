@@ -115,8 +115,11 @@ namespace DMX {
 
 		inspector->addTitle("DMX Channels", ofxCvGui::Widgets::Title::H3);
 
-		for (const auto& channel : this->channels) {
-			inspector->add(channel->getWidget());
+		for (size_t i = 0; i < this->channels.size(); i++) {
+			auto channel = this->channels[i];
+			auto widget = channel->getWidget();
+			widget->setCaption(ofToString(i + 1) + " : " + widget->getCaption());
+			inspector->add(widget);
 		}
 	}
 

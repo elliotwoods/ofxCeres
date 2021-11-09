@@ -11,15 +11,15 @@ namespace DMX {
 			this->populateInspector(args);
 		};
 
-		this->parameters.setName("Sharpy");
-
 		this->channels = {
 			make_shared<Channel>("Color Wheel")
 			, make_shared<Channel>("Shutter")
 			, make_shared<Channel>("Dimmer", [this]() {
 				return ofMap(this->parameters.dimmer.get(), 0, 1, 0, 255, true);
 				})
-			, make_shared<Channel>("Gobo Wheel")
+			, make_shared<Channel>("Gobo Wheel", [this]() {
+					return ofMap(this->parameters.iris.get(), 0, 1, 11, 0, true);
+					})
 			, make_shared<Channel>("Prism Insertion")
 			, make_shared<Channel>("Prism Rotation")
 			, make_shared<Channel>("Effects Movement")
@@ -96,6 +96,14 @@ namespace DMX {
 		Sharpy::populateInspector(ofxCvGui::InspectArguments& args)
 	{
 		auto inspector = args.inspector;
-		inspector->addParameterGroup(this->parameters);
+
+		inspector->addTitle("Sharpy");
+
+		inspector->addButton("Shutter open", [this]() {
+			this->getChannelByName("Shutter")->setValue(104);
+			});
+		inspector->addButton("Shutter close", [this]() {
+			this->getChannelByName("Shutter")->setValue(0);
+			});
 	}
 }

@@ -70,10 +70,7 @@
     <ClCompile Include="src\DMX\Sharpy.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ofxDmx\src\ofxDmx.cpp">
-      <Filter>addons\ofxDmx</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DMX\EntecUSBPro.cpp">
+    <ClCompile Include="src\DMX\EnttecUSBPro.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,9 +110,6 @@
     </Filter>
     <Filter Include="src\DMX">
       <UniqueIdentifier>{493d3037-0c96-40be-b99f-7af456d13334}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxDmx">
-      <UniqueIdentifier>{906c4f32-5129-4dbc-ab8b-02a485769c0e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -314,10 +308,7 @@
     <ClInclude Include="src\DMX\Sharpy.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ofxDmx\src\ofxDmx.h">
-      <Filter>addons\ofxDmx</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DMX\EntecUSBPro.h">
+    <ClInclude Include="src\DMX\EnttecUSBPro.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>

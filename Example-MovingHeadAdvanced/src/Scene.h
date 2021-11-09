@@ -7,13 +7,14 @@
 
 #include "Data/CalibrationPointSet.h"
 #include "DMX/Sharpy.h"
+#include "DMX/EnttecUSBPro.h"
 
 class Scene : public ofxCvGui::IInspectable {
 public:
 	Scene();
 	void update();
 	void drawWorld();
-	void renderDMX(vector<uint8_t>&);
+	void renderDMX();
 
 	void populateInspector(ofxCvGui::InspectArguments&);
 	void load();
@@ -37,6 +38,7 @@ protected:
 	shared_ptr<Markers> markers = make_shared<Markers>();
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
 	shared_ptr<GroupSolve> groupSolve = make_shared<GroupSolve>(*this);
+	shared_ptr<DMX::EnttecUSBPro> enttecUSBPro = make_shared<DMX::EnttecUSBPro>();
 
 	string selection = "";
 	ofParameter<bool> drawOtherFixtures{ "Draw other fixtures", true };

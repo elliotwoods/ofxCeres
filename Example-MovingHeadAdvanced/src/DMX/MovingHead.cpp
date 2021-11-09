@@ -13,6 +13,10 @@ namespace DMX {
 		this->parameters.add(this->parameters.iris);
 
 		RULR_SERIALIZE_LISTENERS;
+
+		this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
+			this->populateInspector(args);
+		};
 	}
 
 	//----------
@@ -43,5 +47,9 @@ namespace DMX {
 	{
 		auto inspector = args.inspector;
 		inspector->addParameterGroup(this->parameters);
+		inspector->addButton("Home", [this]() {
+			this->parameters.pan.set(0);
+			this->parameters.tilt.set(0);
+			});
 	}
 }

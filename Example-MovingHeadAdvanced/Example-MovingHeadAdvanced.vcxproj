@@ -220,13 +220,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\ofxDmx\src\ofxDmx.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPoint.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPointSet.cpp" />
     <ClCompile Include="src\Data\MovingHeadDataPoint.cpp" />
     <ClCompile Include="src\Data\Serializable.cpp" />
     <ClCompile Include="src\DMX\Channel.cpp" />
-    <ClCompile Include="src\DMX\EntecUSBPro.cpp" />
+    <ClCompile Include="src\DMX\EnttecUSBPro.cpp" />
     <ClCompile Include="src\DMX\Fixture.cpp" />
     <ClCompile Include="src\DMX\MovingHead.cpp" />
     <ClCompile Include="src\DMX\Sharpy.cpp" />
@@ -293,14 +292,13 @@
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpModelLoader.h" />
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpTexture.h" />
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpUtils.h" />
-    <ClInclude Include="..\..\ofxDmx\src\ofxDmx.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPoint.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPointSet.h" />
     <ClInclude Include="src\Data\CalibrationPointSet.h" />
     <ClInclude Include="src\Data\MovingHeadDataPoint.h" />
     <ClInclude Include="src\Data\Serializable.h" />
     <ClInclude Include="src\DMX\Channel.h" />
-    <ClInclude Include="src\DMX\EntecUSBPro.h" />
+    <ClInclude Include="src\DMX\EnttecUSBPro.h" />
     <ClInclude Include="src\DMX\Fixture.h" />
     <ClInclude Include="src\DMX\MovingHead.h" />
     <ClInclude Include="src\DMX\Sharpy.h" />
