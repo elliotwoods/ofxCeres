@@ -5,6 +5,7 @@
 
 #include "DMX/FixtureFactory.h"
 #include "DMX/Sharpy.h"
+#include "DMX/Pointe.h"
 
 //--------------------------------------------------------------
 void
@@ -15,6 +16,7 @@ ofApp::setup()
 
 	// Register some fixture types
 	DMX::FixtureFactory::X().add<DMX::Sharpy>();
+	DMX::FixtureFactory::X().add<DMX::Pointe>();
 
 	// Initialise the scene
 	this->scene = Scene::X(); // We want to do this after gui is init setup so we load graphics correctly
@@ -41,16 +43,6 @@ ofApp::setup()
 			inspector->setTitleEnabled(false);
 			this->stripPanel->add(inspector);
 			ofxCvGui::inspect(this->scene);
-		}
-	}
-
-	// look at moving head #1 to start with
-	{
-		auto& movingHeads = this->scene->getMovingHeads();
-		if (!movingHeads.empty()) {
-			auto position = movingHeads.begin()->second->getModel()->getPosition();
-			auto worldPanel = this->scene->getPanel();
-			worldPanel->getCamera().lookAt(position);
 		}
 	}
 }

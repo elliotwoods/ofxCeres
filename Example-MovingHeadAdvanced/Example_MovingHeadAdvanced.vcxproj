@@ -237,6 +237,7 @@
     <ClCompile Include="src\DMX\Fixture.cpp" />
     <ClCompile Include="src\DMX\FixtureFactory.cpp" />
     <ClCompile Include="src\DMX\MovingHead.cpp" />
+    <ClCompile Include="src\DMX\Pointe.cpp" />
     <ClCompile Include="src\DMX\Sharpy.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\GroupSolve.cpp" />
@@ -314,6 +315,7 @@
     <ClInclude Include="src\DMX\Fixture.h" />
     <ClInclude Include="src\DMX\FixtureFactory.h" />
     <ClInclude Include="src\DMX\MovingHead.h" />
+    <ClInclude Include="src\DMX\Pointe.h" />
     <ClInclude Include="src\DMX\Sharpy.h" />
     <ClInclude Include="src\DMX\Types.h" />
     <ClInclude Include="src\Exception.h" />

@@ -50,6 +50,7 @@ protected:
 
 	struct {
 		ofParameter<string> name{ "Name", "1" };
+		ofParameter<DMX::ChannelIndex> dmxChannelIndex{ "Dmx channel index", 1 };
 	} newMovingHead;
 
 };

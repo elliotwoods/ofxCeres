@@ -19,33 +19,29 @@ namespace DMX {
 			make_shared<Channel>("Color Wheel")
 			, make_shared<Channel>("Shutter")
 			, make_shared<Channel>("Dimmer", [this]() {
-				return ofMap(this->parameters.dimmer.get(), 0, 1, 0, 255, true);
+				return Fixture::get8bit(this->parameters.dimmer);
 				})
 			, make_shared<Channel>("Gobo Wheel", [this]() {
-					return ofMap(this->parameters.iris.get(), 0, 1, 11, 0, true);
-					})
+				return ofMap(this->parameters.iris.get(), 0, 1, 11, 0, true);
+				})
 			, make_shared<Channel>("Prism Insertion")
 			, make_shared<Channel>("Prism Rotation")
 			, make_shared<Channel>("Effects Movement")
 			, make_shared<Channel>("Frost")
 			, make_shared<Channel>("Focus", [this]() {
-				return ofMap(this->parameters.focus.get(), 0, 1, 0, 255, true);
+				return Fixture::get8bit(this->parameters.focus);
 				})
 			, make_shared<Channel>("Pan", [this]() {
-				auto panAll = (int)ofMap(this->parameters.pan.get(), this->parameters.pan.getMax(), this->parameters.pan.getMin(), 0, std::numeric_limits<uint16_t>::max());
-				return (DMX::Value)(panAll >> 8);
+				return Fixture::get16bitMSB(this->parameters.pan, true);
 				})
 			, make_shared<Channel>("Pan Fine", [this]() {
-				auto panAll = (int)ofMap(this->parameters.pan.get(), this->parameters.pan.getMax(), this->parameters.pan.getMin(), 0, std::numeric_limits<uint16_t>::max());
-				return (DMX::Value)(panAll % 256);
+				return Fixture::get16bitLSB(this->parameters.pan, true);
 				})
 			, make_shared<Channel>("Tilt", [this]() {
-				auto panAll = (int)ofMap(this->parameters.tilt.get(), this->parameters.tilt.getMin(), this->parameters.tilt.getMax(), 0, std::numeric_limits<uint16_t>::max());
-				return (DMX::Value)(panAll >> 8);
+				return Fixture::get16bitMSB(this->parameters.tilt, false);
 				})
 			, make_shared<Channel>("Tilt Fine", [this]() {
-				auto panAll = (int)ofMap(this->parameters.tilt.get(), this->parameters.tilt.getMin(), this->parameters.tilt.getMax(), 0, std::numeric_limits<uint16_t>::max());
-				return (DMX::Value)(panAll % 256);
+				return Fixture::get16bitLSB(this->parameters.tilt, false);
 				})
 			, make_shared<Channel>("Function")
 			, make_shared<Channel>("Reset")

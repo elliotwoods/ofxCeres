@@ -85,6 +85,9 @@
     <ClCompile Include="src\DMX\FixtureFactory.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
+    <ClCompile Include="src\DMX\Pointe.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -336,6 +339,9 @@
       <Filter>src\Calibration</Filter>
     </ClInclude>
     <ClInclude Include="src\DMX\FixtureFactory.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\Pointe.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>

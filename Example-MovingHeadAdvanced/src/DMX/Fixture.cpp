@@ -141,4 +141,38 @@ namespace DMX {
 		}
 		throw(Exception("Channel '" + name + "' not found."));
 	}
+
+	//----------
+	uint16_t
+		Fixture::getAll(const ofParameter<float>& parameter, bool invert)
+	{
+		return (uint16_t)ofMap(parameter.get()
+			, invert ? parameter.getMax() : parameter.getMin()
+			, invert ? parameter.getMin() : parameter.getMax()
+			, 0
+			, std::numeric_limits<uint16_t>::max());
+	}
+
+	//----------
+	DMX::Value
+	Fixture::get16bitMSB(const ofParameter<float>& parameter, bool invert)
+	{
+		auto all = Fixture::getAll(parameter, invert);
+		return (DMX::Value)(all >> 8);
+	}
+
+	//----------
+	DMX::Value
+	Fixture::get16bitLSB(const ofParameter<float>& parameter, bool invert)
+	{
+		auto all = Fixture::getAll(parameter, invert);
+		return (DMX::Value)(all % 8);
+	}
+
+	//----------
+	DMX::Value
+	Fixture::get8bit(const ofParameter<float>& parameter, bool invert)
+	{
+		return get16bitMSB(parameter, invert);
+	}
 }

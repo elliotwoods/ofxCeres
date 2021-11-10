@@ -31,6 +31,11 @@ namespace DMX {
 
 		shared_ptr<Channel> getChannelByName(const string&);
 	protected:
+		static uint16_t getAll(const ofParameter<float>&, bool invert = false);
+		static DMX::Value get16bitMSB(const ofParameter<float>&, bool invert=false);
+		static DMX::Value get16bitLSB(const ofParameter<float>&, bool invert=false); // 'Fine'
+		static DMX::Value get8bit(const ofParameter<float>&, bool invert = false);
+
 		vector<Command> commands;
 		deque<Command> commandQueue;
 		Command activeCommand;

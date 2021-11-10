@@ -222,9 +222,19 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 			}
 		}
 
+		// Setup the DMX channel as first free channel
+		{
+			// This routine should render the dmx channels in-use
+			vector<DMX::Value> dmxChannels;
+			for (const auto& it : this->movingHeads) {
+				it.second->getDMX(dmxChannels);
+			}
+			this->newMovingHead.dmxChannelIndex.set(dmxChannels.size());
+		}
+
 		auto inspector = args.inspector;
 		inspector->addEditableValue(this->newMovingHead.name);
-
+		inspector->addEditableValue(this->newMovingHead.dmxChannelIndex);
 		auto typeSelector = inspector->addMultipleChoice("Type");
 		{
 			auto fixtureFactory = DMX::FixtureFactory::X();
@@ -240,7 +250,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 				}
 
 				auto movingHead = this->makeMovingHead(typeSelector->getSelection());
-
+				movingHead->channelIndex.set(this->newMovingHead.dmxChannelIndex.get());
 				this->movingHeads.emplace(name, movingHead);
 
 				ofxCvGui::InspectController::X().back();
