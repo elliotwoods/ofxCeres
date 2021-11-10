@@ -95,6 +95,22 @@ struct MovingHeadGroupError {
 	const glm::tvec2<double> panTiltSignal;
 };
 
+struct PanDistortionBiasError {
+	template <typename T>
+	bool operator()(const T* const panDistortionParameters
+		, T* residuals) const {
+		residuals[0] = panDistortionParameters[2];
+		return true;
+	}
+
+	static ceres::CostFunction* Create() {
+		return new ceres::AutoDiffCostFunction<PanDistortionBiasError, 1, 3>(
+			new PanDistortionBiasError()
+			);
+	}
+};
+
+
 struct PointInPlaneError {
 	PointInPlaneError(const glm::tvec4<double>& plane)
 		: plane(plane) {}
@@ -191,6 +207,14 @@ namespace ofxCeres {
 							, markerPositionParameters[image.markerIndex[i]].data()
 						);
 						activeMarkerIndices.insert(image.markerIndex[i]);
+					}
+
+					//Add a pan distortion bias term (0th order should = 0 in solution)
+					{
+						auto costFunction = PanDistortionBiasError::Create();
+						problem.AddResidualBlock(costFunction
+							, NULL
+							, panDistortionParameters[movingHeadIndex].data());
 					}
 				}
 

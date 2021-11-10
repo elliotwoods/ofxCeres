@@ -340,34 +340,6 @@ MovingHead::populateInspector(ofxCvGui::InspectArguments& args)
 			ofxCvGui::inspect(this->calibrationPoints);
 			});
 
-		inspector->addButton("Add new data point...", [this]() {
-			try {
-				auto newDataPoint = make_shared<Data::MovingHeadDataPoint>();
-				newDataPoint->panTiltSignal = this->currentPanTiltSignal.get();
-
-				auto targetPoint = this->lastWorldPosition;
-				{
-					auto response = ofSystemTextBoxDialog("Target point in world [" + ofToString(targetPoint) + "]", ofToString(targetPoint));
-
-					if (!response.empty()) {
-						stringstream ss(response);
-						ss >> targetPoint;
-					}
-				}
-
-				auto markerClosestToCursor = this->markers->getFocusedMarker();
-				if (!markerClosestToCursor) {
-					throw(Exception("There is no marker close to the mouse cursor"));
-				}
-
-				newDataPoint->marker = markerClosestToCursor->name.get();
-
-				this->prepareDataPoint(newDataPoint);
-				this->calibrationPoints->add(newDataPoint);
-			}
-			CATCH_TO_ALERT;
-		});
-
 		inspector->addButton("Add test data", [this]() {
 			this->addTestData();
 		});

@@ -82,7 +82,7 @@ namespace DMX {
 		if (json.contains("channels")) {
 			const auto& jsonChannels = json["channels"];
 			for (auto channel : this->channels) {
-				channel->deserialize(json);
+				channel->deserialize(jsonChannels);
 			}
 		}
 	}

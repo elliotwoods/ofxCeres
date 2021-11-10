@@ -16,6 +16,14 @@ Scene::Scene()
 }
 
 //----------
+shared_ptr<Scene>
+Scene::X()
+{
+	static auto instance = shared_ptr<Scene>(new Scene());
+	return instance;
+}
+
+//----------
 void
 Scene::update()
 {
@@ -165,11 +173,21 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		for (auto& it : this->movingHeads) {
 			auto button = inspector->addSubMenu(it.first, this->movingHeads[it.first]);
 			button->setHeight(75.0f);
-			auto deleteButton = make_shared<ofxCvGui::Widgets::Button>("X", [it, this]() {
+			auto deleteButton = make_shared<ofxCvGui::Widgets::Button>("", [it, this]() {
 				this->deleteMovingHead(it.first);
 				});
-			deleteButton->addToolTip("Delete");
-			button->onBoundsChange += [deleteButton](ofxCvGui::BoundsChangeArguments& args) {
+			{
+				deleteButton->setDrawGlyph(u8"\uf2ed"); // trash can
+				deleteButton->addToolTip("Delete");
+			}
+			auto renameButton = make_shared<ofxCvGui::Widgets::Button>("", [it, this]() {
+				this->renameMovingHead(it.first);
+				});
+			{
+				renameButton->setDrawGlyph(u8"\uf044"); // edit
+				renameButton->addToolTip("Edit name");
+			}
+			button->onBoundsChange += [deleteButton, renameButton](ofxCvGui::BoundsChangeArguments& args) {
 				ofRectangle bounds(
 					args.localBounds.width - 45 - 30
 					, 5
@@ -177,8 +195,11 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 					, args.localBounds.height - 10
 				);
 				deleteButton->setBounds(bounds);
+				bounds.x -= bounds.width + 5;
+				renameButton->setBounds(bounds);
 			};
 			button->addChild(deleteButton);
+			button->addChild(renameButton);
 		}
 	}
 	inspector->addSubMenu("Add moving head", [this](ofxCvGui::InspectArguments& args) {
@@ -323,21 +344,21 @@ Scene::save(string& path)
 	this->panel->saveCamera(path + "-camera.txt");
 }
 
-//--------------------------------------------------------------
+//----------
 map<string, shared_ptr<DMX::MovingHead>>&
 Scene::getMovingHeads()
 {
 	return this->movingHeads;
 }
 
-//--------------------------------------------------------------
+//----------
 shared_ptr<Markers>
 Scene::getMarkers()
 {
 	return this->markers;
 }
 
-//--------------------------------------------------------------
+//----------
 void
 Scene::deleteMovingHead(const string& name)
 {
@@ -346,6 +367,24 @@ Scene::deleteMovingHead(const string& name)
 		throw(Exception("Moving head " + name + " not found. Cannot delete"));
 	}
 	this->movingHeads.erase(findMovingHead);
+
+	ofxCvGui::InspectController::X().refresh(this);
+}
+
+//----------
+void
+Scene::renameMovingHead(const string& name)
+{
+	auto result = ofSystemTextBoxDialog("Rename moving head");
+	if (!result.empty()) {
+		auto findMovingHead = this->movingHeads.find(name);
+		if (findMovingHead == this->movingHeads.end()) {
+			throw(Exception("Moving head " + name + " not found. Cannot delete"));
+		}
+		auto movingHead = findMovingHead->second;
+		this->movingHeads.erase(findMovingHead);
+		this->movingHeads.emplace(result, movingHead);
+	}
 
 	ofxCvGui::InspectController::X().refresh(this);
 }

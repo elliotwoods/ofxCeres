@@ -1,5 +1,6 @@
 #include "pch_ofApp.h"
 #include "MovingHead.h"
+#include "Widgets/PanTiltTrackpad.h"
 
 namespace DMX {
 	//----------
@@ -145,6 +146,10 @@ namespace DMX {
 	{
 		auto inspector = args.inspector;
 		inspector->addParameterGroup(this->parameters);
+		{
+			auto trackpad = make_shared<Widgets::PanTiltTrackpad>(this->parameters.pan, this->parameters.tilt);
+			inspector->add(trackpad);
+		}
 		inspector->addButton("Home", [this]() {
 			this->parameters.pan.set(0);
 			this->parameters.tilt.set(0);

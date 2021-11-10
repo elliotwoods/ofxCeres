@@ -5,36 +5,48 @@ using namespace ofxCvGui;
 
 namespace Widgets {
 	//----------
-	PanTiltTrackpad::PanTiltTrackpad(ofParameter<glm::vec2> & parameter) {
+	PanTiltTrackpad::PanTiltTrackpad() {
 		this->setHeight(300.0f);
 
-		this->parameter = & parameter;
-
-		this->onDraw += [this](DrawArguments & args) {
+		this->onDraw += [this](DrawArguments& args) {
 			this->draw(args);
 		};
 
-		this->onMouse += [this](MouseArguments & args) {
+		this->onMouse += [this](MouseArguments& args) {
 			this->mouse(args);
 		};
 
-		this->onKeyboard += [this](KeyboardArguments & args) {
+		this->onKeyboard += [this](KeyboardArguments& args) {
 			this->keyboard(args);
 		};
 	}
 
 	//----------
-	glm::vec2 PanTiltTrackpad::toXY(const glm::vec2 & panTilt) {
+	PanTiltTrackpad::PanTiltTrackpad(ofParameter<glm::vec2> & parameter)
+	: PanTiltTrackpad() {
+		this->parameter = & parameter;
+	}
+
+	//----------
+	PanTiltTrackpad::PanTiltTrackpad(ofParameter<float>& panParameter, ofParameter<float>& tiltParameter)
+		: PanTiltTrackpad() {
+		this->panParameter = &panParameter;
+		this->tiltParameter = &tiltParameter;
+	}
+
+	//----------
+	glm::vec2
+	PanTiltTrackpad::toXY(const glm::vec2 & panTilt) {
 		return glm::vec2(
 			{
 				ofMap(panTilt.x
-					, this->parameter->getMin().x
-					, this->parameter->getMax().x
+					, this->getMin().x
+					, this->getMax().x
 					, this->getLocalBounds().getLeft()
 					, this->getLocalBounds().getRight())
 				, ofMap(panTilt.y
-					, this->parameter->getMin().y
-					, this->parameter->getMax().y
+					, this->getMin().y
+					, this->getMax().y
 					, this->getLocalBounds().getBottom()
 					, this->getLocalBounds().getTop())
 			}
@@ -42,19 +54,78 @@ namespace Widgets {
 	}
 
 	//----------
+	glm::vec2
+	PanTiltTrackpad::get() const
+	{
+		if (this->parameter) {
+			return this->parameter->get();
+		}
+		else {
+			return glm::vec2(
+				this->panParameter->get()
+				, this->tiltParameter->get()
+			);
+		}
+	}
+
+	//----------
+	glm::vec2
+	PanTiltTrackpad::getMin() const
+	{
+		if (this->parameter) {
+			return this->parameter->getMin();
+		}
+		else {
+			return glm::vec2(
+				this->panParameter->getMin()
+				, this->tiltParameter->getMin()
+			);
+		}
+	}
+
+	//----------
+	glm::vec2
+	PanTiltTrackpad::getMax() const
+	{
+		if (this->parameter) {
+			return this->parameter->getMax();
+		}
+		else {
+			return glm::vec2(
+				this->panParameter->getMax()
+				, this->tiltParameter->getMax()
+			);
+		}
+	}
+
+	//----------
+	void
+	PanTiltTrackpad::set(const glm::vec2& value)
+	{
+		if (this->parameter) {
+			this->parameter->set(value);
+		}
+		else {
+			this->panParameter->set(value.x);
+			this->tiltParameter->set(value.y);
+		}
+	}
+
+
+	//----------
 	void PanTiltTrackpad::draw(DrawArguments & args) {
 		auto drawIsoPan = [&](const float & pan) {
-			ofDrawLine(this->toXY({ pan, this->parameter->getMin().y }), this->toXY({ pan, this->parameter->getMax().y }));
+			ofDrawLine(this->toXY({ pan, this->getMin().y }), this->toXY({ pan, this->getMax().y }));
 			ofDrawBitmapString(ofToString(pan), toXY({pan, 0.0f }));
 		};
 
 		auto drawIsoTilt = [&](const float & tilt) {
-			ofDrawLine(this->toXY({ this->parameter->getMin().x, tilt }), this->toXY({ this->parameter->getMax().x, tilt }));
+			ofDrawLine(this->toXY({ this->getMin().x, tilt }), this->toXY({ this->getMax().x, tilt }));
 			ofDrawBitmapString(ofToString(tilt), this->toXY({ 0.0f, tilt }));
 		};
 
 		// Draw the background of the selected position
-		auto cursorForCurrent = this->toXY(this->parameter->get());
+		auto cursorForCurrent = this->toXY(this->get());
 		ofPushStyle();
 		{
 			ofSetColor(250.0f);
@@ -73,22 +144,22 @@ namespace Widgets {
 			drawIsoPan(0);
 			drawIsoTilt(0);
 
-			drawIsoPan(this->parameter->getMin().x);
-			drawIsoPan(this->parameter->getMax().x);
-			drawIsoTilt(this->parameter->getMin().y);
-			drawIsoTilt(this->parameter->getMax().y);
+			drawIsoPan(this->getMin().x);
+			drawIsoPan(this->getMax().x);
+			drawIsoTilt(this->getMin().y);
+			drawIsoTilt(this->getMax().y);
 
 			ofSetColor(150);
-			for (float pan = -90; pan > this->parameter->getMin().x; pan -= 90.0f) {
+			for (float pan = -90; pan > this->getMin().x; pan -= 90.0f) {
 				drawIsoPan(pan);
 			}
-			for (float pan = +90; pan < this->parameter->getMax().x; pan += 90.0f) {
+			for (float pan = +90; pan < this->getMax().x; pan += 90.0f) {
 				drawIsoPan(pan);
 			}
-			for (float tilt = -90; tilt > this->parameter->getMin().y; tilt -= 90.0f) {
+			for (float tilt = -90; tilt > this->getMin().y; tilt -= 90.0f) {
 				drawIsoTilt(tilt);
 			}
-			for (float tilt = +90; tilt < this->parameter->getMax().y; tilt += 90.0f) {
+			for (float tilt = +90; tilt < this->getMax().y; tilt += 90.0f) {
 				drawIsoTilt(tilt);
 			}
 		}
@@ -121,7 +192,7 @@ namespace Widgets {
 			}
 
 			auto delta = args.movement * speed * glm::vec2(1, -1);
-			this->parameter->set(this->parameter->get() + delta);
+			this->set(this->get() + delta);
 
 			this->clampValue();
 		}
@@ -157,7 +228,7 @@ namespace Widgets {
 
 			delta = delta * speed;
 
-			this->parameter->set(this->parameter->get() + delta);
+			this->set(this->get() + delta);
 			
 			this->clampValue();
 		}
@@ -165,14 +236,14 @@ namespace Widgets {
 
 	//----------
 	void PanTiltTrackpad::clampValue() {
-		auto value = this->parameter->get();
+		auto value = this->get();
 
-		auto lessThan = glm::lessThan(value, this->parameter->getMin());
-		auto moreThan = glm::greaterThan(value, this->parameter->getMin());
+		auto lessThan = glm::lessThan(value, this->getMin());
+		auto moreThan = glm::greaterThan(value, this->getMin());
 		auto outsideRange = glm::any(lessThan) || glm::any(moreThan);
 		
 		if (outsideRange) {
-			this->parameter->set(glm::clamp(value, this->parameter->getMin(), this->parameter->getMax()));
+			this->set(glm::clamp(value, this->getMin(), this->getMax()));
 		}
 	}
 }

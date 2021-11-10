@@ -17,7 +17,7 @@ ofApp::setup()
 	DMX::FixtureFactory::X().add<DMX::Sharpy>();
 
 	// Initialise the scene
-	this->scene = make_shared<Scene>(); // We want to do this after gui is init setup so we load graphics correctly
+	this->scene = Scene::X(); // We want to do this after gui is init setup so we load graphics correctly
 	this->scene->load(Scene::getDefaultFilename());
 
 	// Setup the gui

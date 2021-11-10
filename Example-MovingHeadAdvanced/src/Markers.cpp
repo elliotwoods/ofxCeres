@@ -14,21 +14,21 @@ Markers::Markers(shared_ptr<Mesh> mesh, shared_ptr<ofxCvGui::Panels::WorldManage
 }
 
 //----------
-void
-Markers::focusMarkerClosestTo(const glm::vec3& position)
+shared_ptr<Marker>
+Markers::getMarkerClosestTo(const glm::vec3& position)
 {
-	// Focus the data point close to the world cursor
 	auto minDistance2 = numeric_limits<float>::max();
 	auto markers = this->getSelection();
+	shared_ptr<Marker> closestMarker;
 	for (auto marker : markers) {
 		auto distance2 = glm::distance2(marker->position.get(), position);
 
-		// take the point as the focus if it's closest to the cursor so far (within 30cm)
 		if (distance2 < minDistance2 && sqrt(distance2) < 0.3f) {
-			this->focusedMarker = marker;
+			closestMarker = marker;
 			minDistance2 = distance2;
 		}
 	}
+	return closestMarker;
 }
 
 //----------
@@ -44,13 +44,6 @@ Markers::getMarkerByName(const string& name)
 
 	// None found. Return empty
 	return shared_ptr<Marker>();
-}
-
-//----------
-shared_ptr<Marker>
-Markers::getFocusedMarker() const
-{
-	return this->focusedMarker;
 }
 
 //----------

@@ -10,8 +10,11 @@
 #include "DMX/EnttecUSBPro.h"
 
 class Scene : public ofxCvGui::IInspectable {
-public:
+private:
 	Scene();
+public:
+	static shared_ptr<Scene> X(); // Scene is a global singleton
+
 	void update();
 	void drawWorld();
 	void renderDMX();
@@ -24,6 +27,7 @@ public:
 
 	map<string, shared_ptr<DMX::MovingHead>> & getMovingHeads();
 	void deleteMovingHead(const string&);
+	void renameMovingHead(const string&);
 
 	shared_ptr<Markers> getMarkers();
 
