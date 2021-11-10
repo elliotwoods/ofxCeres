@@ -200,6 +200,8 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 			};
 			button->addChild(deleteButton);
 			button->addChild(renameButton);
+
+			button->addToolTip(it.second->getTypeName() + " on Channel #" + ofToString(it.second->channelIndex.get()));
 		}
 	}
 	inspector->addSubMenu("Add moving head", [this](ofxCvGui::InspectArguments& args) {
@@ -225,7 +227,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		// Setup the DMX channel as first free channel
 		{
 			// This routine should render the dmx channels in-use
-			vector<DMX::Value> dmxChannels;
+			vector<DMX::Value> dmxChannels(1);
 			for (const auto& it : this->movingHeads) {
 				it.second->getDMX(dmxChannels);
 			}
@@ -277,7 +279,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addSpacer();
 
-	inspector->addButton("Rotate scnee", [this]() {
+	inspector->addButton("Rotate scene", [this]() {
 		this->rotateScene();
 		});
 

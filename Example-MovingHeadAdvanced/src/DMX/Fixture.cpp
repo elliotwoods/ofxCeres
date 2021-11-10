@@ -166,7 +166,7 @@ namespace DMX {
 	Fixture::get16bitLSB(const ofParameter<float>& parameter, bool invert)
 	{
 		auto all = Fixture::getAll(parameter, invert);
-		return (DMX::Value)(all % 8);
+		return (DMX::Value)(all % 256);
 	}
 
 	//----------
