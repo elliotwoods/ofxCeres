@@ -10,7 +10,6 @@ Scene::Scene()
 		this->populateInspector(args);
 	};
 
-	this->panel = ofxCvGui::Panels::makeWorldManaged();
 	this->panel->onDrawWorld += [this](ofCamera&) {
 		this->drawWorld();
 	};
@@ -25,8 +24,8 @@ Scene::update()
 	}
 
 	this->enttecUSBPro->update();
-
 	this->renderDMX();
+	this->mesh->update();
 }
 
 //----------
@@ -68,6 +67,7 @@ Scene::serialize(nlohmann::json& json)
 	this->mesh->notifySerialize(json["mesh"]);
 	this->groupSolve->notifySerialize(json["groupSolve"]);
 	this->enttecUSBPro->notifySerialize(json["enttecUSBPro"]);
+	Data::serialize(json["worldPanel"], this->panel->parameters);
 
 	// Save the fixtures
 	{
@@ -101,6 +101,9 @@ Scene::deserialize(const nlohmann::json& json)
 	}
 	if (json.contains("enttecUSBPro")) {
 		this->enttecUSBPro->notifyDeserialize(json["enttecUSBPro"]);
+	}
+	if (json.contains("worldPanel")) {
+		Data::deserialize(json["worldPanel"], this->panel->parameters);
 	}
 
 	// Load the fixtures
@@ -253,9 +256,26 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addSubMenu("Mesh", this->mesh);
 
-	inspector->addButton("Fit world grid", [this]() {
-		this->fitWorldGrid();
-		})->addToolTip("Change the room min/max to match all data");
+	inspector->addSubMenu("World Panel", [this](ofxCvGui::InspectArguments& args) {
+		auto inspector = args.inspector;
+		inspector->addParameterGroup(this->panel->parameters);
+		inspector->addButton("Fit world grid", [this]() {
+			this->fitWorldGrid();
+			})->addToolTip("Change the room min/max to match all data");
+		inspector->addButton("Expand world grid", [this]() {
+			{
+				auto value = this->panel->parameters.grid.roomMin.get();
+				value -= {1, 1, 1};
+				this->panel->parameters.grid.roomMin.set(value);
+			}
+			{
+				auto value = this->panel->parameters.grid.roomMax.get();
+				value += {1, 1, 1};
+				this->panel->parameters.grid.roomMax.set(value);
+			}
+			})->addToolTip("Add 1 unit in all directions");
+		});
+	
 
 	inspector->addSubMenu("Enttec USB Pro", this->enttecUSBPro);
 }
@@ -264,23 +284,28 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 void
 Scene::load(const string& path)
 {
-	ofFile file;
-	file.open(path);
-	if (file.exists()) {
-		// Load the json
-		nlohmann::json json;
-		file >> json;
+	try {
+		ofFile file;
+		file.open(path);
+		if (file.exists()) {
+			// Load the json
+			nlohmann::json json;
+			file >> json;
+			this->deserialize(json);
 
-		this->deserialize(json);
+			this->panel->loadCamera(path + "-camera.txt");
+		}
 	}
+	CATCH_TO_ALERT;
 }
 
 //--------------------------------------------------------------
 void
 Scene::save(string& path)
 {
-	ofFile file;
-	file.open(path, ofFile::Mode::WriteOnly);
+	// get json
+	nlohmann::json json;
+	this->serialize(json);
 
 	// check extension
 	{
@@ -290,10 +315,12 @@ Scene::save(string& path)
 		}
 	}
 
-	// put json
-	nlohmann::json json;
-	this->serialize(json);
+	// open file and put contents of json
+	ofFile file;
+	file.open(path, ofFile::Mode::WriteOnly);
 	file << std::setw(4) << json;
+
+	this->panel->saveCamera(path + "-camera.txt");
 }
 
 //--------------------------------------------------------------
@@ -391,6 +418,10 @@ Scene::fitWorldGrid()
 	}
 	for (const auto& movingHead : this->movingHeads) {
 		positions.push_back(movingHead.second->getModel()->getPosition());
+	}
+	if (this->mesh->isLoaded()) {
+		positions.push_back(this->mesh->getMin());
+		positions.push_back(this->mesh->getMax());
 	}
 
 	// Now expand our min and max

@@ -13,4 +13,7 @@ protected:
 #define CATCH_TO_ALERT \
 catch(const Exception& e) { \
 	ofSystemAlertDialog(e.what()); \
+} \
+catch(std::exception& e) { \
+	ofSystemAlertDialog(e.what()); \
 }

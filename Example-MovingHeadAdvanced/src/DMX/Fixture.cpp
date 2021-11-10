@@ -65,8 +65,11 @@ namespace DMX {
 	{
 		json << this->channelIndex;
 
-		for (auto channel : this->channels) {
-			channel->serialize(json);
+		{
+			auto& jsonChannels = json["channels"];
+			for (auto channel : this->channels) {
+				channel->serialize(jsonChannels);
+			}
 		}
 	}
 
@@ -76,8 +79,11 @@ namespace DMX {
 	{
 		json >> this->channelIndex;
 
-		for (auto channel : this->channels) {
-			channel->deserialize(json);
+		if (json.contains("channels")) {
+			const auto& jsonChannels = json["channels"];
+			for (auto channel : this->channels) {
+				channel->deserialize(json);
+			}
 		}
 	}
 

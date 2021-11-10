@@ -66,6 +66,8 @@ namespace Calibration {
 	{
 		auto inspector = args.inspector;
 
+		inspector->addSubMenu("Calibration points", this->calibrationPoints);
+
 		{
 			auto widget = inspector->addMultipleChoice(this->parameters.solveType.getName());
 			widget->entangleManagedEnum(this->parameters.solveType);

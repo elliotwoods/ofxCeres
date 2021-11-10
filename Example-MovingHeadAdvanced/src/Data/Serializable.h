@@ -36,6 +36,24 @@ namespace Data {
 
 	void serialize(nlohmann::json&, const ofParameterGroup&);
 	void deserialize(const nlohmann::json&, ofParameterGroup&);
+
+	template<typename EnumType>
+	void serializeEnum(nlohmann::json& json, const ofParameter<EnumType>& parameter)
+	{
+		json[parameter.getName()] = parameter.get().toString();
+	}
+
+	template<typename EnumType>
+	void deserializeEnum(const nlohmann::json& json, ofParameter<EnumType>& parameter)
+	{
+		if (json.contains(parameter.getName())) {
+			auto valueString = json[parameter.getName()].get<string>();
+			auto value = parameter.get();
+			value.fromString(valueString);
+			parameter.set(value);
+		}
+	}
+
 }
 
 nlohmann::json & operator<<(nlohmann::json &, const ofParameter<string> &);
@@ -54,6 +72,7 @@ nlohmann::json & operator<<(nlohmann::json &, const ofParameter<glm::vec2> &);
 nlohmann::json & operator<<(nlohmann::json &, const ofParameter<glm::vec3> &);
 nlohmann::json & operator<<(nlohmann::json &, const ofParameter<glm::vec4> &);
 nlohmann::json & operator<<(nlohmann::json &, const ofParameter<ofColor>&);
+nlohmann::json & operator<<(nlohmann::json &, const ofParameter<std::filesystem::path>&);
 
 const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<string> &);
 const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<bool> &);
@@ -70,5 +89,6 @@ const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<double> &)
 const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<glm::vec2> &);
 const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<glm::vec3> &);
 const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<glm::vec4> &);
-const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<ofColor> &);
+const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<ofColor>&);
+const nlohmann::json & operator>>(const nlohmann::json &, ofParameter<std::filesystem::path> &);
 

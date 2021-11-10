@@ -148,6 +148,24 @@ DEFINE_DS_STREAM(glm::vec3)
 DEFINE_DS_STREAM(glm::vec4)
 DEFINE_DS_STREAM(ofColor)
 
+
+nlohmann::json&
+operator<<(nlohmann::json& json, const ofParameter<std::filesystem::path>& parameter)
+{
+	json[parameter.getName()] = parameter.get().string();
+	return json;
+}
+const nlohmann::json&
+operator>>(const nlohmann::json& json, ofParameter<std::filesystem::path>& parameter)
+{
+	if (json.contains(parameter.getName())) {
+		auto value = json[parameter.getName()].get<string>();
+		parameter.set(filesystem::path(value));
+	}
+	return json;
+}
+
+
 #define TRY_SERIALIZE(Type) \
 { \
 	auto typedParameter = dynamic_pointer_cast<ofParameter<Type>>(parameter); \
@@ -191,6 +209,13 @@ namespace Data {
 			TRY_SERIALIZE(glm::vec3);
 			TRY_SERIALIZE(glm::vec4);
 			TRY_SERIALIZE(ofColor);
+			TRY_SERIALIZE(filesystem::path);
+			{
+				auto typedParameter = dynamic_pointer_cast<ofParameterGroup>(parameter);
+				if (typedParameter) {
+					Data::serialize(jsonGroup, *typedParameter);
+				}
+			}
 
 			ofLogWarning("ofParamterGroup") << "Couldn't serialise " << parameter->getName();
 		}
@@ -225,6 +250,13 @@ namespace Data {
 				TRY_DESERIALIZE(glm::vec3);
 				TRY_DESERIALIZE(glm::vec4);
 				TRY_DESERIALIZE(ofColor);
+				TRY_DESERIALIZE(filesystem::path);
+				{
+					auto typedParameter = dynamic_pointer_cast<ofParameterGroup>(parameter);
+					if (typedParameter) {
+						Data::deserialize(jsonGroup, *typedParameter);
+					}
+				}
 
 				ofLogWarning("ofParamterGroup") << "Couldn't deserialize " << parameter->getName();
 			}

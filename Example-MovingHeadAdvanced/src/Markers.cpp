@@ -2,6 +2,18 @@
 #include "Markers.h"
 
 //----------
+Markers::Markers(shared_ptr<Mesh> mesh, shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel)
+	: mesh(mesh)
+	, worldPanel(worldPanel)
+{
+	worldPanel->onMouse += [this](ofxCvGui::MouseArguments& args) {
+		if (this->isBeingInspected()) {
+			this->cursorPosition = this->mesh->getPointClosestTo(this->worldPanel->getCamera().getCursorWorld(), 0.3f);
+		}
+	};
+}
+
+//----------
 void
 Markers::focusMarkerClosestTo(const glm::vec3& position)
 {
@@ -126,6 +138,35 @@ Markers::drawWorld()
 				, marker->position.get()
 				, marker->color.get());
 		}
-
 	}
+
+	if (this->isBeingInspected()) {
+		ofxCvGui::Utils::drawTextAnnotation(ofToString(this->cursorPosition, 3)
+			, this->cursorPosition);
+	}
+}
+
+//----------
+void
+Markers::addMarker()
+{
+
+}
+
+//----------
+void
+Markers::populateInspector(ofxCvGui::InspectArguments& args)
+{
+	auto inspector = args.inspector;
+	AbstractCalibrationPointSet::populateInspector(args);
+	inspector->addButton("Add...", [this]() {
+		auto name = ofSystemTextBoxDialog("Marker name");
+		if (name.empty()) {
+			return;
+		}
+		auto marker = make_shared<Marker>();
+		marker->name.set(name);
+		marker->position.set(this->cursorPosition);
+		this->add(marker);
+		}, ' ')->setHeight(100.0f);
 }

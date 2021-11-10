@@ -38,12 +38,11 @@ protected:
 	static shared_ptr<DMX::MovingHead> makeMovingHead(const string & typeName);
 
 	map<string, shared_ptr<DMX::MovingHead>> movingHeads;
-	shared_ptr<Markers> markers = make_shared<Markers>();
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
 	shared_ptr<GroupSolve> groupSolve = make_shared<GroupSolve>(*this);
 	shared_ptr<DMX::EnttecUSBPro> enttecUSBPro = make_shared<DMX::EnttecUSBPro>();
-
-	shared_ptr<ofxCvGui::Panels::WorldManaged> panel;
+	shared_ptr<ofxCvGui::Panels::WorldManaged> panel = ofxCvGui::Panels::makeWorldManaged();
+	shared_ptr<Markers> markers = make_shared<Markers>(mesh, panel);
 
 	struct {
 		ofParameter<string> name{ "Name", "1" };

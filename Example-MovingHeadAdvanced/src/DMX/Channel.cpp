@@ -73,14 +73,21 @@ namespace DMX {
 	void
 	Channel::serialize(nlohmann::json& json)
 	{
-
+		json[this->getName()] = this->getValue();
 	}
 
 	//----------
 	void
 	Channel::deserialize(const nlohmann::json& json)
 	{
+		if (this->generateValue) {
+			// don't deserialize if it's an auto generated value
+			return;
+		}
 
+		if (json.contains(this->getName())) {
+			this->setValue(json[this->getName()].get<int>());
+		}
 	}
 
 }

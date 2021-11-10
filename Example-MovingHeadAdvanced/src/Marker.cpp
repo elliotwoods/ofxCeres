@@ -4,7 +4,7 @@
 //----------
 Marker::Marker()
 {
-
+	RULR_SERIALIZE_LISTENERS;
 }
 
 //----------
@@ -26,6 +26,24 @@ Marker::getGlyphForConstraint(const Constraint& constraint)
 	case Constraint::Plane:
 		return u8"\uf853";
 	}
+}
+
+//----------
+void
+Marker::serialize(nlohmann::json& json) const
+{
+	json << this->position;
+	json << this->name;
+	Data::serializeEnum(json, this->constraint);
+}
+
+//----------
+void
+Marker::deserialize(const nlohmann::json& json)
+{
+	json >> this->position;
+	json >> this->name;
+	Data::deserializeEnum(json, this->constraint);
 }
 
 //----------
