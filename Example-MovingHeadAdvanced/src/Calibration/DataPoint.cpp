@@ -111,25 +111,5 @@ namespace Calibration {
 		if (height > element->getHeight()) {
 			element->setHeight(height);
 		}
-
-		element->onDraw += [this](ofxCvGui::DrawArguments& args) {
-			if (this->isFocused) {
-				if (this->isFocused()) {
-					// Draw an outline
-					ofPushStyle();
-					{
-						ofNoFill();
-						ofDrawRectangle(args.localBounds);
-					}
-					ofPopStyle();
-				}
-			}
-		};
-
-		element->onMouse += [this](ofxCvGui::MouseArguments& args) {
-			if (args.isLocal() && args.action == ofxCvGui::MouseArguments::Pressed) {
-				this->onRequestFocus.notifyListeners();
-			}
-		};
 	}
 }

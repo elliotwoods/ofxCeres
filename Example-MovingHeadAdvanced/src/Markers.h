@@ -22,5 +22,7 @@ protected:
 	shared_ptr<Mesh> mesh;
 	shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel;
 
+	ofParameter<bool> snapToVertex{ "Snap to vertex", true };
+
 	glm::vec3 cursorPosition;
 };

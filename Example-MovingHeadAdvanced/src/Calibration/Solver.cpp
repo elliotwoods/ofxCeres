@@ -89,6 +89,12 @@ namespace Calibration {
 		}
 
 		this->calibrationPoints->deserialize(json);
+		{
+			auto dataPoints = this->calibrationPoints->getAllCaptures();
+			for (auto dataPoint : dataPoints) {
+				this->prepareDataPoint(dataPoint);
+			}
+		}
 	}
 
 	//---------
@@ -120,6 +126,9 @@ namespace Calibration {
 			inspector->add(trackpad);
 		}
 
+		inspector->addSlider(this->movingHead.parameters.focus);
+
+
 		inspector->addButton("Add", [this]() {
 			try {
 				this->addCalibrationPoint();
@@ -133,6 +142,16 @@ namespace Calibration {
 		}
 
 		inspector->addSubMenu(this->solverSettings);
+
+		inspector->addTitle("Treat data", ofxCvGui::Widgets::Title::H2);
+		inspector->addButton("Invert pan", [this]() {
+			auto dataPoints = this->calibrationPoints->getSelection();
+			for (auto dataPoint : dataPoints) {
+				auto panTilt = dataPoint->panTiltSignal.get();
+				panTilt.x = -panTilt.x;
+				dataPoint->panTiltSignal.set(panTilt);
+			}
+			});
 	}
 
 	//---------
@@ -144,12 +163,13 @@ namespace Calibration {
 			throw(Exception("No marker selected"));
 		}
 
-		auto calibrationPoint = make_shared<DataPoint>();
+		auto dataPoint = make_shared<DataPoint>();
 		{
-			calibrationPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
-			calibrationPoint->marker = marker->name.get();
+			dataPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
+			dataPoint->marker = marker->name.get();
 		}
-		this->calibrationPoints->add(calibrationPoint);
+		this->prepareDataPoint(dataPoint);
+		this->calibrationPoints->add(dataPoint);
 
 		ofxCvGui::refreshInspector(this);
 	}
@@ -167,4 +187,79 @@ namespace Calibration {
 	{
 		return this->calibrationPoints;
 	}
+
+	//---------
+	void
+	Solver::prepareDataPoint(shared_ptr<DataPoint> dataPoint)
+	{
+		auto getResidualFunction = [this](DataPoint* dataPoint) {
+			return this->getResidualOnDataPoint(dataPoint);
+		};
+
+		dataPoint->getResidualFunction = getResidualFunction;
+
+		auto dataPointWeak = weak_ptr<DataPoint>(dataPoint);
+
+		dataPoint->onTakeCurrent += [dataPointWeak, this]() {
+			auto dataPoint = dataPointWeak.lock();
+			dataPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
+		};
+
+		dataPoint->onGoValue += [dataPointWeak, this]() {
+			auto dataPoint = dataPointWeak.lock();
+			auto panTiltSignal = dataPoint->panTiltSignal.get();
+			this->movingHead.parameters.pan.set(panTiltSignal.x);
+			this->movingHead.parameters.tilt.set(panTiltSignal.y);
+		};
+
+		dataPoint->onGoPrediction += [dataPointWeak, this]() {
+			auto dataPoint = dataPointWeak.lock();
+			auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker);
+			if (!marker) {
+				dataPoint->setSelected(false);
+			}
+			else {
+				this->movingHead.navigateToWorldTarget(marker->position.get());
+			}
+		};
+	}
+
+	//---------
+	float
+	Solver::getResidualOnDataPoint(DataPoint* dataPoint) const
+	{
+		auto transform = this->movingHead.getModel()->getTransform();
+
+		//--
+		//World -> Object space
+		//
+
+		//get marker position
+		auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker);
+		if (!marker) {
+			throw(Exception("Marker " + dataPoint->marker.get() + " does not exist"));
+		}
+
+		//apply rigid body transform (marker into the object space of the moving head)
+		auto targetInViewSpace4 = glm::inverse(transform) * glm::vec4(marker->position.get(), 1.0);
+		targetInViewSpace4 /= targetInViewSpace4.w;
+		auto targetInViewSpace = glm::vec3(targetInViewSpace4);
+
+		if (targetInViewSpace == glm::vec3(0, 0, 0)) {
+			//residual is 0 if dataPoint is coincident with fixture
+			return 0.0f;
+		}
+		//
+		//--
+
+		// get ideal angles for target points
+		auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace);
+
+		auto dataPointPanTiltIdeal = this->movingHead.getModel()->panTiltSignalToIdeal(dataPoint->panTiltSignal);
+
+		auto disparity = ofxCeres::VectorMath::sphericalPolarDistance(idealAnglesForTarget, dataPointPanTiltIdeal);
+
+		return disparity * RAD_TO_DEG;
+	}
+
 }

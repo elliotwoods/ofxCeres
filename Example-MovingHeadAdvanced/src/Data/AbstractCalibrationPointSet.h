@@ -20,8 +20,8 @@ namespace Data {
 		shared_ptr<ofxCvGui::Panels::Widgets> getListPanel();
 
 		virtual void populateInspector(ofxCvGui::InspectArguments&);
-		virtual void serialize(nlohmann::json &);
-		virtual void deserialize(const nlohmann::json &);
+		void serialize(nlohmann::json &);
+		void deserialize(const nlohmann::json &);
 
 		vector<shared_ptr<AbstractCalibrationPoint>> getSelectionUntyped() const;
 		vector<shared_ptr<AbstractCalibrationPoint>> getAllCapturesUntyped() const;

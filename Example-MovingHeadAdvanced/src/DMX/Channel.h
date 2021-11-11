@@ -11,9 +11,9 @@
 namespace DMX {
 	class Channel {
 	public:
-		Channel();
 		Channel(const std::string& name, DMX::Value defaultValue = 0);
-		Channel(const std::string& name, std::function<DMX::Value()> generateValue);
+		Channel();
+		Channel(const std::string& name, const std::function<DMX::Value()> & generateValue);
 
 		void update();
 		string getName() const;
@@ -26,7 +26,7 @@ namespace DMX {
 		void serialize(nlohmann::json&);
 		void deserialize(const nlohmann::json&);
 	protected:
-		ofParameter<float> value{ "Channel", 0, 0, 255 }; // We use a float because then we can have a slider
-		std::function<DMX::Value()> generateValue;
+		ofParameter<float> value; // We use a float because then we can have a slider
+		function<DMX::Value()> generateValue;
 	};
 }

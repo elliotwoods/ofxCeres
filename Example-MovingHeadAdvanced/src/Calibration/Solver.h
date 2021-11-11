@@ -37,6 +37,9 @@ namespace Calibration {
 
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> getCalibrationPoints();
 	protected:
+		void prepareDataPoint(shared_ptr<DataPoint>);
+		float getResidualOnDataPoint(DataPoint*) const;
+
 		DMX::MovingHead& movingHead;
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> calibrationPoints = make_shared<Data::CalibrationPointSet<DataPoint>>();
 

@@ -13,6 +13,14 @@ Scene::Scene()
 	this->panel->onDrawWorld += [this](ofCamera&) {
 		this->drawWorld();
 	};
+
+	ofxCvGui::InspectController::X().onClear += [this](ofxCvGui::InspectArguments& args) {
+		auto inspector = args.inspector;
+		inspector->addFps();
+		inspector->addButton("Save all", [this]() {
+			this->save(Scene::getDefaultFilename());
+			});
+	};
 }
 
 //----------
@@ -134,6 +142,8 @@ Scene::deserialize(const nlohmann::json& json)
 			CATCH_TO_ALERT;
 		}
 	}
+
+	ofxCvGui::refreshInspector(this);
 }
 
 
@@ -144,10 +154,6 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 {
 	auto inspector = args.inspector;
 
-	inspector->addFps();
-	inspector->addButton("Save all", [this]() {
-		this->save(Scene::getDefaultFilename());
-		});
 	inspector->addButton("Save as...", [this]() {
 		auto result = ofSystemSaveDialog(Scene::getDefaultFilename(), "Save json...");
 		if (result.bSuccess) {

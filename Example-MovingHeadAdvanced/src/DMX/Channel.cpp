@@ -3,6 +3,12 @@
 
 namespace DMX {
 	//----------
+	Channel::Channel(const string & name, DMX::Value defaultValue)
+	{
+		this->value.set(name, defaultValue, 0, 255);
+	}
+
+	//----------
 	Channel::Channel() :
 		Channel("Value")
 	{
@@ -10,13 +16,7 @@ namespace DMX {
 	}
 
 	//----------
-	Channel::Channel(const string & name, DMX::Value defaultValue)
-	{
-		this->value.set(name, defaultValue, 0, 255);
-	}
-
-	//----------
-	Channel::Channel(const string & name, function<DMX::Value()> generateValue)
+	Channel::Channel(const string & name, const function<DMX::Value()> & generateValue)
 		: Channel(name)
 	{
 		this->generateValue = generateValue;

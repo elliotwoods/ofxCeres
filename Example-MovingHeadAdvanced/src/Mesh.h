@@ -6,6 +6,10 @@
 
 class Mesh : public ofxCvGui::IInspectable, public Data::Serializable {
 public:
+	MAKE_ENUM(DrawStyle
+		, (Mix, Fill, Wireframe)
+		, ("Mix", "Fill", "Wireframe"));
+
 	Mesh();
 	string getTypeName() const override;
 
@@ -38,6 +42,8 @@ protected:
 
 		PARAM_DECLARE("Mesh", filename, scale, rotation, enableMaterials);
 	} parameters;
+
+	ofParameter<DrawStyle> drawStyle{ "Draw style", DrawStyle::Mix };
 
 	std::filesystem::path loadedPath;
 	ofxAssimpModelLoader model;

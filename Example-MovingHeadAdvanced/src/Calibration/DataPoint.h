@@ -19,9 +19,6 @@ namespace Calibration {
 		ofxLiquidEvent<void> onTakeCurrent;
 		ofxLiquidEvent<void> onGoValue;
 		ofxLiquidEvent<void> onGoPrediction;
-		ofxLiquidEvent<void> onRequestFocus;
-
-		function<bool()> isFocused;
 	protected:
 		ofxCvGui::ElementPtr getDataDisplay() override;
 		void overlayMainDisplay(ofxCvGui::ElementPtr) override;

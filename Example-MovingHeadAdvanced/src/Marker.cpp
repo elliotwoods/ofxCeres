@@ -25,6 +25,8 @@ Marker::getGlyphForConstraint(const Constraint& constraint)
 		return u8"\uf05b";
 	case Constraint::Plane:
 		return u8"\uf853";
+	default:
+		return "";
 	}
 }
 

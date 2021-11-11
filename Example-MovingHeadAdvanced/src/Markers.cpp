@@ -6,10 +6,27 @@ Markers::Markers(shared_ptr<Mesh> mesh, shared_ptr<ofxCvGui::Panels::WorldManage
 	: mesh(mesh)
 	, worldPanel(worldPanel)
 {
-	worldPanel->onMouse += [this](ofxCvGui::MouseArguments& args) {
-		if (this->isBeingInspected()) {
-			this->cursorPosition = this->mesh->getPointClosestTo(this->worldPanel->getCamera().getCursorWorld(), 0.3f);
-		}
+	{
+		auto worldPanelWeak = weak_ptr<ofxCvGui::Element>(worldPanel);
+		worldPanel->onMouse += [this, worldPanelWeak](ofxCvGui::MouseArguments& args) {
+			auto worldPanel = worldPanelWeak.lock();
+			if (this->isBeingInspected() && worldPanel->isMouseOver()) {
+				auto cursorPosition = this->worldPanel->getCamera().getCursorWorld();
+				if (this->snapToVertex.get()) {
+					this->cursorPosition = this->mesh->getPointClosestTo(cursorPosition, 0.3f);
+				}
+				else {
+					this->cursorPosition = cursorPosition;
+				}
+			}
+		};
+	}
+
+	this->onSerialize += [this](nlohmann::json& json) {
+		json << this->snapToVertex;
+	};
+	this->onDeserialize += [this](const nlohmann::json& json) {
+		json >> this->snapToVertex;
 	};
 }
 
@@ -152,6 +169,7 @@ Markers::populateInspector(ofxCvGui::InspectArguments& args)
 {
 	auto inspector = args.inspector;
 	AbstractCalibrationPointSet::populateInspector(args);
+	inspector->addToggle(this->snapToVertex);
 	inspector->addButton("Add...", [this]() {
 		auto name = ofSystemTextBoxDialog("Marker name");
 		if (name.empty()) {

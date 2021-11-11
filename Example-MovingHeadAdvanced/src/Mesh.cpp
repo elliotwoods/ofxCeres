@@ -52,9 +52,34 @@ Mesh::drawWorld()
 		ofPushStyle();
 		{
 			ofSetColor(255);
-			this->model.drawWireframe();
-			ofSetColor(100);
-			this->model.drawFaces();
+
+			switch (this->drawStyle.get().get()) {
+			case DrawStyle::Mix:
+			{
+				glPushAttrib(GL_POLYGON_BIT);
+				{
+					glEnable(GL_POLYGON_OFFSET_FILL);
+					glPolygonOffset(1.0, 1.0);
+					this->model.drawWireframe();
+					ofSetColor(100);
+					this->model.drawFaces();
+				}
+				glPopAttrib();
+				break;
+			}
+			case DrawStyle::Fill:
+			{
+				this->model.drawFaces();
+				break;
+			}
+			case DrawStyle::Wireframe:
+			{
+				this->model.drawWireframe();
+				break;
+			}
+			default:
+				break;
+			}
 		}
 		ofPopStyle();
 	}
@@ -66,6 +91,7 @@ void
 Mesh::serialize(nlohmann::json& json)
 {
 	Data::serialize(json, this->parameters);
+	Data::serializeEnum(json, this->drawStyle);
 }
 
 //---------
@@ -73,6 +99,7 @@ void
 Mesh::deserialize(const nlohmann::json& json)
 {
 	Data::deserialize(json, this->parameters);
+	Data::deserializeEnum(json, this->drawStyle);
 }
 
 //---------
@@ -82,6 +109,10 @@ Mesh::populateInspector(ofxCvGui::InspectArguments& args)
 	auto inspector = args.inspector;
 
 	inspector->addParameterGroup(this->parameters);
+	{
+		auto widget = inspector->addMultipleChoice("Draw style");
+		widget->entangleManagedEnum(this->drawStyle);
+	}
 
 	inspector->addTitle("Model info", ofxCvGui::Widgets::Title::H3);
 	inspector->addLiveValue<glm::vec3>("Scene Min", [this]() {
@@ -97,6 +128,7 @@ Mesh::populateInspector(ofxCvGui::InspectArguments& args)
 		this->model.clear();
 		this->loadedPath = "";
 		});
+
 }
 
 //---------

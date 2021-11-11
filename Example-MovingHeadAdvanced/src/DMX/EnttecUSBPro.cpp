@@ -39,7 +39,7 @@ namespace DMX {
 			if (this->parameters.open.get() && !this->isOpen()) {
 				if (!this->open()) {
 					this->parameters.open.set(false);
-					throw(Exception("Could not open serial port on" + this->parameters.port.get()));
+					throw(Exception("Could not open serial port on " + this->parameters.port.get()));
 				}
 			}
 			else if (!this->parameters.open.get() && this->isOpen()) {

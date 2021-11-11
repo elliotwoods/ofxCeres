@@ -17,10 +17,10 @@ namespace DMX {
 
 		this->channels = {
 			make_shared<Channel>("Pan", [this]() {
-				return Fixture::get16bitMSB(this->parameters.pan, true);
+				return Fixture::get16bitMSB(this->parameters.pan, false);
 				})
 			, make_shared<Channel>("Pan fine", [this]() {
-				return Fixture::get16bitLSB(this->parameters.pan, true);
+				return Fixture::get16bitLSB(this->parameters.pan, false);
 				})
 			, make_shared<Channel>("Tilt", [this]() {
 				return Fixture::get16bitMSB(this->parameters.tilt);
@@ -125,10 +125,10 @@ namespace DMX {
 	{
 		auto inspector = args.inspector;
 
-		inspector->addTitle("Pointe");
+		inspector->addParameterGroup(this->customParameters);
 
 		inspector->addButton("Shutter open", [this]() {
-			this->getChannelByName("Shutter/strobe")->setValue(50);
+			this->getChannelByName("Shutter/strobe")->setValue(255);
 			});
 		inspector->addButton("Shutter close", [this]() {
 			this->getChannelByName("Shutter/strobe")->setValue(0);
