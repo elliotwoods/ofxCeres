@@ -30,7 +30,7 @@ namespace Calibration {
 
 		ofxCeres::Models::DistortedMovingHead::Solution getDistortedMovingHeadSolution() const;
 		void setDistortedMovingHeadSolution(const ofxCeres::Models::DistortedMovingHead::Solution&);
-	protected:
+
 		struct Parameters : ofParameterGroup {
 			Parameters();
 			ofParameter<glm::vec3> translation{ "Translation", {0, 0, 0} };
@@ -40,6 +40,7 @@ namespace Calibration {
 			ofParameter<float> residual{ "Residual", 0 };
 		} parameters;
 
+	protected:
 		DMX::MovingHead& movingHead;
 	};
 }

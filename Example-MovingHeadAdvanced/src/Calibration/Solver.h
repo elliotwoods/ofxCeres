@@ -34,10 +34,16 @@ namespace Calibration {
 		void populateInspector(ofxCvGui::InspectArguments&);
 
 		void addCalibrationPoint();
+
 		void solve();
+		void solveBasic();
+		void solveDistorted();
+		void solveGroup();
 
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> getCalibrationPoints();
 	protected:
+		void getCalibrationData(vector<glm::vec3>& targetPoints
+			, vector<glm::vec2>& panTiltSignal) const;
 		void prepareDataPoint(shared_ptr<DataPoint>);
 		float getResidualOnDataPoint(DataPoint*) const;
 

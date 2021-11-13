@@ -201,19 +201,26 @@ namespace Calibration {
 		{
 			auto widget = inspector->addMultipleChoice(this->parameters.solveType.getName());
 			widget->entangleManagedEnum(this->parameters.solveType);
+			inspector->addSubMenu(this->solverSettings);
+			inspector->addButton("Solve", [this]() {
+				try {
+					this->solve();
+				}
+				CATCH_TO_ALERT
+				});
 		}
 
-		inspector->addSubMenu(this->solverSettings);
-
 		inspector->addTitle("Treat data", ofxCvGui::Widgets::Title::H2);
-		inspector->addButton("Invert pan", [this]() {
-			auto dataPoints = this->calibrationPoints->getSelection();
-			for (auto dataPoint : dataPoints) {
-				auto panTilt = dataPoint->panTiltSignal.get();
-				panTilt.x = -panTilt.x;
-				dataPoint->panTiltSignal.set(panTilt);
-			}
-			});
+		{
+			inspector->addButton("Invert pan", [this]() {
+				auto dataPoints = this->calibrationPoints->getSelection();
+				for (auto dataPoint : dataPoints) {
+					auto panTilt = dataPoint->panTiltSignal.get();
+					panTilt.x = -panTilt.x;
+					dataPoint->panTiltSignal.set(panTilt);
+				}
+				});
+		}
 	}
 
 	//---------
@@ -240,7 +247,165 @@ namespace Calibration {
 	void
 	Solver::solve()
 	{
+		switch (this->parameters.solveType.get().get()) {
+		case SolveType::Basic:
+			this->solveBasic();
+			break;
+		case SolveType::Distorted:
+			this->solveDistorted();
+			break;
+		case SolveType::Group:
+			this->solveGroup();
+			break;
+		default:
+			break;
+		}
+	}
 
+	//----------
+	void
+	Solver::solveBasic()
+	{
+		vector<glm::vec3> targetPoints;
+		vector<glm::vec2> panTiltSignal;
+		this->getCalibrationData(targetPoints, panTiltSignal);
+
+		auto priorSolution = ofxCeres::Models::MovingHead::Solution{
+			this->movingHead.getModel()->parameters.translation.get()
+				, this->movingHead.getModel()->parameters.rotationVector.get()
+		};
+
+		auto result = ofxCeres::Models::MovingHead::solve(targetPoints
+			, panTiltSignal
+			, priorSolution
+			, this->solverSettings.getSolverSettings());
+
+		this->movingHead.getModel()->parameters.translation = result.solution.translation;
+		this->movingHead.getModel()->parameters.rotationVector = result.solution.rotationVector;
+		this->movingHead.getModel()->parameters.panDistortion.set({
+			0
+			, 1
+			, 0
+			});
+		this->movingHead.getModel()->parameters.tiltDistortion.set({
+			0
+			, 1
+			, 0
+			});
+
+		// Convert residual into degrees
+		this->movingHead.getModel()->parameters.residual.set(sqrt(result.residual / targetPoints.size()) * RAD_TO_DEG);
+	}
+
+	//----------
+	void
+	Solver::solveDistorted()
+	{
+		vector<glm::vec3> targetPoints;
+		vector<glm::vec2> panTiltSignal;
+		this->getCalibrationData(targetPoints, panTiltSignal);
+
+		// Initialise the solution based on current state
+		auto priorSolution = this->movingHead.getModel()->getDistortedMovingHeadSolution();
+
+		// Perform the fit
+		auto result = ofxCeres::Models::DistortedMovingHead::solve(targetPoints
+			, panTiltSignal
+			, priorSolution
+			, this->solverSettings.getSolverSettings());
+		//
+		//--
+
+
+
+		//--
+		// Load solution into local parameters
+		//
+		this->movingHead.getModel()->setDistortedMovingHeadSolution(result.solution);
+
+		{
+			// Convert residual into degrees
+			auto residual = result.residual;
+			residual = sqrt(residual / targetPoints.size());
+			residual = residual * RAD_TO_DEG;
+			this->movingHead.getModel()->parameters.residual.set(residual);
+		}
+		//
+		//--
+	}
+
+	//----------
+	void
+	Solver::solveGroup()
+	{
+		// Note this function uses the new MovingHeadGroup solver,
+		// but feeds it only one moving head and fixes all the
+		// markerPositions so that they cannot move
+
+		auto selectedMarkers = Scene::X()->getMarkers()->getSelection();
+
+		// Create the prior solution
+		ofxCeres::Models::MovingHeadGroup::Solution priorSolution;
+		{
+			// Add the marker positions
+			for (const auto& marker : selectedMarkers) {
+				priorSolution.markerPositions.push_back(marker->position.get());
+			}
+
+			// Add this moving head
+			priorSolution.movingHeads.push_back(this->movingHead.getModel()->getDistortedMovingHeadSolution());
+		}
+
+		// Create fixed constraints for all markers
+		vector<shared_ptr<ofxCeres::Models::MovingHeadGroup::Constraint>> constraints;
+		for (int i = 0; i < priorSolution.markerPositions.size(); i++) {
+			auto constraint = make_shared<ofxCeres::Models::MovingHeadGroup::FixedMarkerConstraint>();
+			constraint->markerIndex = i;
+			constraints.push_back(constraint);
+		}
+
+		// A function to convert marker names into the index in our vector of selected markers
+		auto getIndexForMarkerName = [&selectedMarkers](const string& name) {
+			for (size_t i = 0; i < selectedMarkers.size(); i++) {
+				if (selectedMarkers[i]->name.get() == name) {
+					return i;
+				}
+			}
+			throw(Exception("Couldn't find marker with name '" + name + "' in the selection."));
+		};
+
+		// Create the image
+		ofxCeres::Models::MovingHeadGroup::Image image;
+		auto calibrationPoints = this->calibrationPoints->getSelection();
+		for (auto calibrationPoint : calibrationPoints) {
+			image.panTiltSignal.push_back(calibrationPoint->panTiltSignal.get());
+			image.markerIndex.push_back(getIndexForMarkerName(calibrationPoint->marker.get()));
+		}
+
+		// Create options (let's just keep defaults for this one - since it's not real group solve)
+		ofxCeres::Models::MovingHeadGroup::Options options;
+		{
+			options.noDistortion = false;
+		}
+
+		// Solve
+		auto result = ofxCeres::Models::MovingHeadGroup::solve(vector<ofxCeres::Models::MovingHeadGroup::Image>(1, image)
+			, priorSolution
+			, constraints
+			, options
+			, this->solverSettings.getSolverSettings());
+
+		// Convert residual into meters
+		{
+			auto residual = result.residual;
+			residual = sqrt(residual / image.panTiltSignal.size());
+			this->movingHead.getModel()->parameters.residual.set(residual);
+		}
+
+		// Unpack the solution
+		{
+			this->movingHead.getModel()->setDistortedMovingHeadSolution(result.solution.movingHeads[0]);
+		}
 	}
 
 	//---------
@@ -248,6 +413,25 @@ namespace Calibration {
 	Solver::getCalibrationPoints()
 	{
 		return this->calibrationPoints;
+	}
+
+	//---------
+	void
+	Solver::getCalibrationData(vector<glm::vec3>& targetPoints
+		, vector<glm::vec2>& panTiltSignal) const
+	{
+		auto markers = Scene::X()->getMarkers();
+		auto dataPoints = this->calibrationPoints->getSelection();
+		for (auto dataPoint : dataPoints) {
+			auto marker = markers->getMarkerByName(dataPoint->marker.get());
+			if (!marker) {
+				dataPoint->setSelected(false);
+			}
+			else {
+				targetPoints.push_back(marker->position.get());
+				panTiltSignal.push_back(dataPoint->panTiltSignal.get());
+			}
+		}
 	}
 
 	//---------
