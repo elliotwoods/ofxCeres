@@ -26,6 +26,26 @@ GroupSolve::getTypeName() const
 
 //----------
 void
+GroupSolve::update()
+{
+	if (this->parameters.solveContinuously) {
+		this->solve();
+	}
+}
+//----------
+void
+GroupSolve::drawWorld()
+{
+	if (this->isBeingInspected()) {
+		auto movingHeads = Scene::X()->getMovingHeads();
+		for (auto& movingHead : movingHeads) {
+			movingHead.second->getSolver()->drawRaysAndResiduals();
+		}
+	}
+}
+
+//----------
+void
 GroupSolve::serialize(nlohmann::json&)
 {
 
@@ -44,13 +64,14 @@ GroupSolve::populateInspector(ofxCvGui::InspectArguments& args)
 {
 	auto inspector = args.inspector;
 
-	inspector->addButton("Prepare markers", [this]() {
+	inspector->addParameterGroup(this->parameters);
+
+	inspector->addButton("Prepare markers", 
+		[this]() {
 		this->prepareMarkers();
 		});
 
-	inspector->addButton("Solver Settings >>", [this]() {
-		ofxCvGui::inspectParameterGroup(this->solverSettings);
-		});
+	inspector->addSubMenu(this->solverSettings);
 	inspector->addButton("Solve", [this]() {
 		try {
 			this->solve();
@@ -287,5 +308,10 @@ GroupSolve::solve()
 		for (int i = 0; i < markers.size(); i++) {
 			markers[i]->position.set(result.solution.markerPositions[i]);
 		}
+	}
+
+	// Turn off continuous solve when we have a solution
+	if (result.isConverged()) {
+		this->parameters.solveContinuously.set(false);
 	}
 }

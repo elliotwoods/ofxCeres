@@ -53,7 +53,7 @@ namespace OSC {
 	void
 	Router::staticRoute(const std::string& name, const std::function<void(const ofxOscMessage&)>& action)
 	{
-		this->staticRoutes.emplace(name, action);
+		this->staticRoutes.emplace(Path::stripName(name), action);
 	}
 
 	//----------
@@ -67,6 +67,6 @@ namespace OSC {
 	void
 	Router::addSubRouter(const std::string& name, std::shared_ptr<Router> router)
 	{
-		this->childRouters.emplace(name, router);
+		this->childRouters.emplace(Path::stripName(name), router);
 	}
 }

@@ -61,6 +61,7 @@ Scene::update()
 	this->enttecUSBPro->update();
 	this->renderDMX();
 	this->mesh->update();
+	this->groupSolve->update();
 
 	// OSC
 	{
@@ -113,10 +114,8 @@ Scene::drawWorld()
 	}
 
 	this->markers->drawWorld();
-
-	// Draw the mesh
 	this->mesh->drawWorld();
-
+	this->groupSolve->drawWorld();
 	this->groupControl->drawWorld();
 }
 

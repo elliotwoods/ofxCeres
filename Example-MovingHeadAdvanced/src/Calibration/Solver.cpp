@@ -54,6 +54,50 @@ namespace Calibration {
 				, selectedMarker->position.get()
 				, selectedMarker->color);
 		}
+
+		if (this->isBeingInspected()) {
+			this->drawRaysAndResiduals();
+		}
+	}
+
+	//----------
+	void
+	Solver::drawRaysAndResiduals()
+	{
+		auto calibrationPoints = this->calibrationPoints->getSelection();
+		auto model = this->movingHead.getModel();
+		ofPushStyle();
+		{
+			for (const auto& calibrationPoint : calibrationPoints) {
+				auto marker = Scene::X()->getMarkers()->getMarkerByName(calibrationPoint->marker);
+				if (!marker) {
+					// Don't draw the rays for missing markers
+					continue;
+				}
+
+				ofSetColor(calibrationPoint->color);
+
+				auto idealPanTilt = model->panTiltSignalToIdeal(calibrationPoint->panTiltSignal.get());
+				auto transmissionObject = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(idealPanTilt);
+
+				// Set length to distance of marker to moving head
+				auto distance = glm::distance(marker->position.get(), model->getPosition());
+				transmissionObject *= distance;
+
+				auto transmissionWorld = ofxCeres::VectorMath::applyTransform(model->getTransform(), transmissionObject);
+
+				ofSetLineWidth(2.0f);
+				ofDrawLine(model->getPosition(), transmissionWorld);
+
+				if (marker) {
+					ofSetLineWidth(1.0f);
+					ofSetColor(100);
+					ofDrawLine(transmissionWorld, marker->position);
+				}
+
+			}
+		}
+		ofPopStyle();
 	}
 
 	//---------

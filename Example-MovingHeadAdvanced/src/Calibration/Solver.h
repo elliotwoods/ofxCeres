@@ -27,6 +27,7 @@ namespace Calibration {
 		string getTypeName() const override;
 
 		void drawWorld();
+		void drawRaysAndResiduals();
 
 		void serialize(nlohmann::json&);
 		void deserialize(const nlohmann::json&);

@@ -29,6 +29,15 @@ namespace DMX {
 
 		// OSC routers
 		{
+			this->staticRoute("navigateTo", [this](const ofxOscMessage& message) {
+				if (message.getNumArgs() >= 3) {
+					this->navigateToWorldTarget(glm::vec3(message.getArgAsFloat(0)
+						, message.getArgAsFloat(1)
+						, message.getArgAsFloat(1)
+					));
+				}
+				});
+
 			this->dynamicRoute([this](const OSC::Path& path, const ofxOscMessage& message) {
 				// Handle parameters
 				if (message.getNumArgs() > 0) {

@@ -10,6 +10,9 @@ public:
 	GroupSolve(Scene&);
 	string getTypeName() const override;
 
+	void update();
+	void drawWorld();
+
 	void serialize(nlohmann::json&);
 	void deserialize(const nlohmann::json&);
 	void populateInspector(ofxCvGui::InspectArguments&);
@@ -22,9 +25,7 @@ protected:
 
 	struct Parameters : ofParameterGroup {
 		ofParameter<bool> noDistortion{ "No distortion", false };
-		Parameters(){
-			this->setName("GroupSolve");
-			this->add(this->noDistortion);
-		}
+		ofParameter<bool> solveContinuously{ "Solve continuously", false };
+		PARAM_DECLARE("GroupSolve", noDistortion, solveContinuously);
 	} parameters;
 };
