@@ -15,6 +15,8 @@ namespace DMX {
 			this->populateInspector(args);
 		};
 
+		MovingHead::parameters.add(this->customParameters.zoom);
+
 		this->channels = {
 			make_shared<Channel>("Pan", [this]() {
 				return Fixture::get16bitMSB(this->parameters.pan, false);
@@ -124,8 +126,6 @@ namespace DMX {
 		Pointe::populateInspector(ofxCvGui::InspectArguments& args)
 	{
 		auto inspector = args.inspector;
-
-		inspector->addParameterGroup(this->customParameters);
 
 		inspector->addButton("Shutter open", [this]() {
 			this->getChannelByName("Shutter/strobe")->setValue(255);

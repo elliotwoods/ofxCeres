@@ -11,9 +11,8 @@ namespace DMX {
 		void deserialize(const nlohmann::json&);
 		void populateInspector(ofxCvGui::InspectArguments&);
 	protected:
-		struct : ofParameterGroup {
+		struct {
 			ofParameter<float> zoom{ "Zoom", 0, 0, 1 };
-			PARAM_DECLARE("Pointe", zoom);
 		} customParameters;
 	};
 }

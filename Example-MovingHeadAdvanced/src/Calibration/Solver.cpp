@@ -105,7 +105,14 @@ namespace Calibration {
 
 		inspector->addTitle("Calibration points", ofxCvGui::Widgets::Title::H2);
 		this->calibrationPoints->populateInspector(args);
-
+		inspector->addButton("Sort by marker name", [this]() {
+			this->calibrationPoints->sortBy([](shared_ptr<DataPoint> dataPointA, shared_ptr<DataPoint> dataPointB) {
+				return dataPointA->marker.get() < dataPointB->marker.get();
+				});
+			});
+		inspector->addButton("Sort by date", [this]() {
+			this->calibrationPoints->sortByDate();
+			});
 		{
 			auto trackpad = make_shared<Widgets::PanTiltTrackpad>(this->movingHead.parameters.pan, this->movingHead.parameters.tilt);
 			auto trackpadWeak = weak_ptr<Widgets::PanTiltTrackpad>(trackpad);
@@ -114,12 +121,23 @@ namespace Calibration {
 
 				// draw the existing selected data points onto the trackpad
 				ofMesh pointsPreview;
-				pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_POINTS);
+				pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_LINES);
 
 				auto calibrationPoints = this->calibrationPoints->getSelection();
 				for (auto calibrationPoint : calibrationPoints) {
 					pointsPreview.addColor(calibrationPoint->color.get());
-					pointsPreview.addVertex(glm::vec3(trackpadWidget->toXY(calibrationPoint->panTiltSignal.get()), 0.0f));
+					pointsPreview.addColor(calibrationPoint->color.get());
+					pointsPreview.addColor(calibrationPoint->color.get());
+					pointsPreview.addColor(calibrationPoint->color.get());
+					auto crossCenter = glm::vec3(trackpadWidget->toXY(calibrationPoint->panTiltSignal.get()), 0.0f);
+					pointsPreview.addVertex(crossCenter - glm::vec3(0, 5, 0));
+					pointsPreview.addVertex(crossCenter + glm::vec3(0, 5, 0));
+					pointsPreview.addVertex(crossCenter - glm::vec3(5, 0, 0));
+					pointsPreview.addVertex(crossCenter + glm::vec3(5, 0, 0));
+				}
+
+				for (size_t i = 0; i < pointsPreview.getNumVertices(); i++) {
+					pointsPreview.addIndex(i);
 				}
 				pointsPreview.draw();
 			};

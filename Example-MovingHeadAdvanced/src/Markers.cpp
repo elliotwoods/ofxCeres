@@ -169,6 +169,14 @@ Markers::populateInspector(ofxCvGui::InspectArguments& args)
 {
 	auto inspector = args.inspector;
 	AbstractCalibrationPointSet::populateInspector(args);
+	inspector->addButton("Sort by name", [this]() {
+		this->sortBy([](shared_ptr<Marker> a, shared_ptr<Marker> b) {
+			return a->name.get() < b->name.get();
+			});
+		});
+	inspector->addButton("Sort by date", [this]() {
+		this->sortByDate();
+		});
 	inspector->addToggle(this->snapToVertex);
 	inspector->addButton("Add...", [this]() {
 		auto name = ofSystemTextBoxDialog("Marker name");
