@@ -11,6 +11,24 @@ namespace DMX {
 
 		// Set the active command to be completed by default
 		this->activeCommand.complete = true;
+
+		this->dynamicRoute([this](const OSC::Path& path, const ofxOscMessage& message) {
+			if (path.size() >= 2) {
+				if (path[0] == "dmx") {
+					auto channelIndex = ofToInt(path[1]);
+
+					// Remove the offest of 1
+					channelIndex -= 1;
+
+					if (channelIndex >= 0 || channelIndex < this->channels.size()) {
+						auto value = message.getArgAsInt(0);
+						this->channels[channelIndex]->setValue(value);
+						return true;
+					}
+				}
+			}
+			return false;
+			});
 	}
 
 	//----------

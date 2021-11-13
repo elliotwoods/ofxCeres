@@ -2,9 +2,10 @@
 
 #include "Channel.h"
 #include "Data/Serializable.h"
+#include "OSC/Router.h"
 
 namespace DMX {
-	class Fixture : public ofxCvGui::IInspectable, public Data::Serializable{
+	class Fixture : public ofxCvGui::IInspectable, public Data::Serializable, public OSC::Router {
 	public:
 		struct Command {
 			std::string name;

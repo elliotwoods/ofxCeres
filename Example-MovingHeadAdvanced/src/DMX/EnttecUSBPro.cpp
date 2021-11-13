@@ -79,7 +79,6 @@ namespace DMX {
 		}
 
 		if (!this->serial.isInitialized()) {
-			ofLogError("DMX::EnttecUSBPro") << "Cannot send when not open";
 			return;
 		}
 

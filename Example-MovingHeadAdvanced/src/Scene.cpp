@@ -21,6 +21,24 @@ Scene::Scene()
 			this->save(Scene::getDefaultFilename());
 			});
 	};
+
+	// OSC routes
+	{
+		this->addSubRouter("groupControl", this->groupControl);
+		this->dynamicRoute([this](const OSC::Path& path, const ofxOscMessage& message) {
+			if (path.size() > 2 && path[0] == "movingheads") {
+				auto name = path[1];
+				for (auto& it : this->movingHeads) {
+					if (OSC::Path::stripName(it.first) == name) {
+						auto innerPath = path.subPath().subPath();
+						it.second->route(innerPath, message);
+						return true;
+					}
+				}
+			}
+			return false;
+		});
+	}
 }
 
 //----------
@@ -39,9 +57,46 @@ Scene::update()
 		movingHead.second->update();
 	}
 
+	this->groupControl->update();
 	this->enttecUSBPro->update();
 	this->renderDMX();
 	this->mesh->update();
+
+	// OSC
+	{
+		// clear OSC object if needs be
+		if (this->oscReceiver) {
+			if (!this->oscParameters.enabled) {
+				this->oscReceiver.reset();
+			}
+			if (this->oscParameters.port.get() != this->oscReceiver->getPort()) {
+				this->oscReceiver.reset();
+			}
+		}
+		
+		// create OSC object if needs be
+		if(!this->oscReceiver && this->oscParameters.enabled) {
+			ofxOscReceiverSettings settings;
+			{
+				settings.port = this->oscParameters.port.get();
+			}
+			this->oscReceiver = make_shared<ofxOscReceiver>();
+			this->oscReceiver->setup(settings);
+			if (!this->oscReceiver->isListening()) {
+				ofLogError("OSC") << "Couldn't listen on port " << this->oscParameters.port.get();
+				this->oscReceiver.reset();
+				this->oscParameters.enabled.set(false);
+			}
+		}
+
+		// route incoming OSC messages
+		if(this->oscReceiver) {
+			ofxOscMessage message;
+			while (this->oscReceiver->getNextMessage(message)) {
+				this->route(OSC::Path(message.getAddress()), message);
+			}
+		}
+	}
 }
 
 //----------
@@ -61,6 +116,8 @@ Scene::drawWorld()
 
 	// Draw the mesh
 	this->mesh->drawWorld();
+
+	this->groupControl->drawWorld();
 }
 
 //----------
@@ -83,7 +140,9 @@ Scene::serialize(nlohmann::json& json)
 	this->mesh->notifySerialize(json["mesh"]);
 	this->groupSolve->notifySerialize(json["groupSolve"]);
 	this->enttecUSBPro->notifySerialize(json["enttecUSBPro"]);
+	this->groupControl->notifySerialize(json["groupControl"]);
 	Data::serialize(json["worldPanel"], this->panel->parameters);
+	Data::serialize(json["OSC"], this->oscParameters);
 
 	// Save the fixtures
 	{
@@ -118,8 +177,14 @@ Scene::deserialize(const nlohmann::json& json)
 	if (json.contains("enttecUSBPro")) {
 		this->enttecUSBPro->notifyDeserialize(json["enttecUSBPro"]);
 	}
+	if (json.contains("groupControl")) {
+		this->groupControl->notifyDeserialize(json["groupControl"]);
+	}
 	if (json.contains("worldPanel")) {
 		Data::deserialize(json["worldPanel"], this->panel->parameters);
+	}
+	if (json.contains("OSC")) {
+		Data::deserialize(json["OSC"], this->oscParameters);
 	}
 
 	// Load the fixtures
@@ -146,8 +211,6 @@ Scene::deserialize(const nlohmann::json& json)
 	ofxCvGui::refreshInspector(this);
 }
 
-
-
 //--------------------------------------------------------------
 void
 Scene::populateInspector(ofxCvGui::InspectArguments& args)
@@ -166,7 +229,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 			this->load(result.filePath);
 		}
 		});
-
+	inspector->addSubMenu(this->oscParameters);
 	inspector->addSpacer();
 
 	inspector->addTitle("Moving heads", ofxCvGui::Widgets::Title::Level::H2);
@@ -290,6 +353,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		});
 
 	inspector->addSubMenu("Group Solve", this->groupSolve);
+	inspector->addSubMenu("Group Control", this->groupControl);
 
 	inspector->addSpacer();
 

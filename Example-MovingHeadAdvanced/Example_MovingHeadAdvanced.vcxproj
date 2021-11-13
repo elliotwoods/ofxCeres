@@ -312,6 +312,7 @@
     <ClCompile Include="src\DMX\Pointe.cpp" />
     <ClCompile Include="src\DMX\Sharpy.cpp" />
     <ClCompile Include="src\Exception.cpp" />
+    <ClCompile Include="src\GroupControl.cpp" />
     <ClCompile Include="src\GroupSolve.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Marker.cpp" />
@@ -319,6 +320,8 @@
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MovingHead.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="src\OSC\Path.cpp" />
+    <ClCompile Include="src\OSC\Router.cpp" />
     <ClCompile Include="src\pch_ofApp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -411,12 +414,15 @@
     <ClInclude Include="src\DMX\Sharpy.h" />
     <ClInclude Include="src\DMX\Types.h" />
     <ClInclude Include="src\Exception.h" />
+    <ClInclude Include="src\GroupControl.h" />
     <ClInclude Include="src\GroupSolve.h" />
     <ClInclude Include="src\Marker.h" />
     <ClInclude Include="src\Markers.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MovingHead.h" />
     <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="src\OSC\Path.h" />
+    <ClInclude Include="src\OSC\Router.h" />
     <ClInclude Include="src\pch_ofApp.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Widgets\PanTiltTrackpad.h" />

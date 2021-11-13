@@ -4,12 +4,16 @@
 #include "Markers.h"
 #include "Mesh.h"
 #include "GroupSolve.h"
+#include "GroupControl.h"
 
 #include "Data/CalibrationPointSet.h"
 #include "DMX/MovingHead.h"
 #include "DMX/EnttecUSBPro.h"
 
-class Scene : public ofxCvGui::IInspectable {
+#include "OSC/Router.h"
+#include "ofxOscReceiver.h"
+
+class Scene : public ofxCvGui::IInspectable, public OSC::Router {
 private:
 	Scene();
 public:
@@ -47,10 +51,19 @@ protected:
 	shared_ptr<DMX::EnttecUSBPro> enttecUSBPro = make_shared<DMX::EnttecUSBPro>();
 	shared_ptr<ofxCvGui::Panels::WorldManaged> panel = ofxCvGui::Panels::makeWorldManaged();
 	shared_ptr<Markers> markers = make_shared<Markers>(mesh, panel);
+	shared_ptr<GroupControl> groupControl = make_shared<GroupControl>();
+
+	shared_ptr<ofxOscReceiver> oscReceiver;
 
 	struct {
 		ofParameter<string> name{ "Name", "1" };
 		ofParameter<DMX::ChannelIndex> dmxChannelIndex{ "Dmx channel index", 1 };
 	} newMovingHead;
+
+	struct : ofParameterGroup {
+		ofParameter<bool> enabled{ "Enabled", false };
+		ofParameter<int> port{ "Port", 4000 };
+		PARAM_DECLARE("OSC", enabled, port);
+	} oscParameters;
 
 };

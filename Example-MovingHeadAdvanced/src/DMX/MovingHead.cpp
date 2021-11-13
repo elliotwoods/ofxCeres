@@ -26,6 +26,42 @@ namespace DMX {
 
 		RULR_SERIALIZE_LISTENERS;
 		RULR_INSPECTOR_LISTENER;
+
+		// OSC routers
+		{
+			this->dynamicRoute([this](const OSC::Path& path, const ofxOscMessage& message) {
+				// Handle parameters
+				if (message.getNumArgs() > 0) {
+
+					for (auto& parameter : this->parameters) {
+						if (OSC::Path::stripName(parameter->getName()) == path[0]) {
+							{
+								auto typedParameter = dynamic_pointer_cast<ofParameter<float>>(parameter);
+								if (typedParameter) {
+									typedParameter->set(message.getArgAsFloat(0));
+									return true;
+								}
+							}
+							{
+								auto typedParameter = dynamic_pointer_cast<ofParameter<int>>(parameter);
+								if (typedParameter) {
+									typedParameter->set(message.getArgAsInt(0));
+									return true;
+								}
+							}
+							{
+								auto typedParameter = dynamic_pointer_cast<ofParameter<bool>>(parameter);
+								if (typedParameter) {
+									typedParameter->set(message.getArgAsInt(0) != 0);
+									return true;
+								}
+							}
+						}
+					}
+				}
+				return false;
+				});
+		}
 	}
 
 	//----------

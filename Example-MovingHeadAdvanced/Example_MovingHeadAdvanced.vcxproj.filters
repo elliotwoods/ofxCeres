@@ -124,6 +124,15 @@
     <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.cpp">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
     </ClCompile>
+    <ClCompile Include="src\GroupControl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OSC\Router.cpp">
+      <Filter>src\OSC</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OSC\Path.cpp">
+      <Filter>src\OSC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -188,6 +197,9 @@
     </Filter>
     <Filter Include="addons\ofxOsc\libs\oscpack\src\osc">
       <UniqueIdentifier>{1ea2ef13-e128-4585-832b-c38ce05bf1f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\OSC">
+      <UniqueIdentifier>{5925c99f-348f-4660-aa1d-16dfd53e3cdc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -463,6 +475,15 @@
     </ClInclude>
     <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.h">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GroupControl.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OSC\Path.h">
+      <Filter>src\OSC</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OSC\Router.h">
+      <Filter>src\OSC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
