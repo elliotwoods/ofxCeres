@@ -22,7 +22,7 @@ namespace DMX {
 				return Fixture::get8bit(this->parameters.dimmer);
 				})
 			, make_shared<Channel>("Gobo Wheel", [this]() {
-				return ofMap(this->parameters.iris.get(), 0, 1, 11, 0, true);
+				return ofMap(this->customParameters.iris.get(), 0, 1, 11, 0, true);
 				})
 			, make_shared<Channel>("Prism Insertion")
 			, make_shared<Channel>("Prism Rotation")
@@ -69,6 +69,8 @@ namespace DMX {
 			, 0
 			, 5
 			});
+
+		this->parameters.add(this->customParameters.iris);
 	}
 
 	//----------

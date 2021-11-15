@@ -14,16 +14,6 @@ namespace DMX {
 			this->parameters.tilt.setMax(configuration.maximumTilt);
 		}
 
-		// Setup parameter group
-		{
-			this->parameters.setName("MovingHead");
-			this->parameters.add(this->parameters.pan);
-			this->parameters.add(this->parameters.tilt);
-			this->parameters.add(this->parameters.dimmer);
-			this->parameters.add(this->parameters.focus);
-			this->parameters.add(this->parameters.iris);
-		}
-
 		RULR_SERIALIZE_LISTENERS;
 		RULR_INSPECTOR_LISTENER;
 

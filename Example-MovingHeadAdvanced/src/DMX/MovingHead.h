@@ -35,7 +35,7 @@ namespace DMX {
 			ofParameter<float> tilt{ "Tilt", 0, -90, 90 };
 			ofParameter<float> dimmer{ "Dimmer", 0, 0, 1};
 			ofParameter<float> focus{ "Focus", 0, 0, 1};
-			ofParameter<float> iris{ "Iris", 0, 0, 1};
+			PARAM_DECLARE("MovingHead", pan, tilt, dimmer, focus);
 		} parameters;
 
 	protected:
