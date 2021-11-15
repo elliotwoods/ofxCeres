@@ -302,7 +302,6 @@
     <ClCompile Include="src\Calibration\Solver.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPoint.cpp" />
     <ClCompile Include="src\Data\AbstractCalibrationPointSet.cpp" />
-    <ClCompile Include="src\Data\MovingHeadDataPoint.cpp" />
     <ClCompile Include="src\Data\Serializable.cpp" />
     <ClCompile Include="src\DMX\Channel.cpp" />
     <ClCompile Include="src\DMX\EnttecUSBPro.cpp" />
@@ -402,7 +401,6 @@
     <ClInclude Include="src\Data\AbstractCalibrationPoint.h" />
     <ClInclude Include="src\Data\AbstractCalibrationPointSet.h" />
     <ClInclude Include="src\Data\CalibrationPointSet.h" />
-    <ClInclude Include="src\Data\MovingHeadDataPoint.h" />
     <ClInclude Include="src\Data\Serializable.h" />
     <ClInclude Include="src\DMX\Channel.h" />
     <ClInclude Include="src\DMX\EnttecUSBPro.h" />

@@ -240,19 +240,17 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		for (auto& it : this->movingHeads) {
 			auto button = inspector->addSubMenu(it.first, it.second);
 			button->setHeight(75.0f);
-			auto deleteButton = make_shared<ofxCvGui::Widgets::Button>("", [it, this]() {
+			auto deleteButton = make_shared<ofxCvGui::Widgets::Button>("Delete", [it, this]() {
 				this->deleteMovingHead(it.first);
 				});
 			{
 				deleteButton->setDrawGlyph(u8"\uf2ed"); // trash can
-				deleteButton->addToolTip("Delete");
 			}
-			auto renameButton = make_shared<ofxCvGui::Widgets::Button>("", [it, this]() {
+			auto renameButton = make_shared<ofxCvGui::Widgets::Button>("Edit name", [it, this]() {
 				this->renameMovingHead(it.first);
 				});
 			{
 				renameButton->setDrawGlyph(u8"\uf044"); // edit
-				renameButton->addToolTip("Edit name");
 			}
 			button->onBoundsChange += [deleteButton, renameButton](ofxCvGui::BoundsChangeArguments& args) {
 				ofRectangle bounds(

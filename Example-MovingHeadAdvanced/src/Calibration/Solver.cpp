@@ -46,6 +46,38 @@ namespace Calibration {
 
 	//----------
 	void
+	Solver::update()
+	{
+		// This needs to occur whenever:
+		//   1. The model changes
+		//   2. A data point changes
+		// Since this isn't 
+		if (this->isBeingInspected()) {
+			auto dataPoints = this->calibrationPoints->getAllCaptures();
+			float maxResidual = 0.0f;
+			for (auto dataPoint : dataPoints) {
+				try {
+					auto residual = this->getResidualOnDataPoint(dataPoint);
+					dataPoint->residual = residual;
+					if (residual > maxResidual) {
+						maxResidual = residual;
+					}
+				}
+				catch (...) {
+					// e.g. if marker doesn't exist
+				}
+			}
+			if (maxResidual == 0.0f) {
+				maxResidual = 1.0f; // then the normalisedResiduals will all be 0.0
+			}
+			for (auto dataPoint : dataPoints) {
+				dataPoint->normalisedResidual = dataPoint->residual / maxResidual;
+			}
+		}
+	}
+
+	//----------
+	void
 	Solver::drawWorld()
 	{
 		auto selectedMarker = this->markerClosestToCursor.lock();
@@ -149,14 +181,100 @@ namespace Calibration {
 
 		inspector->addTitle("Calibration points", ofxCvGui::Widgets::Title::H2);
 		this->calibrationPoints->populateInspector(args);
-		inspector->addButton("Sort by marker name", [this]() {
-			this->calibrationPoints->sortBy([](shared_ptr<DataPoint> dataPointA, shared_ptr<DataPoint> dataPointB) {
-				return dataPointA->marker.get() < dataPointB->marker.get();
+		
+		inspector->addTitle("Sort by", ofxCvGui::Widgets::Title::H2);
+		{
+			inspector->addButton("Marker name", [this]() {
+				this->calibrationPoints->sortBy([](shared_ptr<DataPoint> dataPointA, shared_ptr<DataPoint> dataPointB) {
+					return dataPointA->marker.get() < dataPointB->marker.get();
+					});
 				});
-			});
-		inspector->addButton("Sort by date", [this]() {
-			this->calibrationPoints->sortByDate();
-			});
+			inspector->addButton("Date", [this]() {
+				this->calibrationPoints->sortByDate();
+				});
+			inspector->addButton("Quadrant", [this]() {
+				this->calibrationPoints->sortBy([](shared_ptr<DataPoint> dataPointA, shared_ptr<DataPoint> dataPointB) {
+					return dataPointA->getQuadrant() < dataPointB->getQuadrant();
+					});
+				});
+			inspector->addButton("Residual", [this]() {
+				this->calibrationPoints->sortBy([](shared_ptr<DataPoint> dataPointA, shared_ptr<DataPoint> dataPointB) {
+					return dataPointA->residual < dataPointB->residual;
+					});
+				});
+		}
+
+		inspector->addTitle("Color by", ofxCvGui::Widgets::Title::H2);
+		{
+			auto colorBy = [this](function<ofColor(shared_ptr<DataPoint>)> coloringFunction) {
+				auto dataPoints = this->calibrationPoints->getAllCaptures();
+				for (auto dataPoint : dataPoints) {
+					dataPoint->color = coloringFunction(dataPoint);
+				}
+			};
+
+			inspector->addButton("Marker", [this, colorBy]() {
+				colorBy([this](shared_ptr<DataPoint> dataPoint) {
+					auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker.get());
+					if (marker) {
+						return marker->color.get();
+					}
+					else {
+						return ofColor(255);
+					}
+					});
+				});
+
+			inspector->addButton("Random", [this, colorBy]() {
+				colorBy([this](shared_ptr<DataPoint> dataPoint) {
+					ofColor color = ofColor(200, 100, 100);
+					color.setHueAngle(ofRandom(360.0));
+					return color;
+					});
+				});
+
+			inspector->addButton("Residual", [this, colorBy]() {
+				colorBy([this](shared_ptr<DataPoint> dataPoint) {
+					ofColor color = ofColor(255 * dataPoint->normalisedResidual);
+					return color;
+					});
+				});
+
+			inspector->addButton("Quadrant", [this, colorBy]() {
+				colorBy([this](shared_ptr<DataPoint> dataPoint) {
+					ofColor color = ofColor(200, 100, 100);
+					color.setHueAngle(ofMap(dataPoint->getQuadrant()
+						, 0, 4
+						, 0, 360));
+					return color;
+					});
+				});
+
+			inspector->addButton("Pan/Tilt", [this, colorBy]() {
+				auto panMin = this->movingHead.parameters.pan.getMin();
+				auto panMax = this->movingHead.parameters.pan.getMax();
+				auto tiltMin = this->movingHead.parameters.tilt.getMin();
+				auto tiltMax = this->movingHead.parameters.tilt.getMax();
+
+				colorBy([this, panMin, panMax, tiltMin, tiltMax](shared_ptr<DataPoint> dataPoint) {
+					ofColor color(200);
+					color.setSaturation(ofMap(dataPoint->panTiltSignal.get().y
+						, tiltMin
+						, tiltMax
+						, 100
+						, 255.0f));
+					color.setHueAngle(ofMap(dataPoint->panTiltSignal.get().x
+						, panMin
+						, panMax
+						, 0
+						, 360.0f));
+					return color;
+					});
+				});
+		}
+
+		inspector->addSpacer();
+
 		{
 			auto trackpad = make_shared<Widgets::PanTiltTrackpad>(this->movingHead.parameters.pan, this->movingHead.parameters.tilt);
 			auto trackpadWeak = weak_ptr<Widgets::PanTiltTrackpad>(trackpad);
@@ -164,26 +282,81 @@ namespace Calibration {
 				auto trackpadWidget = trackpadWeak.lock();
 
 				// draw the existing selected data points onto the trackpad
-				ofMesh pointsPreview;
-				pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_LINES);
+				// and accumulate info for residuals graph
+				map<float, float> residualsByPan;
+				map<float, float> residualsByTilt;
+				{
+					ofMesh pointsPreview;
+					pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_LINES);
 
-				auto calibrationPoints = this->calibrationPoints->getSelection();
-				for (auto calibrationPoint : calibrationPoints) {
-					pointsPreview.addColor(calibrationPoint->color.get());
-					pointsPreview.addColor(calibrationPoint->color.get());
-					pointsPreview.addColor(calibrationPoint->color.get());
-					pointsPreview.addColor(calibrationPoint->color.get());
-					auto crossCenter = glm::vec3(trackpadWidget->toXY(calibrationPoint->panTiltSignal.get()), 0.0f);
-					pointsPreview.addVertex(crossCenter - glm::vec3(0, 5, 0));
-					pointsPreview.addVertex(crossCenter + glm::vec3(0, 5, 0));
-					pointsPreview.addVertex(crossCenter - glm::vec3(5, 0, 0));
-					pointsPreview.addVertex(crossCenter + glm::vec3(5, 0, 0));
+					auto calibrationPoints = this->calibrationPoints->getSelection();
+
+					// exit early if empty
+					if (calibrationPoints.empty()) {
+						return;
+					}
+
+					for (auto calibrationPoint : calibrationPoints) {
+						auto positionOnTrackpad = trackpadWidget->toXY(calibrationPoint->panTiltSignal.get());
+
+						pointsPreview.addColor(calibrationPoint->color.get());
+						pointsPreview.addColor(calibrationPoint->color.get());
+						pointsPreview.addColor(calibrationPoint->color.get());
+						pointsPreview.addColor(calibrationPoint->color.get());
+						auto crossCenter = glm::vec3(positionOnTrackpad, 0.0f);
+						pointsPreview.addVertex(crossCenter - glm::vec3(0, 5, 0));
+						pointsPreview.addVertex(crossCenter + glm::vec3(0, 5, 0));
+						pointsPreview.addVertex(crossCenter - glm::vec3(5, 0, 0));
+						pointsPreview.addVertex(crossCenter + glm::vec3(5, 0, 0));
+
+						// Info for residuals (used later)
+						{
+							residualsByPan.emplace(positionOnTrackpad.x, calibrationPoint->normalisedResidual);
+							residualsByTilt.emplace(positionOnTrackpad.y, calibrationPoint->normalisedResidual);
+						}
+					}
+
+					for (size_t i = 0; i < pointsPreview.getNumVertices(); i++) {
+						pointsPreview.addIndex(i);
+					}
+					pointsPreview.draw();
 				}
 
-				for (size_t i = 0; i < pointsPreview.getNumVertices(); i++) {
-					pointsPreview.addIndex(i);
+				// draw the graph of residuals
+				{
+					ofPushStyle();
+					ofEnableAlphaBlending();
+
+					// pan
+					{
+						ofPath path;
+						path.setColor(ofColor(255, 255, 255, 200));
+						path.moveTo({ residualsByPan.begin()->first, 0 });
+						path.lineTo({ residualsByPan.begin()->first, residualsByPan.begin()->second });
+						for (const auto& residualByPan : residualsByPan) {
+							path.lineTo({ residualByPan.first, residualByPan.second * 15.0f });
+						}
+						path.lineTo({ residualsByPan.rbegin()->first, 0 });
+						path.close();
+						path.draw();
+					}
+
+					// tilt
+					{
+						ofPath path;
+						path.setColor(ofColor(255, 255, 255, 200));
+						path.moveTo({ 0, residualsByTilt.begin()->first });
+						path.lineTo({ residualsByTilt.begin()->second, residualsByTilt.begin()->first });
+						for (const auto& residualByTilt : residualsByTilt) {
+							path.lineTo({ residualByTilt.second * 15.0f, residualByTilt.first });
+						}
+						path.lineTo({ 0, residualsByTilt.rbegin()->first });
+						path.close();
+						path.draw();
+					}
+
+					ofPopStyle();
 				}
-				pointsPreview.draw();
 			};
 			inspector->add(trackpad);
 		}
@@ -458,12 +631,6 @@ namespace Calibration {
 	void
 	Solver::prepareDataPoint(shared_ptr<DataPoint> dataPoint)
 	{
-		auto getResidualFunction = [this](DataPoint* dataPoint) {
-			return this->getResidualOnDataPoint(dataPoint);
-		};
-
-		dataPoint->getResidualFunction = getResidualFunction;
-
 		auto dataPointWeak = weak_ptr<DataPoint>(dataPoint);
 
 		dataPoint->onTakeCurrent += [dataPointWeak, this]() {
@@ -492,13 +659,9 @@ namespace Calibration {
 
 	//---------
 	float
-	Solver::getResidualOnDataPoint(DataPoint* dataPoint) const
+		Solver::getResidualOnDataPoint(shared_ptr<DataPoint> dataPoint) const
 	{
 		auto transform = this->movingHead.getModel()->getTransform();
-
-		//--
-		//World -> Object space
-		//
 
 		//get marker position
 		auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker);
@@ -506,26 +669,11 @@ namespace Calibration {
 			throw(Exception("Marker " + dataPoint->marker.get() + " does not exist"));
 		}
 
-		//apply rigid body transform (marker into the object space of the moving head)
-		auto targetInViewSpace4 = glm::inverse(transform) * glm::vec4(marker->position.get(), 1.0);
-		targetInViewSpace4 /= targetInViewSpace4.w;
-		auto targetInViewSpace = glm::vec3(targetInViewSpace4);
+		//get the predicted pan-tilt near to stored value
+		auto navigatedPanTilt = this->movingHead.getModel()->getPanTiltForWorldTarget(marker->position.get()
+			, dataPoint->panTiltSignal.get());
+		auto disparity = glm::distance(navigatedPanTilt, dataPoint->panTiltSignal.get());
 
-		if (targetInViewSpace == glm::vec3(0, 0, 0)) {
-			//residual is 0 if dataPoint is coincident with fixture
-			return 0.0f;
-		}
-		//
-		//--
-
-		// get ideal angles for target points
-		auto idealAnglesForTarget = ofxCeres::VectorMath::getPanTiltToTargetInObjectSpace(targetInViewSpace);
-
-		auto dataPointPanTiltIdeal = this->movingHead.getModel()->panTiltSignalToIdeal(dataPoint->panTiltSignal);
-
-		auto disparity = ofxCeres::VectorMath::sphericalPolarDistance(idealAnglesForTarget, dataPointPanTiltIdeal);
-
-		return disparity * RAD_TO_DEG;
+		return disparity;
 	}
-
 }

@@ -11,10 +11,13 @@ namespace Calibration {
 		void serialize(nlohmann::json&);
 		void deserialize(const nlohmann::json&);
 
+		int getQuadrant() const;
+
 		ofParameter<glm::vec2> panTiltSignal{ "Pan tilt angles", glm::vec2(0, 0) };
 		ofParameter<string> marker{ "Marker", "" };
 
-		function<float(DataPoint*)> getResidualFunction;
+		float residual = 0.0f;
+		float normalisedResidual = 0.0f;
 
 		ofxLiquidEvent<void> onTakeCurrent;
 		ofxLiquidEvent<void> onGoValue;

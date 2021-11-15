@@ -21,7 +21,7 @@ namespace DMX {
 		ofParameter<DMX::ChannelIndex> channelIndex{ "Channel Index", 1, 1, 512 };
 		vector<shared_ptr<Channel>> channels;
 
-		void update();
+		virtual void update();
 		void getDMX(vector<DMX::Value>&);
 
 		virtual void drawWorld() = 0;

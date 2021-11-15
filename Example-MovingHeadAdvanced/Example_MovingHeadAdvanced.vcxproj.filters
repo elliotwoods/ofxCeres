@@ -10,9 +10,6 @@
     <ClCompile Include="src\pch_ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Data\MovingHeadDataPoint.cpp">
-      <Filter>src\Data</Filter>
-    </ClCompile>
     <ClCompile Include="src\Data\Serializable.cpp">
       <Filter>src\Data</Filter>
     </ClCompile>
@@ -205,9 +202,6 @@
     </ClInclude>
     <ClInclude Include="src\pch_ofApp.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\MovingHeadDataPoint.h">
-      <Filter>src\Data</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\Serializable.h">
       <Filter>src\Data</Filter>

@@ -17,6 +17,7 @@ namespace DMX {
 
 		MovingHead(const Configuration &);
 
+		void update() override;
 		void drawWorld() override;
 
 		void serialize(nlohmann::json&);

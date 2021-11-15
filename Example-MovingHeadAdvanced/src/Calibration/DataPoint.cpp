@@ -3,59 +3,101 @@
 
 namespace Calibration {
 	//----------
-	DataPoint::DataPoint() {
+	DataPoint::DataPoint()
+	{
 		RULR_SERIALIZE_LISTENERS;
 	}
 
 	//----------
-	string DataPoint::getTypeName() const {
+	string
+	DataPoint::getTypeName() const
+	{
 		return "Calibration::DataPoint";
 	}
 
 	//----------
-	void DataPoint::serialize(nlohmann::json& json) {
+	void
+	DataPoint::serialize(nlohmann::json& json)
+	{
 		json << this->panTiltSignal;
 		json << this->marker;
 	}
 
 	//----------
-	void DataPoint::deserialize(const nlohmann::json& json) {
+	void
+	DataPoint::deserialize(const nlohmann::json& json)
+	{
 		json >> this->panTiltSignal;
 		json >> this->marker;
 	}
 
 	//----------
-	ofxCvGui::ElementPtr DataPoint::getDataDisplay() {
+	int
+	DataPoint::getQuadrant() const
+	{
+		const auto& panTilt = this->panTiltSignal.get();
+		return (panTilt.x > 0.0f ? 1.0 : 0.0) + (panTilt.y > 0.0f ? 2.0 : 0.0);
+	}
+
+	//----------
+	ofxCvGui::ElementPtr
+	DataPoint::getDataDisplay()
+	{
 		auto element = ofxCvGui::makeElement();
 
-		auto children = vector<ofxCvGui::ElementPtr>({
-			make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltSignal)
-			, make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->marker)
-			});
+		auto children = vector<ofxCvGui::ElementPtr>();
+		
+		// pan tilt widget
+		{
+			auto widget = make_shared<ofxCvGui::Widgets::EditableValue<glm::vec2>>(this->panTiltSignal);
+			widget->onDraw.addListener([this](ofxCvGui::DrawArguments& args) {
+				// Draw quadrant 
+				{
+					auto quadrantRect = args.localBounds;
+					quadrantRect.width /= 2.0f;
+					quadrantRect.height /= 2.0f;
+					auto quadrant = this->getQuadrant();
+					if (quadrant % 2) {
+						quadrantRect.x += quadrantRect.width;
+					}
+					if (quadrant / 2) {
+						quadrantRect.y += quadrantRect.height;
+					}
 
+					ofPushStyle();
+					{
+						ofSetColor(80);
+						ofDrawRectangle(quadrantRect);
+
+						// outline
+						ofNoFill();
+						ofDrawRectangle(args.localBounds);
+					}
+					ofPopStyle();
+				}
+			}, this, -1);
+			widget->addToolTip("Background shading denotes quadrant");
+			children.push_back(widget);
+		}
+
+		children.push_back(make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->marker));
+
+		// residual widget
 		{
 			auto residualWidget = make_shared<ofxCvGui::Widgets::LiveValue<float>>("Residual [degrees]", [this]() {
-				if (this->getResidualFunction) {
-					try {
-						return this->getResidualFunction(this);
-					}
-					catch (...) {
-						// e.g. if this marker doesn't exist any more
-						return 0.0f;
-					}
-				}
-				else {
-					return 0.0f;
-				}
+				return this->residual;
 				});
-			element->onUpdate += [residualWidget, this](ofxCvGui::UpdateArguments&) {
-				if (this->getResidualFunction) {
-					residualWidget->setEnabled(true);
+			// draw bar underneath
+			residualWidget->onDraw.addListener([this](ofxCvGui::DrawArguments& args) {
+				ofPushStyle();
+				{
+					ofSetColor(100, 80, 80);
+					auto bounds = args.localBounds;
+					bounds.width *= this->normalisedResidual;
+					ofDrawRectangle(bounds);
 				}
-				else {
-					residualWidget->setEnabled(false);
-				}
-			};
+				ofPopStyle();
+				}, this, -1);
 
 			children.push_back(residualWidget);
 		}
@@ -79,7 +121,9 @@ namespace Calibration {
 	}
 
 	//----------
-	void DataPoint::overlayMainDisplay(ofxCvGui::ElementPtr element) {
+	void
+	DataPoint::overlayMainDisplay(ofxCvGui::ElementPtr element)
+	{
 		float y = 60.0f;
 
 		auto addButton = [element, &y](string caption, function<void()> action) {
@@ -89,22 +133,24 @@ namespace Calibration {
 			element->addChild(button);
 
 			y += 35.0f;
+
+			return button;
 		};
 
-		addButton("GO Value", [this] {
+		addButton("Go to stored pan/tilt", [this] {
 			this->onGoValue.notifyListeners();
-			});
+			})->setDrawGlyph(u8"\uf093");
 
-		addButton("GO Prediction", [this] {
+		addButton("Go to calculated pan/tilt", [this] {
 			try {
 				this->onGoPrediction.notifyListeners();
 			}
 			CATCH_TO_ALERT;
-			});
+			})->setDrawGlyph(u8"\uf1ec");
 
-		addButton("TAKE Current", [this] {
+		addButton("Store the current pan/tilt", [this] {
 			this->onTakeCurrent.notifyListeners();
-			});
+			})->setDrawGlyph(u8"\uf019");
 
 		// Expand height if needs be
 		auto height = y;

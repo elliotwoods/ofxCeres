@@ -75,6 +75,14 @@ namespace DMX {
 
 	//----------
 	void
+	MovingHead::update()
+	{
+		Fixture::update();
+		this->solver->update();
+	}
+
+	//----------
+	void
 	MovingHead::drawWorld()
 	{
 		ofPushStyle();
@@ -157,11 +165,7 @@ namespace DMX {
 	void
 	MovingHead::serialize(nlohmann::json& json)
 	{
-		json << this->parameters.pan;
-		json << this->parameters.tilt;
-		json << this->parameters.dimmer;
-		json << this->parameters.focus;
-		json << this->parameters.iris;
+		Data::serialize(json, this->parameters);
 
 		this->model->notifySerialize(json["model"]);
 		this->solver->notifySerialize(json["solver"]);
@@ -171,11 +175,7 @@ namespace DMX {
 	void
 	MovingHead::deserialize(const nlohmann::json& json)
 	{
-		json >> this->parameters.pan;
-		json >> this->parameters.tilt;
-		json >> this->parameters.dimmer;
-		json >> this->parameters.focus;
-		json >> this->parameters.iris;
+		Data::deserialize(json, this->parameters);
 
 		if (json.contains("model")) {
 			this->model->notifyDeserialize(json["model"]);

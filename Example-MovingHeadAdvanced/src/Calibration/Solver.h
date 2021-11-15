@@ -26,6 +26,7 @@ namespace Calibration {
 
 		string getTypeName() const override;
 
+		void update();
 		void drawWorld();
 		void drawRaysAndResiduals();
 
@@ -45,7 +46,7 @@ namespace Calibration {
 		void getCalibrationData(vector<glm::vec3>& targetPoints
 			, vector<glm::vec2>& panTiltSignal) const;
 		void prepareDataPoint(shared_ptr<DataPoint>);
-		float getResidualOnDataPoint(DataPoint*) const;
+		float getResidualOnDataPoint(shared_ptr<DataPoint>) const;
 
 		DMX::MovingHead& movingHead;
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> calibrationPoints = make_shared<Data::CalibrationPointSet<DataPoint>>();
@@ -57,5 +58,7 @@ namespace Calibration {
 		ofxCeres::ParameterisedSolverSettings solverSettings;
 		weak_ptr<Marker> markerClosestToCursor;
 		shared_ptr<Scene> scene;
+
+		float maxResidual = 1;
 	};
 }
