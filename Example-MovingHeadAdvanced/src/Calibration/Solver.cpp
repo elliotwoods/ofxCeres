@@ -51,6 +51,18 @@ namespace Calibration {
 	void
 	Solver::update()
 	{
+		// perform solve if needs be
+		if (this->needsSolve) {
+			try {
+				this->needsSolve = false; // we might have an exception in the solve. In which case we want to switch off solving
+				auto solveSuccess = this->solve();
+				if (!solveSuccess) {
+					this->needsSolve = true;
+				}
+			}
+			CATCH_TO_ALERT;
+		}
+
 		// update the residuals
 		if(this->needsToCalculateResiduals) {
 			auto dataPoints = this->calibrationPoints->getAllCaptures();
@@ -374,12 +386,15 @@ namespace Calibration {
 			auto widget = inspector->addMultipleChoice(this->parameters.solveType.getName());
 			widget->entangleManagedEnum(this->parameters.solveType);
 			inspector->addSubMenu(this->solverSettings);
-			inspector->addButton("Solve", [this]() {
-				try {
-					this->solve();
-				}
-				CATCH_TO_ALERT
-				}, OF_KEY_RETURN)->setHeight(100.0f);
+			{
+				auto solveButton = inspector->addToggle("Solve", [this]() {
+					return this->needsSolve;
+					}, [this](bool needsSolve) {
+						this->needsSolve = needsSolve;
+					});
+				solveButton->setHotKey(OF_KEY_RETURN);
+				solveButton->setHeight(100.0f);
+			}
 		}
 
 		inspector->addTitle("Treat data", ofxCvGui::Widgets::Title::H2);
@@ -436,28 +451,25 @@ namespace Calibration {
 	}
 
 	//---------
-	void
+	bool
 	Solver::solve()
 	{
+		this->needsToCalculateResiduals = true;
+
 		switch (this->parameters.solveType.get().get()) {
 		case SolveType::Basic:
-			this->solveBasic();
-			break;
+			return this->solveBasic();
 		case SolveType::Distorted:
-			this->solveDistorted();
-			break;
+			return this->solveDistorted();
 		case SolveType::Group:
-			this->solveGroup();
-			break;
+			return this->solveGroup();
 		default:
-			break;
+			return true;
 		}
-
-		this->needsToCalculateResiduals = true;
 	}
 
 	//----------
-	void
+	bool
 	Solver::solveBasic()
 	{
 		vector<glm::vec3> targetPoints;
@@ -489,10 +501,12 @@ namespace Calibration {
 
 		// Convert residual into degrees
 		this->movingHead.getModel()->parameters.residual.set(sqrt(result.residual / targetPoints.size()) * RAD_TO_DEG);
+
+		return result.isConverged();
 	}
 
 	//----------
-	void
+	bool
 	Solver::solveDistorted()
 	{
 		vector<glm::vec3> targetPoints;
@@ -526,10 +540,12 @@ namespace Calibration {
 		}
 		//
 		//--
+
+		return result.isConverged();
 	}
 
 	//----------
-	void
+	bool
 	Solver::solveGroup()
 	{
 		// Note this function uses the new MovingHeadGroup solver,
@@ -600,6 +616,9 @@ namespace Calibration {
 		{
 			this->movingHead.getModel()->setDistortedMovingHeadSolution(result.solution.movingHeads[0]);
 		}
+
+
+		return result.isConverged();
 	}
 
 	//---------

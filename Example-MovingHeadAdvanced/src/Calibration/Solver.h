@@ -36,10 +36,10 @@ namespace Calibration {
 
 		void addCalibrationPoint();
 
-		void solve();
-		void solveBasic();
-		void solveDistorted();
-		void solveGroup();
+		bool solve();
+		bool solveBasic();
+		bool solveDistorted();
+		bool solveGroup();
 
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> getCalibrationPoints();
 		void markResidualsStale();
@@ -62,5 +62,6 @@ namespace Calibration {
 		shared_ptr<Scene> scene;
 
 		bool needsToCalculateResiduals = true;
+		bool needsSolve = false;
 	};
 }
