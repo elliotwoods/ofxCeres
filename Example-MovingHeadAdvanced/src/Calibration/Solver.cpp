@@ -207,7 +207,7 @@ namespace Calibration {
 					this->solve();
 				}
 				CATCH_TO_ALERT
-				});
+				}, OF_KEY_RETURN)->setHeight(100.0f);
 		}
 
 		inspector->addTitle("Treat data", ofxCvGui::Widgets::Title::H2);
@@ -221,6 +221,26 @@ namespace Calibration {
 				}
 				});
 		}
+		inspector->addTitle("Filter data", ofxCvGui::Widgets::Title::H2);
+		{
+			inspector->addButton("Positive tilt", [this]() {
+				auto dataPoints = this->calibrationPoints->getSelection();
+				for (auto dataPoint : dataPoints) {
+					if (dataPoint->panTiltSignal.get().y < 0) {
+						dataPoint->setSelected(false);
+					}
+				}
+				});
+			inspector->addButton("Negative tilt", [this]() {
+				auto dataPoints = this->calibrationPoints->getSelection();
+				for (auto dataPoint : dataPoints) {
+					if (dataPoint->panTiltSignal.get().y > 0) {
+						dataPoint->setSelected(false);
+					}
+				}
+				});
+		}
+
 	}
 
 	//---------

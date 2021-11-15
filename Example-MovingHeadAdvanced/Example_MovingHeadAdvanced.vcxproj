@@ -318,7 +318,6 @@
     <ClCompile Include="src\Marker.cpp" />
     <ClCompile Include="src\Markers.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\MovingHead.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\OSC\Path.cpp" />
     <ClCompile Include="src\OSC\Router.cpp" />
@@ -419,7 +418,6 @@
     <ClInclude Include="src\Marker.h" />
     <ClInclude Include="src\Markers.h" />
     <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\MovingHead.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\OSC\Path.h" />
     <ClInclude Include="src\OSC\Router.h" />

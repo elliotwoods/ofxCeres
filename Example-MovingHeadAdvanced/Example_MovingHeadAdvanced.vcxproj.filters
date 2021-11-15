@@ -22,9 +22,6 @@
     <ClCompile Include="src\Data\AbstractCalibrationPoint.cpp">
       <Filter>src\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\MovingHead.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Widgets\PanTiltTrackpad.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
@@ -62,9 +59,6 @@
       <Filter>src\DMX</Filter>
     </ClCompile>
     <ClCompile Include="src\DMX\Fixture.cpp">
-      <Filter>src\DMX</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DMX\MovingHead.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
     <ClCompile Include="src\DMX\Sharpy.cpp">
@@ -132,6 +126,9 @@
     </ClCompile>
     <ClCompile Include="src\OSC\Path.cpp">
       <Filter>src\OSC</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DMX\MovingHead.cpp">
+      <Filter>src\DMX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -223,9 +220,6 @@
     </ClInclude>
     <ClInclude Include="src\Data\AbstractCalibrationPoint.h">
       <Filter>src\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MovingHead.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Widgets\PanTiltTrackpad.h">
       <Filter>src\Widgets</Filter>
@@ -392,9 +386,6 @@
     <ClInclude Include="src\DMX\Types.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
-    <ClInclude Include="src\DMX\MovingHead.h">
-      <Filter>src\DMX</Filter>
-    </ClInclude>
     <ClInclude Include="src\DMX\Sharpy.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
@@ -484,6 +475,9 @@
     </ClInclude>
     <ClInclude Include="src\OSC\Router.h">
       <Filter>src\OSC</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\MovingHead.h">
+      <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
