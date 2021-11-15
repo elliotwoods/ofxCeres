@@ -24,17 +24,13 @@ protected:
 	bool needsWorldUpdate = true;
 
 	struct : ofParameterGroup {
-		ofParameter<bool> trackCursor{ "Track cursor", false };
-
 		struct : ofParameterGroup {
-			struct : ofParameterGroup {
-				ofParameter<bool> enabled{ "Enabled", true };
-				ofParameter<int> length{ "Length", 100, 0, 1000 };
-				PARAM_DECLARE("History trail", enabled, length);
-			} historyTrail;
-			PARAM_DECLARE("Draw", historyTrail);
-		} draw;
-		
-		PARAM_DECLARE("Group Control", trackCursor, draw);
+			ofParameter<bool> enabled{ "Enabled", true };
+			ofParameter<int> length{ "Length", 100, 0, 1000 };
+			PARAM_DECLARE("History trail", enabled, length);
+		} historyTrail;
+		PARAM_DECLARE("Group Control", historyTrail);
 	} parameters;
+
+	ofParameter<bool> trackCursor{ "Track cursor", false };
 };

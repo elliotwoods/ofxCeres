@@ -65,5 +65,4 @@ protected:
 		ofParameter<int> port{ "Port", 4000 };
 		PARAM_DECLARE("OSC", enabled, port);
 	} oscParameters;
-
 };

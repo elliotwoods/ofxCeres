@@ -6,15 +6,12 @@ namespace DMX {
 	Pointe::Pointe()
 		: MovingHead(Configuration{
 			-270, 270
-			, -125, 125
+			, -135, 135
 			})
 	{
 		RULR_SERIALIZE_LISTENERS;
-
-		this->onPopulateInspector += [this](ofxCvGui::InspectArguments& args) {
-			this->populateInspector(args);
-		};
-
+		RULR_INSPECTOR_LISTENER;
+		
 		MovingHead::parameters.add(this->customParameters.zoom);
 
 		this->channels = {

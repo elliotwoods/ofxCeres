@@ -53,14 +53,14 @@ GroupControl::update()
 		this->init();
 	}
 
-	if (this->needsWorldUpdate && this->parameters.trackCursor) {
+	if (this->needsWorldUpdate && this->trackCursor) {
 		auto cursorPosition = Scene::X()->getPanel()->getCamera().getCursorWorld();
 		this->navigateTo(cursorPosition);
 		this->needsWorldUpdate = false;
 	}
 
 	// trim history
-	while (this->history.size() > this->parameters.draw.historyTrail.length.get()) {
+	while (this->history.size() > this->parameters.historyTrail.length.get()) {
 		this->history.pop_front();
 	}
 }
@@ -69,7 +69,7 @@ GroupControl::update()
 void
 GroupControl::drawWorld()
 {
-	if (this->parameters.draw.historyTrail.enabled) {
+	if (this->parameters.historyTrail.enabled) {
 		ofPushStyle();
 		{
 			ofEnableAlphaBlending();
@@ -104,6 +104,7 @@ void
 GroupControl::serialize(nlohmann::json& json)
 {
 	Data::serialize(json, this->parameters);
+	json << this->trackCursor;
 }
 
 //----------
@@ -111,6 +112,7 @@ void
 GroupControl::deserialize(const nlohmann::json& json)
 {
 	Data::deserialize(json, this->parameters);
+	json >> this->trackCursor;
 }
 
 //----------
@@ -118,6 +120,13 @@ void
 GroupControl::populateInspector(ofxCvGui::InspectArguments& args)
 {
 	auto inspector = args.inspector;
+
+	{
+		auto toggle = inspector->addToggle(this->trackCursor);
+		toggle->setHotKey(' ');
+		toggle->setHeight(75.0f);
+	}
+
 	inspector->addParameterGroup(this->parameters);
 }
 

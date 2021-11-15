@@ -104,13 +104,11 @@ Scene::update()
 void
 Scene::drawWorld()
 {
-	auto sceneIsSelected = this->isBeingInspected();
-
 	// Draw the moving heads
-	auto groupSolveSelected = this->groupSolve->isBeingInspected();
 	for (auto& movingHead : this->movingHeads) {
 		movingHead.second->drawWorld();
-		ofxCvGui::Utils::drawTextAnnotation(movingHead.first, movingHead.second->getModel()->getPosition());
+		ofxCvGui::Utils::drawTextAnnotation(movingHead.first
+			, movingHead.second->getModel()->getPosition());
 	}
 
 	this->markers->drawWorld();
@@ -229,6 +227,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		}
 		});
 	inspector->addSubMenu(this->oscParameters);
+
 	inspector->addSpacer();
 
 	inspector->addTitle("Moving heads", ofxCvGui::Widgets::Title::Level::H2);
@@ -239,7 +238,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 
 		// Selection buttons for moving heads
 		for (auto& it : this->movingHeads) {
-			auto button = inspector->addSubMenu(it.first, this->movingHeads[it.first]);
+			auto button = inspector->addSubMenu(it.first, it.second);
 			button->setHeight(75.0f);
 			auto deleteButton = make_shared<ofxCvGui::Widgets::Button>("", [it, this]() {
 				this->deleteMovingHead(it.first);
