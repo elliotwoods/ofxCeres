@@ -18,6 +18,8 @@ namespace Calibration {
 
 		float residual = 0.0f;
 		float normalisedResidual = 0.0f;
+		glm::vec2 disparity{ 0, 0 };
+		glm::vec2 normalisedDisparity{ 0 , 0 };
 
 		ofxLiquidEvent<void> onTakeCurrent;
 		ofxLiquidEvent<void> onGoValue;

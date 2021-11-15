@@ -26,6 +26,9 @@ namespace Calibration {
 
 		// store here because otherwise we might accidentally call Scene::X() from Solver::~Solver() whilst Scene is being destroyed
 		this->scene = Scene::X();
+
+		// set default solver settings
+		this->solverSettings.maxIterations.set(1000);
 	}
 
 	//----------
@@ -48,20 +51,21 @@ namespace Calibration {
 	void
 	Solver::update()
 	{
-		// This needs to occur whenever:
-		//   1. The model changes
-		//   2. A data point changes
-		// Since this isn't 
-		if (this->isBeingInspected()) {
+		// update the residuals
+		if(this->needsToCalculateResiduals) {
 			auto dataPoints = this->calibrationPoints->getAllCaptures();
+
 			float maxResidual = 0.0f;
 			for (auto dataPoint : dataPoints) {
 				try {
-					auto residual = this->getResidualOnDataPoint(dataPoint);
+					auto disparity = this->getDisparityOnDataPoint(dataPoint);
+					auto residual = glm::length(disparity);
 					dataPoint->residual = residual;
 					if (residual > maxResidual) {
 						maxResidual = residual;
 					}
+
+					dataPoint->disparity = disparity;
 				}
 				catch (...) {
 					// e.g. if marker doesn't exist
@@ -72,7 +76,10 @@ namespace Calibration {
 			}
 			for (auto dataPoint : dataPoints) {
 				dataPoint->normalisedResidual = dataPoint->residual / maxResidual;
+				dataPoint->normalisedDisparity = dataPoint->disparity / maxResidual;
 			}
+
+			this->needsToCalculateResiduals = false;
 		}
 	}
 
@@ -286,9 +293,6 @@ namespace Calibration {
 				map<float, float> residualsByPan;
 				map<float, float> residualsByTilt;
 				{
-					ofMesh pointsPreview;
-					pointsPreview.setMode(ofPrimitiveMode::OF_PRIMITIVE_LINES);
-
 					auto calibrationPoints = this->calibrationPoints->getSelection();
 
 					// exit early if empty
@@ -298,16 +302,16 @@ namespace Calibration {
 
 					for (auto calibrationPoint : calibrationPoints) {
 						auto positionOnTrackpad = trackpadWidget->toXY(calibrationPoint->panTiltSignal.get());
+						auto dispairtyPosition = trackpadWidget->toXY(calibrationPoint->panTiltSignal.get() 
+							+ calibrationPoint->normalisedDisparity * 10);
 
-						pointsPreview.addColor(calibrationPoint->color.get());
-						pointsPreview.addColor(calibrationPoint->color.get());
-						pointsPreview.addColor(calibrationPoint->color.get());
-						pointsPreview.addColor(calibrationPoint->color.get());
-						auto crossCenter = glm::vec3(positionOnTrackpad, 0.0f);
-						pointsPreview.addVertex(crossCenter - glm::vec3(0, 5, 0));
-						pointsPreview.addVertex(crossCenter + glm::vec3(0, 5, 0));
-						pointsPreview.addVertex(crossCenter - glm::vec3(5, 0, 0));
-						pointsPreview.addVertex(crossCenter + glm::vec3(5, 0, 0));
+						ofPushStyle();
+						{
+							ofSetColor(calibrationPoint->color.get());
+							ofDrawCircle(positionOnTrackpad, 2.0f);
+							ofDrawLine(positionOnTrackpad, dispairtyPosition);
+						}
+						ofPopStyle();
 
 						// Info for residuals (used later)
 						{
@@ -315,11 +319,6 @@ namespace Calibration {
 							residualsByTilt.emplace(positionOnTrackpad.y, calibrationPoint->normalisedResidual);
 						}
 					}
-
-					for (size_t i = 0; i < pointsPreview.getNumVertices(); i++) {
-						pointsPreview.addIndex(i);
-					}
-					pointsPreview.draw();
 				}
 
 				// draw the graph of residuals
@@ -330,7 +329,7 @@ namespace Calibration {
 					// pan
 					{
 						ofPath path;
-						path.setColor(ofColor(255, 255, 255, 200));
+						path.setColor(ofColor(255, 255, 255, 100));
 						path.moveTo({ residualsByPan.begin()->first, 0 });
 						path.lineTo({ residualsByPan.begin()->first, residualsByPan.begin()->second });
 						for (const auto& residualByPan : residualsByPan) {
@@ -344,7 +343,7 @@ namespace Calibration {
 					// tilt
 					{
 						ofPath path;
-						path.setColor(ofColor(255, 255, 255, 200));
+						path.setColor(ofColor(255, 255, 255, 100));
 						path.moveTo({ 0, residualsByTilt.begin()->first });
 						path.lineTo({ residualsByTilt.begin()->second, residualsByTilt.begin()->first });
 						for (const auto& residualByTilt : residualsByTilt) {
@@ -453,6 +452,8 @@ namespace Calibration {
 		default:
 			break;
 		}
+
+		this->needsToCalculateResiduals = true;
 	}
 
 	//----------
@@ -610,6 +611,13 @@ namespace Calibration {
 
 	//---------
 	void
+	Solver::markResidualsStale()
+	{
+		this->needsToCalculateResiduals = true;
+	}
+
+	//---------
+	void
 	Solver::getCalibrationData(vector<glm::vec3>& targetPoints
 		, vector<glm::vec2>& panTiltSignal) const
 	{
@@ -658,8 +666,8 @@ namespace Calibration {
 	}
 
 	//---------
-	float
-		Solver::getResidualOnDataPoint(shared_ptr<DataPoint> dataPoint) const
+	glm::vec2
+	Solver::getDisparityOnDataPoint(shared_ptr<DataPoint> dataPoint) const
 	{
 		auto transform = this->movingHead.getModel()->getTransform();
 
@@ -672,7 +680,7 @@ namespace Calibration {
 		//get the predicted pan-tilt near to stored value
 		auto navigatedPanTilt = this->movingHead.getModel()->getPanTiltForWorldTarget(marker->position.get()
 			, dataPoint->panTiltSignal.get());
-		auto disparity = glm::distance(navigatedPanTilt, dataPoint->panTiltSignal.get());
+		auto disparity = dataPoint->panTiltSignal.get() - navigatedPanTilt;
 
 		return disparity;
 	}

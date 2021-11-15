@@ -15,6 +15,9 @@ GroupSolve::GroupSolve(Scene& scene)
 	this->onDeserialize += [this](const nlohmann::json& json) {
 		this->deserialize(json);
 	};
+
+	// set default solver settings
+	this->solverSettings.maxIterations.set(1000);
 }
 
 //----------
@@ -307,6 +310,13 @@ GroupSolve::solve()
 		}
 		for (int i = 0; i < markers.size(); i++) {
 			markers[i]->position.set(result.solution.markerPositions[i]);
+		}
+	}
+
+	// Mark datapoints as needing calculate residual
+	{
+		for (auto movingHead : movingHeads) {
+			movingHead->getSolver()->markResidualsStale();
 		}
 	}
 

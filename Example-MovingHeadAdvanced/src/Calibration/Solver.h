@@ -42,23 +42,25 @@ namespace Calibration {
 		void solveGroup();
 
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> getCalibrationPoints();
+		void markResidualsStale();
 	protected:
 		void getCalibrationData(vector<glm::vec3>& targetPoints
 			, vector<glm::vec2>& panTiltSignal) const;
 		void prepareDataPoint(shared_ptr<DataPoint>);
-		float getResidualOnDataPoint(shared_ptr<DataPoint>) const;
+
+		glm::vec2 getDisparityOnDataPoint(shared_ptr<DataPoint>) const;
 
 		DMX::MovingHead& movingHead;
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> calibrationPoints = make_shared<Data::CalibrationPointSet<DataPoint>>();
 
 		struct : ofParameterGroup {
-			ofParameter<SolveType> solveType{ "Solve type", SolveType::Basic };
+			ofParameter<SolveType> solveType{ "Solve type", SolveType::Distorted };
 		} parameters;
 
 		ofxCeres::ParameterisedSolverSettings solverSettings;
 		weak_ptr<Marker> markerClosestToCursor;
 		shared_ptr<Scene> scene;
 
-		float maxResidual = 1;
+		bool needsToCalculateResiduals = true;
 	};
 }
