@@ -15,14 +15,14 @@ public:
 		, bool useExistingIfWeHaveAMatch);
 
 	void drawWorld();
-	void addMarker();
+	shared_ptr<Marker> addMarker();
 
 	void populateInspector(ofxCvGui::InspectArguments&) override;
 protected:
 	shared_ptr<Mesh> mesh;
 	shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel;
 
-	ofParameter<bool> snapToVertex{ "Snap to vertex", true };
+	ofParameter<bool> snapToVertex{ "Snap to vertex", false };
 
 	glm::vec3 cursorPosition;
 };

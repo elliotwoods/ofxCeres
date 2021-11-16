@@ -52,7 +52,9 @@ namespace DMX {
 					return Fixture::get16bitLSB(this->parameters.focus);
 					})
 			, make_shared<Channel>("Autofocus")
-			, make_shared<Channel>("Shutter/strobe")
+			, make_shared<Channel>("Shutter/strobe", [this]() {
+				return this->parameters.shutter.get() ? 255 : 0;
+					})
 			, make_shared<Channel>("Dimmer intensity", [this]() {
 					return Fixture::get16bitMSB(this->parameters.dimmer);
 					})
@@ -123,12 +125,5 @@ namespace DMX {
 		Pointe::populateInspector(ofxCvGui::InspectArguments& args)
 	{
 		auto inspector = args.inspector;
-
-		inspector->addButton("Shutter open", [this]() {
-			this->getChannelByName("Shutter/strobe")->setValue(255);
-			});
-		inspector->addButton("Shutter close", [this]() {
-			this->getChannelByName("Shutter/strobe")->setValue(0);
-			});
 	}
 }

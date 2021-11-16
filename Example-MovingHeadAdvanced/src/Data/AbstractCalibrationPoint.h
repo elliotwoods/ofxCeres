@@ -8,6 +8,7 @@ namespace Data {
 	public:
 		AbstractCalibrationPoint();
 		ofxCvGui::ElementPtr getGuiElement();
+		ofxCvGui::ElementPtr getExistingGuiElement();
 		bool isSelected() const;
 		void setSelected(bool);
 
@@ -25,7 +26,7 @@ namespace Data {
 		void callbackSelectedChanged(bool &);
 
 		ofParameter<bool> selected{ "Selected", true };
-
+		ofxCvGui::ElementPtr cachedGuiElement;
 		string timeString;
 		string secondString;
 		string dateString;

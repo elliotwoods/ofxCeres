@@ -30,12 +30,19 @@ namespace DMX {
 		shared_ptr<Calibration::Model> getModel();
 		shared_ptr<Calibration::Solver> getSolver();
 
+		void flip();
+		void toggleSolo();
+
+		bool getSolo() const;
+		void setSolo(bool);
+
 		struct : ofParameterGroup {
+			ofParameter<bool> shutter{ "Shutter", false };
 			ofParameter<float> pan{ "Pan", 0, -180, 180 };
 			ofParameter<float> tilt{ "Tilt", 0, -90, 90 };
 			ofParameter<float> dimmer{ "Dimmer", 0, 0, 1};
 			ofParameter<float> focus{ "Focus", 0, 0, 1};
-			PARAM_DECLARE("MovingHead", pan, tilt, dimmer, focus);
+			PARAM_DECLARE("MovingHead", shutter, pan, tilt, dimmer, focus);
 		} parameters;
 
 	protected:

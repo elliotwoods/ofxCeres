@@ -21,6 +21,7 @@ namespace Calibration {
 	{
 		json << this->panTiltSignal;
 		json << this->marker;
+		json << this->focus;
 	}
 
 	//----------
@@ -29,6 +30,7 @@ namespace Calibration {
 	{
 		json >> this->panTiltSignal;
 		json >> this->marker;
+		json >> this->focus;
 	}
 
 	//----------
@@ -81,6 +83,7 @@ namespace Calibration {
 		}
 
 		children.push_back(make_shared<ofxCvGui::Widgets::EditableValue<string>>(this->marker));
+		children.push_back(make_shared<ofxCvGui::Widgets::EditableValue<float>>(this->focus));
 
 		// residual widget
 		{
@@ -137,18 +140,18 @@ namespace Calibration {
 			return button;
 		};
 
-		addButton("Go to stored pan/tilt", [this] {
+		addButton("Go to stored values", [this] {
 			this->onGoValue.notifyListeners();
 			})->setDrawGlyph(u8"\uf093");
 
-		addButton("Go to calculated pan/tilt", [this] {
+		addButton("Go to calculated values", [this] {
 			try {
 				this->onGoPrediction.notifyListeners();
 			}
 			CATCH_TO_ALERT;
 			})->setDrawGlyph(u8"\uf1ec");
 
-		addButton("Store the current pan/tilt", [this] {
+		addButton("Store the current values", [this] {
 			this->onTakeCurrent.notifyListeners();
 			})->setDrawGlyph(u8"\uf019");
 
@@ -157,5 +160,17 @@ namespace Calibration {
 		if (height > element->getHeight()) {
 			element->setHeight(height);
 		}
+
+		// Draw selected if this is current pan tilt
+		element->onDraw += [this](ofxCvGui::DrawArguments& args) {
+			if (this->comparePanTiltToCurrent(this->panTiltSignal.get()) == 0.0f) {
+				ofPushStyle();
+				{
+					ofNoFill();
+					ofDrawRectangle(args.localBounds);
+				}
+				ofPopStyle();
+			}
+		};
 	}
 }

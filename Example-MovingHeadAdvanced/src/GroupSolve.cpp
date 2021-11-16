@@ -320,6 +320,13 @@ GroupSolve::solve()
 		}
 	}
 
+	// Solve the focus models if converged
+	if (result.isConverged()) {
+		for (auto movingHead : movingHeads) {
+			movingHead->getSolver()->solveFocus();
+		}
+	}
+
 	// Turn off continuous solve when we have a solution
 	if (result.isConverged()) {
 		this->parameters.solveContinuously.set(false);

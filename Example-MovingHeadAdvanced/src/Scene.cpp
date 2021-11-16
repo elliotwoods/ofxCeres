@@ -252,7 +252,12 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 			{
 				renameButton->setDrawGlyph(u8"\uf044"); // edit
 			}
-			button->onBoundsChange += [deleteButton, renameButton](ofxCvGui::BoundsChangeArguments& args) {
+			auto shutterButton = make_shared<ofxCvGui::Widgets::Toggle>(it.second->parameters.shutter);
+			{
+				shutterButton->setDrawGlyph(u8"\uf0eb"); // lightbulb
+			}
+
+			button->onBoundsChange += [deleteButton, renameButton, shutterButton](ofxCvGui::BoundsChangeArguments& args) {
 				ofRectangle bounds(
 					args.localBounds.width - 45 - 30
 					, 5
@@ -262,9 +267,12 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 				deleteButton->setBounds(bounds);
 				bounds.x -= bounds.width + 5;
 				renameButton->setBounds(bounds);
+				bounds.x = 5;
+				shutterButton->setBounds(bounds);
 			};
 			button->addChild(deleteButton);
 			button->addChild(renameButton);
+			button->addChild(shutterButton);
 
 			button->addToolTip(it.second->getTypeName() + " on Channel #" + ofToString(it.second->channelIndex.get()));
 		}
@@ -537,8 +545,8 @@ Scene::fitWorldGrid()
 		positions.push_back(movingHead.second->getModel()->getPosition());
 	}
 	if (this->mesh->isLoaded()) {
-		positions.push_back(this->mesh->getMin());
-		positions.push_back(this->mesh->getMax());
+		positions.push_back(this->mesh->getMinWorld());
+		positions.push_back(this->mesh->getMaxWorld());
 	}
 
 	// Now expand our min and max

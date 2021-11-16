@@ -21,15 +21,15 @@ public:
 	void populateInspector(ofxCvGui::InspectArguments&);
 
 	bool isLoaded();
-	glm::vec3 getMin();
-	glm::vec3 getMax();
+	glm::vec3 getMinWorld();
+	glm::vec3 getMaxWorld();
 
 	glm::mat4 getTransform() const;
 	glm::vec3 getPointClosestTo(const glm::vec3&, float maxDistance);
 protected:
 	struct : ofParameterGroup {
 		ofParameter<std::filesystem::path> filename{ "Filename", "" };
-		ofParameter<float> scale{ "Scale", 1.0f };
+		ofParameter<float> scale{ "Scale", 1.0f, 0.0f, 1000.0f };
 
 		struct : ofParameterGroup {
 			ofParameter<float> x{ "X", 0, -180, 180 };

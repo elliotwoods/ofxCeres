@@ -53,7 +53,7 @@ GroupControl::update()
 		this->init();
 	}
 
-	if (this->needsWorldUpdate && this->trackCursor) {
+	if (this->needsWorldUpdate && this->trackCursor && this->isBeingInspected()) {
 		auto cursorPosition = Scene::X()->getPanel()->getCamera().getCursorWorld();
 		this->navigateTo(cursorPosition);
 		this->needsWorldUpdate = false;
@@ -69,7 +69,7 @@ GroupControl::update()
 void
 GroupControl::drawWorld()
 {
-	if (this->parameters.historyTrail.enabled) {
+	if (this->parameters.historyTrail.enabled && this->isBeingInspected()) {
 		ofPushStyle();
 		{
 			ofEnableAlphaBlending();

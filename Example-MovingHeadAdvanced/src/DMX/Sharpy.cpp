@@ -17,7 +17,9 @@ namespace DMX {
 
 		this->channels = {
 			make_shared<Channel>("Color Wheel")
-			, make_shared<Channel>("Shutter")
+			, make_shared<Channel>("Shutter", [this]() {
+				return this->parameters.shutter.get() ? 104 : 0;
+				})
 			, make_shared<Channel>("Dimmer", [this]() {
 				return Fixture::get8bit(this->parameters.dimmer);
 				})
@@ -98,14 +100,5 @@ namespace DMX {
 		Sharpy::populateInspector(ofxCvGui::InspectArguments& args)
 	{
 		auto inspector = args.inspector;
-
-		inspector->addTitle("Sharpy");
-
-		inspector->addButton("Shutter open", [this]() {
-			this->getChannelByName("Shutter")->setValue(104);
-			});
-		inspector->addButton("Shutter close", [this]() {
-			this->getChannelByName("Shutter")->setValue(0);
-			});
 	}
 }

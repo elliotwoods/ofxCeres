@@ -1,5 +1,6 @@
 #include "pch_ofApp.h"
 #include "Markers.h"
+#include "Scene.h"
 
 //----------
 Markers::Markers(shared_ptr<Mesh> mesh, shared_ptr<ofxCvGui::Panels::WorldManaged> worldPanel)
@@ -157,10 +158,42 @@ Markers::drawWorld()
 }
 
 //----------
-void
+shared_ptr<Marker>
 Markers::addMarker()
 {
+	auto name = ofSystemTextBoxDialog("Marker name");
+	if (name.empty()) {
+		return shared_ptr<Marker>();
+	}
 
+	shared_ptr<Marker> marker;
+
+	// check if existing marker exists
+	{
+		auto markers = this->getAllCaptures();
+		for (auto priorMarker : markers) {
+			if (priorMarker->name.get() == name) {
+				// If so, we will update the existing marker
+				marker = priorMarker;
+				break;
+			}
+		}
+
+		// Otherwise make it
+		if (!marker) {
+			marker = make_shared<Marker>();
+			marker->name.set(name);
+		}
+	}
+	
+	if (this->isBeingInspected()) {
+		marker->position.set(this->cursorPosition);
+	}
+	else {
+		marker->position.set(Scene::X()->getPanel()->getCamera().getCursorWorld());
+	}
+	this->add(marker);
+	return marker;
 }
 
 //----------
@@ -179,13 +212,6 @@ Markers::populateInspector(ofxCvGui::InspectArguments& args)
 		});
 	inspector->addToggle(this->snapToVertex);
 	inspector->addButton("Add...", [this]() {
-		auto name = ofSystemTextBoxDialog("Marker name");
-		if (name.empty()) {
-			return;
-		}
-		auto marker = make_shared<Marker>();
-		marker->name.set(name);
-		marker->position.set(this->cursorPosition);
-		this->add(marker);
+		this->addMarker();
 		}, ' ')->setHeight(100.0f);
 }

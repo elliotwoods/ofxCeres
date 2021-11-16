@@ -8,6 +8,8 @@ namespace DMX {
 	class MovingHead;
 }
 
+#define MOVINGHEAD_FOCUS_ORDER 3
+
 namespace Calibration {
 	class Model : public ofxCvGui::IInspectable, public Data::Serializable {
 	public:
@@ -39,6 +41,8 @@ namespace Calibration {
 			ofParameter<glm::vec3> tiltDistortion{ "Tilt distortion", {0, 1, 0} };
 			ofParameter<float> residual{ "Residual", 0 };
 		} parameters;
+
+		ofxCeres::Models::PolyFit<MOVINGHEAD_FOCUS_ORDER>::Solution focusModel;
 
 	protected:
 		DMX::MovingHead& movingHead;

@@ -156,6 +156,7 @@ namespace Calibration {
 	Solver::serialize(nlohmann::json& json)
 	{
 		Data::serialize(json, this->solverSettings);
+		Data::serialize(json, this->parameters.draw);
 
 		{
 			ofParameter<string> solveTypeName{ "Solve type", this->parameters.solveType.get().toString() };
@@ -170,6 +171,7 @@ namespace Calibration {
 	Solver::deserialize(const nlohmann::json& json)
 	{
 		Data::deserialize(json, this->solverSettings);
+		Data::deserialize(json, this->parameters.draw);
 
 		if (json.contains("parameters")) {
 			ofParameter<string> solveTypeName{ "Solve type", "" };
@@ -293,7 +295,7 @@ namespace Calibration {
 		}
 
 		inspector->addSpacer();
-
+		inspector->addParameterGroup(this->parameters.draw);
 		{
 			auto trackpad = make_shared<Widgets::PanTiltTrackpad>(this->movingHead.parameters.pan, this->movingHead.parameters.tilt);
 			auto trackpadWeak = weak_ptr<Widgets::PanTiltTrackpad>(trackpad);
@@ -312,16 +314,24 @@ namespace Calibration {
 						return;
 					}
 
+					auto drawNormalised = this->parameters.draw.normalised.get();
+
 					for (auto calibrationPoint : calibrationPoints) {
 						auto positionOnTrackpad = trackpadWidget->toXY(calibrationPoint->panTiltSignal.get());
-						auto dispairtyPosition = trackpadWidget->toXY(calibrationPoint->panTiltSignal.get() 
-							+ calibrationPoint->normalisedDisparity * 10);
+						auto disparityPosition = drawNormalised
+							? trackpadWidget->toXY(calibrationPoint->panTiltSignal.get() + calibrationPoint->normalisedDisparity * 10)
+							: trackpadWidget->toXY(calibrationPoint->panTiltSignal.get() + calibrationPoint->disparity);
+
+						if (calibrationPoint->normalisedDisparity != calibrationPoint->normalisedDisparity) {
+							// Ignore NaN's
+							continue;
+						}
 
 						ofPushStyle();
 						{
 							ofSetColor(calibrationPoint->color.get());
 							ofDrawCircle(positionOnTrackpad, 2.0f);
-							ofDrawLine(positionOnTrackpad, dispairtyPosition);
+							ofDrawLine(positionOnTrackpad, disparityPosition);
 						}
 						ofPopStyle();
 
@@ -339,7 +349,7 @@ namespace Calibration {
 					ofEnableAlphaBlending();
 
 					// pan
-					{
+					if (!residualsByPan.empty()) {
 						ofPath path;
 						path.setColor(ofColor(255, 255, 255, 100));
 						path.moveTo({ residualsByPan.begin()->first, 0 });
@@ -353,7 +363,7 @@ namespace Calibration {
 					}
 
 					// tilt
-					{
+					if(!residualsByTilt.empty()) {
 						ofPath path;
 						path.setColor(ofColor(255, 255, 255, 100));
 						path.moveTo({ 0, residualsByTilt.begin()->first });
@@ -371,9 +381,26 @@ namespace Calibration {
 			};
 			inspector->add(trackpad);
 		}
-
+		inspector->addButton("Flip", [this]() {
+			this->movingHead.flip();
+			}, 'l');
+		inspector->addToggle("Solo", [this]() {
+			return this->movingHead.getSolo();
+			}, [this](bool solo) {
+				this->movingHead.setSolo(solo);
+			})->setHotKey('s');
 		inspector->addSlider(this->movingHead.parameters.focus);
 
+
+		inspector->addButton("Navigate to cursor", [this]() {
+			this->navigateThisToTarget();
+			}, 'n');
+		inspector->addButton("Navigate all to cursor", [this]() {
+			this->navigateAllToTarget();
+			}, 'a');
+		inspector->addButton("Go to stored data point", [this]() {
+			this->goToStoredDataPoint();
+			}, 'g');
 
 		inspector->addButton("Add", [this]() {
 			try {
@@ -436,16 +463,43 @@ namespace Calibration {
 	{
 		auto marker = this->markerClosestToCursor.lock();
 		if (!marker) {
-			throw(Exception("No marker selected"));
+			marker = Scene::X()->getMarkers()->addMarker();
+		}
+		if (!marker) {
+			return;
 		}
 
-		auto dataPoint = make_shared<DataPoint>();
+		auto panTiltSignal = this->movingHead.getCurrentPanTilt();
+
+		shared_ptr<DataPoint> dataPoint;
+		
+		// Try to find matching data points to start with
 		{
-			dataPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
-			dataPoint->marker = marker->name.get();
+			auto dataPoints = this->calibrationPoints->getSelection();
+			for (auto priorDataPoint : dataPoints) {
+				// check marker matches
+				if (priorDataPoint->marker.get() == marker->name.get()) {
+					// check 'quadrant' matches
+					glm::vec2 deltaPanTilt = abs(priorDataPoint->panTiltSignal.get() - panTiltSignal);
+					if (deltaPanTilt.x < 90.0f && deltaPanTilt.y < 90.0f) {
+						// match!
+						dataPoint = priorDataPoint;
+						dataPoint->scrollTo();
+						break;
+					}
+				}
+			}
 		}
-		this->prepareDataPoint(dataPoint);
-		this->calibrationPoints->add(dataPoint);
+
+		// No match found - make a new one
+		if (!dataPoint) {
+			dataPoint = make_shared<DataPoint>();
+			dataPoint->marker = marker->name.get();
+			this->prepareDataPoint(dataPoint);
+			this->calibrationPoints->add(dataPoint);
+		}
+
+		dataPoint->panTiltSignal.set(panTiltSignal);
 
 		ofxCvGui::refreshInspector(this);
 	}
@@ -456,16 +510,27 @@ namespace Calibration {
 	{
 		this->needsToCalculateResiduals = true;
 
+		bool converged = false;
+
 		switch (this->parameters.solveType.get().get()) {
 		case SolveType::Basic:
-			return this->solveBasic();
+			converged = this->solveBasic();
+			break;
 		case SolveType::Distorted:
-			return this->solveDistorted();
+			converged = this->solveDistorted();
+			break;
 		case SolveType::Group:
-			return this->solveGroup();
+			converged = this->solveGroup();
+			break;
 		default:
-			return true;
+			break;
 		}
+
+		if (converged) {
+			this->solveFocus();
+		}
+
+		return converged;
 	}
 
 	//----------
@@ -622,6 +687,50 @@ namespace Calibration {
 	}
 
 	//---------
+	void
+	Solver::solveFocus()
+	{
+		// Gather data
+		vector<float> inverseDistances;
+		vector<float> foci;
+		{
+			auto position = this->movingHead.getModel()->getPosition();
+			auto dataPoints = this->calibrationPoints->getSelection();
+			for (auto dataPoint : dataPoints) {
+				auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker.get());
+				if (marker) {
+					auto distance = glm::distance(position, marker->position.get());
+					auto focus = dataPoint->focus.get();
+					if (focus == 0.0f || focus == 1.0f) {
+						// Ignore extreme values
+						continue;
+					}
+
+					inverseDistances.push_back(1.0 / distance);
+					foci.push_back(focus);
+				}
+			}
+		}
+
+		if (inverseDistances.size() < MOVINGHEAD_FOCUS_ORDER) {
+			throw(Exception("Insufficient data points to fit the focus model"));
+		}
+
+		// Perform fit
+		auto result = ofxCeres::Models::PolyFit<MOVINGHEAD_FOCUS_ORDER>::solve(inverseDistances
+			, foci
+			, this->movingHead.getModel()->focusModel
+			, this->solverSettings.getSolverSettings());
+
+		if (!result.isConverged()) {
+			throw(Exception("Failed to converge when solving focus"));
+		}
+		else {
+			this->movingHead.getModel()->focusModel = result.solution;
+		}
+	}
+
+	//---------
 	shared_ptr<Data::CalibrationPointSet<DataPoint>>
 	Solver::getCalibrationPoints()
 	{
@@ -660,19 +769,31 @@ namespace Calibration {
 	{
 		auto dataPointWeak = weak_ptr<DataPoint>(dataPoint);
 
-		dataPoint->onTakeCurrent += [dataPointWeak, this]() {
+		auto pointCameraAtMarker = [dataPointWeak]() {
 			auto dataPoint = dataPointWeak.lock();
-			dataPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
+			auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker.get());
+			if (marker) {
+				Scene::X()->getPanel()->getCamera().lookAt(marker->position.get(), { 0, 1, 0 });
+			}
 		};
 
-		dataPoint->onGoValue += [dataPointWeak, this]() {
+		dataPoint->onTakeCurrent += [dataPointWeak, pointCameraAtMarker, this]() {
+			auto dataPoint = dataPointWeak.lock();
+			dataPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
+			dataPoint->focus.set(this->movingHead.parameters.focus.get());
+			pointCameraAtMarker();
+		};
+
+		dataPoint->onGoValue += [dataPointWeak, pointCameraAtMarker, this]() {
 			auto dataPoint = dataPointWeak.lock();
 			auto panTiltSignal = dataPoint->panTiltSignal.get();
 			this->movingHead.parameters.pan.set(panTiltSignal.x);
 			this->movingHead.parameters.tilt.set(panTiltSignal.y);
+			this->movingHead.parameters.focus.set(dataPoint->focus.get());
+			pointCameraAtMarker();
 		};
 
-		dataPoint->onGoPrediction += [dataPointWeak, this]() {
+		dataPoint->onGoPrediction += [dataPointWeak, pointCameraAtMarker, this]() {
 			auto dataPoint = dataPointWeak.lock();
 			auto marker = Scene::X()->getMarkers()->getMarkerByName(dataPoint->marker);
 			if (!marker) {
@@ -680,6 +801,20 @@ namespace Calibration {
 			}
 			else {
 				this->movingHead.navigateToWorldTarget(marker->position.get());
+				pointCameraAtMarker();
+			}
+		};
+
+		dataPoint->comparePanTiltToCurrent = [this](const glm::vec2& point) {
+			return glm::distance(point, this->movingHead.getCurrentPanTilt());
+		};
+
+		dataPoint->scrollTo = [this, dataPointWeak]() {
+			auto dataPoint = dataPointWeak.lock();
+			auto guiElement = dataPoint->getExistingGuiElement();
+			auto listPanel = this->calibrationPoints->getListPanel();
+			if (guiElement && listPanel) {
+				listPanel->setScroll(guiElement->getBounds().y);
 			}
 		};
 	}
@@ -702,5 +837,81 @@ namespace Calibration {
 		auto disparity = dataPoint->panTiltSignal.get() - navigatedPanTilt;
 
 		return disparity;
+	}
+
+	//---------
+	void
+	Solver::navigateThisToTarget()
+	{
+		auto selectedMarker = this->markerClosestToCursor.lock();
+		if (selectedMarker) {
+			// Snap to marker if one is selected
+			this->movingHead.navigateToWorldTarget(selectedMarker->position.get());
+		}
+		else {
+			// Otherwise position under mouse cursor
+			auto cursorPosition = Scene::X()->getPanel()->getCamera().getCursorWorld();
+			this->movingHead.navigateToWorldTarget(cursorPosition);
+		}
+	}
+
+	//---------
+	void
+	Solver::navigateAllToTarget()
+	{
+		glm::vec3 position;
+		auto selectedMarker = this->markerClosestToCursor.lock();
+		if (selectedMarker) {
+			// Snap to marker if one is selected
+			position = selectedMarker->position.get();
+		}
+		else {
+			// Otherwise position under mouse cursor
+			auto cursorPosition = Scene::X()->getPanel()->getCamera().getCursorWorld();
+			position = cursorPosition;
+		}
+
+		// Navigate this
+		this->movingHead.navigateToWorldTarget(position);
+
+		// Navigate others
+		{
+			const auto& movingHeads = Scene::X()->getMovingHeads();
+			for (const auto& it : movingHeads) {
+				if (it.second.get() == &this->movingHead) {
+					//ignore
+					continue;
+				}
+
+				// Navigate it to target
+				it.second->navigateToWorldTarget(position);
+			}
+		}
+	}
+
+	//---------
+	void
+	Solver::goToStoredDataPoint()
+	{
+		auto marker = this->markerClosestToCursor.lock();
+		if (!marker) {
+			throw(Exception("No marker under cursor"));
+		}
+
+		// find the data point
+		shared_ptr<DataPoint> selectedDataPoint;
+		{
+			auto dataPoints = this->calibrationPoints->getSelection();
+			for (auto dataPoint : dataPoints) {
+				if (dataPoint->marker.get() == marker->name.get()) {
+					selectedDataPoint = dataPoint;
+				}
+			}
+		}
+
+		if (selectedDataPoint) {
+			selectedDataPoint->scrollTo();
+			selectedDataPoint->onGoValue.notifyListeners();
+		}
 	}
 }

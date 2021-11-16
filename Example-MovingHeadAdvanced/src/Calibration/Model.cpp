@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "ofxCeres.h"
 #include "DMX/MovingHead.h"
+#include "Scene.h"
 
 namespace Calibration {
 	//----------
@@ -36,6 +37,13 @@ namespace Calibration {
 	Model::serialize(nlohmann::json& json)
 	{
 		Data::serialize(json, this->parameters);
+
+		{
+			auto& focusModel = json["focusModel"];
+			for (const auto& coefficient : this->focusModel.coefficients) {
+				focusModel.push_back(coefficient);
+			}
+		}
 	}
 
 	//---------
@@ -43,6 +51,15 @@ namespace Calibration {
 	Model::deserialize(const nlohmann::json& json)
 	{
 		Data::deserialize(json, this->parameters);
+
+		if (json.contains("focusModel")) {
+			const auto& jsonFocusModel = json["focusModel"];
+			if (jsonFocusModel.size() == this->focusModel.coefficients.size()) {
+				for (size_t i = 0; i < this->focusModel.coefficients.size(); i++) {
+					this->focusModel.coefficients[i] = jsonFocusModel[i].get<float>();
+				}
+			}
+		}
 	}
 
 	//---------
@@ -67,6 +84,10 @@ namespace Calibration {
 			this->parameters.tiltDistortion.set({ 0, 1, 0 });
 			this->parameters.residual.set(0.0);
 			});
+		inspector->addButton("Take cursor position", [this]() {
+			auto position = Scene::X()->getPanel()->getCamera().getCursorWorld();
+			this->parameters.translation.set(position);
+			}, ' ');
 	}
 
 

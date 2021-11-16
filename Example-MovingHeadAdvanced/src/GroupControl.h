@@ -32,5 +32,5 @@ protected:
 		PARAM_DECLARE("Group Control", historyTrail);
 	} parameters;
 
-	ofParameter<bool> trackCursor{ "Track cursor", false };
+	ofParameter<bool> trackCursor{ "Track cursor", true };
 };

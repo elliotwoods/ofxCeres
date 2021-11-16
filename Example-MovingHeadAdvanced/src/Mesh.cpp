@@ -140,16 +140,16 @@ Mesh::isLoaded()
 
 //---------
 glm::vec3
-Mesh::getMin()
+Mesh::getMinWorld()
 {
-	return this->model.getSceneMin();
+	return ofxCeres::VectorMath::applyTransform(this->getTransform(), (glm::vec3) this->model.getSceneMin());
 }
 
 //---------
 glm::vec3
-Mesh::getMax()
+Mesh::getMaxWorld()
 {
-	return this->model.getSceneMax();
+	return ofxCeres::VectorMath::applyTransform(this->getTransform(), (glm::vec3)this->model.getSceneMax());
 }
 
 //---------

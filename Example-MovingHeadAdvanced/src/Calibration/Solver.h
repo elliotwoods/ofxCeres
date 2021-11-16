@@ -40,6 +40,7 @@ namespace Calibration {
 		bool solveBasic();
 		bool solveDistorted();
 		bool solveGroup();
+		void solveFocus();
 
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> getCalibrationPoints();
 		void markResidualsStale();
@@ -50,11 +51,19 @@ namespace Calibration {
 
 		glm::vec2 getDisparityOnDataPoint(shared_ptr<DataPoint>) const;
 
+		void navigateThisToTarget();
+		void navigateAllToTarget();
+		void goToStoredDataPoint();
+
 		DMX::MovingHead& movingHead;
 		shared_ptr<Data::CalibrationPointSet<DataPoint>> calibrationPoints = make_shared<Data::CalibrationPointSet<DataPoint>>();
 
 		struct : ofParameterGroup {
 			ofParameter<SolveType> solveType{ "Solve type", SolveType::Distorted };
+			struct : ofParameterGroup {
+				ofParameter<bool> normalised{ "Normalised", true };
+				PARAM_DECLARE("Draw", normalised);
+			} draw;
 		} parameters;
 
 		ofxCeres::ParameterisedSolverSettings solverSettings;

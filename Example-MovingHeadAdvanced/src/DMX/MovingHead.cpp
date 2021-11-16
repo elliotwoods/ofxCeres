@@ -1,6 +1,7 @@
 #include "pch_ofApp.h"
 #include "MovingHead.h"
 #include "Widgets/PanTiltTrackpad.h"
+#include "Scene.h"
 
 namespace DMX {
 	//----------
@@ -188,7 +189,15 @@ namespace DMX {
 		inspector->addButton("Home", [this]() {
 			this->parameters.pan.set(0);
 			this->parameters.tilt.set(0);
-			});
+			}, 'h');
+		inspector->addButton("Flip", [this]() {
+			this->flip();
+			}, 'l');
+		inspector->addToggle("Solo", [this]() {
+			return this->getSolo();
+			}, [this](bool solo) {
+			this->setSolo(solo);
+			})->setHotKey('s');
 		inspector->addSubMenu("Model", this->model);
 		inspector->addSubMenu("Solver", this->solver);
 	}
@@ -213,24 +222,19 @@ namespace DMX {
 		this->parameters.tilt.set(panTiltAngles.y);
 	
 
-		// Navigate the focus (NOTE : hardcoded for Robe Pointe)
+		// Navigate the focus
 		{
 			//check 'Fit focus values.ipynb'
 			auto distance = glm::distance(world, this->model->getPosition());
 
-			if (distance < 1.5f) {
-				// near range
-				this->parameters.focus.set(1.0f);
+			auto focus = model->focusModel(1.0 / distance);
+			if (focus < 0.0f) {
+				focus = 0.0f;
 			}
-			else {
-				auto inverseDistance = 1.0f / distance;
-				auto dmxCoarseFloat =
-					-77.16738954 * inverseDistance * inverseDistance * inverseDistance
-					+ -45.98512483 * inverseDistance * inverseDistance
-					+ 403.21323162 * inverseDistance
-					+ 29.67284246;
-				this->parameters.focus.set(dmxCoarseFloat / 256.0f);
+			else if (focus > 1.0f) {
+				focus = 1.0f;
 			}
+			this->parameters.focus.set(focus);
 		}
 	}
 
@@ -246,5 +250,78 @@ namespace DMX {
 	MovingHead::getSolver()
 	{
 		return this->solver;
+	}
+
+	//---------
+	void
+	MovingHead::flip()
+	{
+		auto panTilt = this->model->panTiltSignalToIdeal(this->getCurrentPanTilt());
+
+		// All ideal flips
+		vector<glm::vec2> flips = {
+			panTilt + glm::vec2(360, 0)
+			, panTilt - glm::vec2(360, 0)
+			, glm::vec2(panTilt.x + 180, -panTilt.y)
+			, glm::vec2(panTilt.x - 180, -panTilt.y)
+		};
+
+		// Check which ones are in range
+		vector<glm::vec2> possibleFlips;
+		for (const auto& flip : flips) {
+			auto panTiltSignal = this->model->panTiltIdealToSignal(flip);
+			if (panTiltSignal.x >= this->parameters.pan.getMin()
+				&& panTiltSignal.x <= this->parameters.pan.getMax()
+				&& panTiltSignal.y >= this->parameters.tilt.getMin()
+				&& panTiltSignal.y <= this->parameters.tilt.getMax()) {
+				// Take the first if this flip is available
+				this->parameters.pan.set(panTiltSignal.x);
+				this->parameters.tilt.set(panTiltSignal.y);
+				return;
+			}
+		}
+	}
+
+	//---------
+	void
+	MovingHead::toggleSolo()
+	{
+		this->setSolo(!this->getSolo());
+	}
+
+	//---------
+	bool
+	MovingHead::getSolo() const
+	{
+		const auto& movingHeads = Scene::X()->getMovingHeads();
+		for (const auto& it : movingHeads) {
+			if (it.second.get() == this) {
+				// ignore this
+				continue;
+			}
+			if (it.second->parameters.shutter.get()) {
+				return false;
+				break;
+			}
+		}
+		return true;
+	}
+
+	//---------
+	void
+	MovingHead::setSolo(bool solo)
+	{
+		const auto& movingHeads = Scene::X()->getMovingHeads();
+
+		for (const auto& it : movingHeads) {
+			if (it.second.get() == this) {
+				// ignore this
+				continue;
+			}
+			it.second->parameters.shutter.set(!solo);
+		}
+
+		// anyway turn this one on
+		this->parameters.shutter.set(true);
 	}
 }

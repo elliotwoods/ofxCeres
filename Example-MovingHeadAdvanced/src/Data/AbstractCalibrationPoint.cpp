@@ -124,7 +124,15 @@ namespace Data {
 
 		element->arrange();
 
+		this->cachedGuiElement = element;
 		return element;
+	}
+
+
+	//----------
+	ofxCvGui::ElementPtr
+	AbstractCalibrationPoint::getExistingGuiElement() {
+		return this->cachedGuiElement;
 	}
 
 	//----------
