@@ -72,7 +72,17 @@ namespace Calibration {
 
 		// We manually populate the dialog because the last value isn't editable
 		inspector->addEditableValue<glm::vec3>(this->parameters.translation);
-		inspector->addEditableValue<glm::vec3>(this->parameters.rotationVector);
+		inspector->addEditableValue<glm::vec3>("Rotation vector (degrees)", [this]() {
+			return this->parameters.rotationVector.get() * RAD_TO_DEG;
+			}
+			, [this](const string& valueString) {
+				if (!valueString.empty()) {
+					glm::vec3 degrees;
+					stringstream ss(valueString);
+					ss >> degrees;
+					this->parameters.rotationVector.set(degrees * DEG_TO_RAD);
+				}
+			});
 		inspector->addEditableValue<glm::vec3>(this->parameters.panDistortion);
 		inspector->addEditableValue<glm::vec3>(this->parameters.tiltDistortion);
 		inspector->addLiveValue<float>(this->parameters.residual);

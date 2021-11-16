@@ -223,6 +223,11 @@ namespace Calibration {
 					return dataPointA->residual < dataPointB->residual;
 					});
 				});
+			inspector->addButton("Focus", [this]() {
+				this->calibrationPoints->sortBy([](shared_ptr<DataPoint> dataPointA, shared_ptr<DataPoint> dataPointB) {
+					return dataPointA->focus.get() < dataPointB->focus.get();
+					});
+				});
 		}
 
 		inspector->addTitle("Color by", ofxCvGui::Widgets::Title::H2);
@@ -399,7 +404,10 @@ namespace Calibration {
 			this->navigateAllToTarget();
 			}, 'a');
 		inspector->addButton("Go to stored data point", [this]() {
-			this->goToStoredDataPoint();
+			try {
+				this->goToStoredDataPoint();
+			}
+			CATCH_TO_ALERT;
 			}, 'g');
 
 		inspector->addButton("Add", [this]() {
@@ -500,6 +508,7 @@ namespace Calibration {
 		}
 
 		dataPoint->panTiltSignal.set(panTiltSignal);
+		dataPoint->focus.set(this->movingHead.parameters.focus.get());
 
 		ofxCvGui::refreshInspector(this);
 	}
