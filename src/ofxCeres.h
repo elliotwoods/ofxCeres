@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ofxCeres/Models/PolyFit.h"
 #include "ofxCeres/Models/RigidBodyTransform.h"
 
 #include "ofxCeres/Models/MovingHead.h"

@@ -75,6 +75,9 @@
     <ClInclude Include="..\src\ofxCeres\Models\MovingHeadGroup.h">
       <Filter>src\ofxCeres\Models</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\PolyFit.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">
@@ -118,6 +121,9 @@
     </None>
     <None Include="..\src\ofxCeres\Models\InverseKinematics\System.inl">
       <Filter>src\ofxCeres\Models\InverseKinematics</Filter>
+    </None>
+    <None Include="..\src\ofxCeres\Models\PolyFit.inl">
+      <Filter>src\ofxCeres\Models</Filter>
     </None>
   </ItemGroup>
 </Project>
