@@ -20,6 +20,7 @@ public:
 	void deserialize(const nlohmann::json&);
 	void populateInspector(ofxCvGui::InspectArguments&);
 
+	void loadMesh();
 	bool isLoaded();
 	glm::vec3 getMinWorld();
 	glm::vec3 getMaxWorld();
@@ -40,11 +41,24 @@ protected:
 
 		ofParameter<bool> enableMaterials{ "Enable materials", false };
 
-		PARAM_DECLARE("Mesh", filename, scale, rotation, enableMaterials);
+		struct : ofParameterGroup {
+			ofParameter<bool> wireframe{ "Wireframe", false };
+			ofParameter<bool> fill{ "Fill", true};
+			PARAM_DECLARE("Cull back faces", wireframe, fill);
+		} cullBackFaces;
+
+		PARAM_DECLARE("Mesh", filename, scale, rotation, enableMaterials, cullBackFaces);
 	} parameters;
 
 	ofParameter<DrawStyle> drawStyle{ "Draw style", DrawStyle::Mix };
 
 	std::filesystem::path loadedPath;
-	ofxAssimpModelLoader model;
+
+	struct {
+		vector<ofMesh> meshes;
+		vector<ofMaterial> materials;
+		glm::vec3 modelMin;
+		glm::vec3 modelMax;
+	} model;
+	
 };

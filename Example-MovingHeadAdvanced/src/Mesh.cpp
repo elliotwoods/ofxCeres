@@ -21,18 +21,13 @@ Mesh::update()
 {
 	if (this->loadedPath != this->parameters.filename) {
 		try {
-			this->model.loadModel(this->parameters.filename.get().string());
-			this->model.setScaleNormalization(false);
-			this->model.disableMaterials();
-			if (!this->model.hasMeshes()) {
-				throw(Exception("File does not contain any meshes"));
-				this->model.clear();
-			}
-			this->loadedPath = this->parameters.filename;
+			this->loadMesh();
 		}
 		catch (Exception e) {
 			ofLogError("Mesh") << "Couldn't load mesh " << this->parameters.filename.get();
 			this->parameters.filename.set(filesystem::path());
+			this->model.meshes.clear();
+			this->model.materials.clear();
 		}
 	}
 }
@@ -41,9 +36,7 @@ Mesh::update()
 void
 Mesh::drawWorld()
 {
-	this->parameters.enableMaterials.get()
-		? this->model.enableMaterials()
-		: this->model.disableMaterials();
+	const auto& enableMaterials = this->parameters.enableMaterials.get();
 
 	ofPushMatrix();
 	{
@@ -53,6 +46,19 @@ Mesh::drawWorld()
 		{
 			ofSetColor(255);
 
+			auto cullOn = [](bool enabled) {
+				if (enabled) {
+					glEnable(GL_CULL_FACE);
+					glCullFace(GL_BACK);
+				}
+			};
+
+			auto cullOff = [](bool enabled) {
+				if (enabled) {
+					glDisable(GL_CULL_FACE);
+				}
+			};
+
 			switch (this->drawStyle.get().get()) {
 			case DrawStyle::Mix:
 			{
@@ -60,21 +66,76 @@ Mesh::drawWorld()
 				{
 					glEnable(GL_POLYGON_OFFSET_FILL);
 					glPolygonOffset(1.0, 1.0);
-					this->model.drawWireframe();
+
+					cullOn(this->parameters.cullBackFaces.wireframe.get());
+					{
+						for (size_t i = 0; i < this->model.meshes.size(); i++) {
+							if (enableMaterials) {
+								this->model.materials[i].begin();
+							}
+							this->model.meshes[i].drawWireframe();
+
+							if (enableMaterials) {
+								this->model.materials[i].end();
+							}
+						}
+					}
+					cullOff(this->parameters.cullBackFaces.wireframe.get());
+
 					ofSetColor(100);
-					this->model.drawFaces();
+
+					cullOn(this->parameters.cullBackFaces.fill.get());
+					{
+						for (size_t i = 0; i < this->model.meshes.size(); i++) {
+							if (enableMaterials) {
+								this->model.materials[i].begin();
+							}
+							this->model.meshes[i].drawFaces();
+
+							if (enableMaterials) {
+								this->model.materials[i].end();
+							}
+						}
+					}
+					cullOff(this->parameters.cullBackFaces.fill.get());
 				}
 				glPopAttrib();
 				break;
 			}
 			case DrawStyle::Fill:
 			{
-				this->model.drawFaces();
+				cullOn(this->parameters.cullBackFaces.fill.get());
+				{
+					for (size_t i = 0; i < this->model.meshes.size(); i++) {
+						if (enableMaterials) {
+							this->model.materials[i].begin();
+						}
+						this->model.meshes[i].drawFaces();
+
+						if (enableMaterials) {
+							this->model.materials[i].end();
+						}
+					}
+				}
+				cullOff(this->parameters.cullBackFaces.fill.get());
 				break;
 			}
 			case DrawStyle::Wireframe:
 			{
-				this->model.drawWireframe();
+				cullOn(this->parameters.cullBackFaces.wireframe.get());
+				{
+					for (size_t i = 0; i < this->model.meshes.size(); i++) {
+						if (enableMaterials) {
+							this->model.materials[i].begin();
+						}
+						this->model.meshes[i].drawWireframe();
+
+						if (enableMaterials) {
+							this->model.materials[i].end();
+						}
+					}
+				}
+				cullOff(this->parameters.cullBackFaces.wireframe.get());
 				break;
 			}
 			default:
@@ -116,19 +177,74 @@ Mesh::populateInspector(ofxCvGui::InspectArguments& args)
 
 	inspector->addTitle("Model info", ofxCvGui::Widgets::Title::H3);
 	inspector->addLiveValue<glm::vec3>("Scene Min", [this]() {
-		return this->model.getSceneMin();
+		return this->model.modelMin;
 		});
 	inspector->addLiveValue<glm::vec3>("Scene Max", [this]() {
-		return this->model.getSceneMax();
+		return this->model.modelMax;
 		});
 	inspector->addLiveValue<size_t>("Mesh count", [this]() {
-		return this->model.getMeshCount();
+		return this->model.meshes.size();
 		});
 	inspector->addButton("Reload", [this]() {
-		this->model.clear();
+		this->model.meshes.clear();
+		this->model.materials.clear();
 		this->loadedPath = "";
 		});
 
+}
+
+//---------
+void
+Mesh::loadMesh()
+{
+	ofxAssimpModelLoader modelLoader;
+
+	modelLoader.loadModel(this->parameters.filename.get().string());
+	if (!modelLoader.hasMeshes()) {
+		throw(Exception("File does not contain any meshes"));
+	}
+	modelLoader.setScaleNormalization(false);
+
+	auto meshCount = modelLoader.getMeshCount();
+
+	// Copy the meshes across to local
+	for (int i = 0; i < meshCount; i++) {
+		const auto& meshHelper = modelLoader.getMeshHelper(i);
+		this->model.meshes.push_back(meshHelper.cachedMesh);
+		this->model.materials.push_back(meshHelper.material);
+
+		// Apply transform
+		{
+			auto& mesh = this->model.meshes[i];
+			auto vertices = mesh.getVertices();
+			for (auto& vertex : vertices) {
+				vertex = ofxCeres::VectorMath::applyTransform((glm::mat4) meshHelper.matrix, vertex);
+			}
+		}
+	}
+
+	// Take the min and max
+	{
+		for (const auto& mesh : this->model.meshes) {
+			const auto& vertices = mesh.getVertices();
+			auto modelMin = glm::vec3(1.0, 1.0, 1.0) * std::numeric_limits<float>::max();
+			auto modelMax = glm::vec3(1.0, 1.0, 1.0) * std::numeric_limits<float>::min();
+			for (const auto& vertex : vertices) {
+				for (int c = 0; c < 3; c++) {
+					if (vertex[c] < modelMin[c]) {
+						modelMin[c] = vertex[c];
+					}
+					if (vertex[c] > modelMax[c]) {
+						modelMax[c] = vertex[c];
+					}
+				}
+			}
+			this->model.modelMin = modelMin;
+			this->model.modelMax = modelMax;
+		}
+	}
+
+	this->loadedPath = this->parameters.filename;
 }
 
 //---------
@@ -142,14 +258,14 @@ Mesh::isLoaded()
 glm::vec3
 Mesh::getMinWorld()
 {
-	return ofxCeres::VectorMath::applyTransform(this->getTransform(), (glm::vec3) this->model.getSceneMin());
+	return ofxCeres::VectorMath::applyTransform(this->getTransform(), (glm::vec3) this->model.modelMin);
 }
 
 //---------
 glm::vec3
 Mesh::getMaxWorld()
 {
-	return ofxCeres::VectorMath::applyTransform(this->getTransform(), (glm::vec3)this->model.getSceneMax());
+	return ofxCeres::VectorMath::applyTransform(this->getTransform(), (glm::vec3)this->model.modelMax);
 }
 
 //---------
@@ -168,19 +284,14 @@ Mesh::getTransform() const
 glm::vec3
 Mesh::getPointClosestTo(const glm::vec3& samplePosition, float maxDistance)
 {
-	auto meshCount = this->model.getMeshCount();
-	
 	// This value will be used if no close vertex is found
 	auto closestVertex = samplePosition;
 	auto minDistance = numeric_limits<float>::max();
 
-	for (size_t i = 0; i < meshCount; i++) {
-		auto& meshHelper = this->model.getMeshHelper(i);
-		auto& vertices = meshHelper.cachedMesh.getVertices();
+	for(const auto& mesh : this->model.meshes) {
+		auto& vertices = mesh.getVertices();
 		for (const auto& rawVertex : vertices) {
-			auto transform = (glm::mat4)meshHelper.matrix
-				* (glm::mat4)this->model.getModelMatrix()
-				* this->getTransform();
+			auto transform = this->getTransform();
 
 			auto vertexPosition = ofxCeres::VectorMath::applyTransform(transform, rawVertex);
 			auto distance = glm::distance(vertexPosition, samplePosition);
