@@ -225,10 +225,11 @@ Mesh::loadMesh()
 
 	// Take the min and max
 	{
+		auto modelMin = glm::vec3(1.0, 1.0, 1.0) * std::numeric_limits<float>::max();
+		auto modelMax = glm::vec3(1.0, 1.0, 1.0) * std::numeric_limits<float>::min();
+
 		for (const auto& mesh : this->model.meshes) {
 			const auto& vertices = mesh.getVertices();
-			auto modelMin = glm::vec3(1.0, 1.0, 1.0) * std::numeric_limits<float>::max();
-			auto modelMax = glm::vec3(1.0, 1.0, 1.0) * std::numeric_limits<float>::min();
 			for (const auto& vertex : vertices) {
 				for (int c = 0; c < 3; c++) {
 					if (vertex[c] < modelMin[c]) {
@@ -239,9 +240,10 @@ Mesh::loadMesh()
 					}
 				}
 			}
-			this->model.modelMin = modelMin;
-			this->model.modelMax = modelMax;
 		}
+
+		this->model.modelMin = modelMin;
+		this->model.modelMax = modelMax;
 	}
 
 	this->loadedPath = this->parameters.filename;
