@@ -39,26 +39,34 @@ protected:
 			PARAM_DECLARE("Rotation", x, y, z);
 		} rotation;
 
-		ofParameter<bool> enableMaterials{ "Enable materials", false };
 
 		struct : ofParameterGroup {
-			ofParameter<bool> wireframe{ "Wireframe", false };
-			ofParameter<bool> fill{ "Fill", true};
-			PARAM_DECLARE("Cull back faces", wireframe, fill);
-		} cullBackFaces;
+			ofParameter<bool> enableMaterials{ "Enable materials", false };
+			ofParameter<bool> enableTextures{ "Enable textures", true };
 
-		PARAM_DECLARE("Mesh", filename, scale, rotation, enableMaterials, cullBackFaces);
+			struct : ofParameterGroup {
+				ofParameter<bool> wireframe{ "Wireframe", false };
+				ofParameter<bool> fill{ "Fill", true };
+				PARAM_DECLARE("Cull back faces", wireframe, fill);
+			} cullBackFaces;
+			PARAM_DECLARE("Draw style", enableMaterials, enableTextures, cullBackFaces);
+		} drawStyle;
+		
+
+		PARAM_DECLARE("Mesh", filename, scale, rotation, drawStyle);
 	} parameters;
 
 	ofParameter<DrawStyle> drawStyle{ "Draw style", DrawStyle::Mix };
 
 	std::filesystem::path loadedPath;
 
-	struct {
-		vector<ofMesh> meshes;
-		vector<ofMaterial> materials;
-		glm::vec3 modelMin;
-		glm::vec3 modelMax;
-	} model;
-	
+	struct Model {
+		ofMesh mesh;
+		ofTexture texture;
+		ofMaterial material;
+	};
+
+	vector<Model> models;
+	glm::vec3 sceneMin;
+	glm::vec3 sceneMax;
 };
