@@ -167,7 +167,7 @@ GroupSolve::solve()
 				}
 			}
 			if (image.markerIndex.empty()) {
-				throw("No good calibration points for moving head #" + ofToString(movingHeadIndex));
+				throw(Exception("No good calibration points for moving head #" + ofToString(movingHeadIndex)));
 			}
 			images.push_back(image);
 			movingHeadIndex++;

@@ -25,7 +25,8 @@ namespace Calibration {
 		void applyRotation(const glm::quat&);
 
 		glm::vec2 getPanTiltForWorldTarget(const glm::vec3&
-			, const glm::vec2& currentPanTiltSignal) const;
+			, const glm::vec2& currentPanTiltSignal
+			, const ofRectangle& boundsLimit = ofRectangle()) const;
 
 		glm::vec2 panTiltIdealToSignal(const glm::vec2&) const;
 		glm::vec2 panTiltSignalToIdeal(const glm::vec2&) const;

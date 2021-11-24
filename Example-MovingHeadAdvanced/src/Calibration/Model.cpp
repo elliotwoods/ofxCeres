@@ -138,7 +138,8 @@ namespace Calibration {
 	//---------
 	glm::vec2
 	Model::getPanTiltForWorldTarget(const glm::vec3& world
-			, const glm::vec2& currentPanTilt) const
+			, const glm::vec2& currentPanTilt
+			, const ofRectangle& boundsLimit) const
 	{
 		auto objectSpacePosition4 = glm::inverse(this->getTransform()) * glm::vec4(world, 1.0f);
 		auto objectSpacePosition = (glm::vec3)(objectSpacePosition4 / objectSpacePosition4.w);
@@ -168,6 +169,19 @@ namespace Calibration {
 				}
 				for (float pan = panTiltObject.x + 180.0f; pan <= this->movingHead.parameters.pan.getMax(); pan += 360.0f) {
 					panTiltOptions.push_back(glm::vec2(pan, -panTiltObject.y));
+				}
+			}
+		}
+
+		// filter the options
+		if (boundsLimit.getArea() != 0.0f) {
+			for (auto it = panTiltOptions.begin(); it != panTiltOptions.end(); ) {
+				auto insideBounds = boundsLimit.inside(*it);
+				if (insideBounds) {
+					it++;
+				}
+				else {
+					it = panTiltOptions.erase(it);
 				}
 			}
 		}

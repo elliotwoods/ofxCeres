@@ -184,6 +184,23 @@ namespace DMX {
 		inspector->addParameterGroup(this->parameters);
 		{
 			auto trackpad = make_shared<Widgets::PanTiltTrackpad>(this->parameters.pan, this->parameters.tilt);
+			auto trackpadWeak = weak_ptr<Widgets::PanTiltTrackpad>(trackpad);
+			trackpad->onDraw += [this, trackpadWeak](ofxCvGui::DrawArguments& args) {
+				auto trackpad = trackpadWeak.lock();
+				const auto& boundsLimit = this->parameters.boundsLimit.get();
+				if (boundsLimit.getArea() != 0.0f) {
+					ofRectangle boundsInDraw;
+					auto topLeft = trackpad->toXY(boundsLimit.getTopLeft());
+					auto bottomRight = trackpad->toXY(boundsLimit.getBottomRight());
+					ofPushStyle();
+					{
+						ofEnableAlphaBlending();
+						ofSetColor(0, 255, 0, 40);
+						ofDrawRectangle(topLeft, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+					}
+					ofPopStyle();
+				}
+			};
 			inspector->add(trackpad);
 		}
 		inspector->addButton("Home", [this]() {
@@ -217,7 +234,9 @@ namespace DMX {
 	MovingHead::navigateToWorldTarget(const glm::vec3& world)
 	{
 		// Navigate pan-tilt values
-		auto panTiltAngles = this->model->getPanTiltForWorldTarget(world, this->getCurrentPanTilt());
+		auto panTiltAngles = this->model->getPanTiltForWorldTarget(world
+			, this->getCurrentPanTilt()
+			, this->parameters.boundsLimit.get());
 		this->parameters.pan.set(panTiltAngles.x);
 		this->parameters.tilt.set(panTiltAngles.y);
 	

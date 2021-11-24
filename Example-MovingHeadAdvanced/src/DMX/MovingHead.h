@@ -42,7 +42,8 @@ namespace DMX {
 			ofParameter<float> tilt{ "Tilt", 0, -90, 90 };
 			ofParameter<float> dimmer{ "Dimmer", 0, 0, 1};
 			ofParameter<float> focus{ "Focus", 0, 0, 1};
-			PARAM_DECLARE("MovingHead", shutter, pan, tilt, dimmer, focus);
+			ofParameter<ofRectangle> boundsLimit{ "Bounds limit", ofRectangle() };
+			PARAM_DECLARE("MovingHead", shutter, pan, tilt, dimmer, focus, boundsLimit);
 		} parameters;
 
 	protected:
