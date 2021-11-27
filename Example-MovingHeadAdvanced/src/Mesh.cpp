@@ -168,6 +168,8 @@ Mesh::populateInspector(ofxCvGui::InspectArguments& args)
 void
 Mesh::loadMesh()
 {
+	this->models.clear();
+
 	ofxAssimpModelLoader modelLoader;
 
 	modelLoader.loadModel(this->parameters.filename.get().string());
