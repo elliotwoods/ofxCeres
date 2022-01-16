@@ -514,6 +514,29 @@ namespace Calibration {
 	}
 
 	//---------
+	void
+		Solver::addCalibrationPointAt(const glm::vec3& position)
+	{
+		// Create a new marker at this position with name as index
+		auto markers = Scene::X()->getMarkers();
+		auto priorCount = markers->getAllCaptures().size();
+		string markerName = ofToString(priorCount + 1);
+		auto marker = markers->addNewMarker(markerName, position, false);
+
+		// Create a new data point with this marker
+		auto dataPoint = make_shared<DataPoint>();
+		dataPoint->marker = marker->name.get();
+		this->prepareDataPoint(dataPoint);
+		this->calibrationPoints->add(dataPoint);
+		
+		// Set the data for the new marker
+		dataPoint->panTiltSignal.set(this->movingHead.getCurrentPanTilt());
+		dataPoint->focus.set(this->movingHead.parameters.focus.get());
+
+		ofxCvGui::refreshInspector(this);
+	}
+
+	//---------
 	bool
 	Solver::solve()
 	{

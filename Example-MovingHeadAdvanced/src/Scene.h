@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "GroupSolve.h"
 #include "GroupControl.h"
+#include "VR/Controller.h"
 
 #include "Data/CalibrationPointSet.h"
 #include "DMX/MovingHead.h"
@@ -34,10 +35,20 @@ public:
 	void renameMovingHead(const string&);
 
 	shared_ptr<Markers> getMarkers();
+	shared_ptr<GroupControl> getGroupControl();
 
 	void mergeMarkers();
 	void fitWorldGrid();
 	void rotateScene();
+
+	// These functions are useful when one light is selected
+	shared_ptr<DMX::MovingHead> getSoloMovingHead();
+	void soloNextFixture();
+	void soloPreviousFixture();
+	void soloStoreDataPoint(const glm::vec3&);
+	void soloCalibrate();
+	void soloMovePanTilt(const glm::vec2&);
+	void soloMoveFocus(float);
 
 	shared_ptr<ofxCvGui::Panels::WorldManaged> getPanel();
 
@@ -52,6 +63,7 @@ protected:
 	shared_ptr<ofxCvGui::Panels::WorldManaged> panel = ofxCvGui::Panels::makeWorldManaged();
 	shared_ptr<Markers> markers = make_shared<Markers>(mesh, panel);
 	shared_ptr<GroupControl> groupControl = make_shared<GroupControl>();
+	shared_ptr<VR::Controller> vrController = make_shared<VR::Controller>();
 
 	shared_ptr<ofxOscReceiver> oscReceiver;
 

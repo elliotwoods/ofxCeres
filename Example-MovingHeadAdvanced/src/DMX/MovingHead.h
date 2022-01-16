@@ -25,7 +25,9 @@ namespace DMX {
 		void populateInspector(ofxCvGui::InspectArguments&);
 
 		glm::vec2 getCurrentPanTilt() const;
+		void clampPanTilt();
 		void navigateToWorldTarget(const glm::vec3&);
+		void clampFocus();
 
 		shared_ptr<Calibration::Model> getModel();
 		shared_ptr<Calibration::Solver> getSolver();

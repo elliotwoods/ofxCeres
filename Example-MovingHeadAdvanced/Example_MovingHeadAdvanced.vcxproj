@@ -59,6 +59,7 @@
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
     <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
+    <Import Project="..\..\ofxOpenVR\ofxOpenVRLib\ofxOpenVRLib.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -66,6 +67,7 @@
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
     <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
+    <Import Project="..\..\ofxOpenVR\ofxOpenVRLib\ofxOpenVRLib.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -73,6 +75,7 @@
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
     <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
+    <Import Project="..\..\ofxOpenVR\ofxOpenVRLib\ofxOpenVRLib.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -80,6 +83,7 @@
     <Import Project="..\ofxCeresLib\ofxCeres.props" />
     <Import Project="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGui.props" />
     <Import Project="..\..\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
+    <Import Project="..\..\ofxOpenVR\ofxOpenVRLib\ofxOpenVRLib.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -327,6 +331,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\VR\Controller.cpp" />
     <ClCompile Include="src\Widgets\PanTiltTrackpad.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -421,6 +426,7 @@
     <ClInclude Include="src\OSC\Router.h" />
     <ClInclude Include="src\pch_ofApp.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\VR\Controller.h" />
     <ClInclude Include="src\Widgets\PanTiltTrackpad.h" />
   </ItemGroup>
   <ItemGroup>
@@ -429,6 +435,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\ofxCvGui\ofxCvGuiLib\ofxCvGuiLib.vcxproj">
       <Project>{6f0ddb4f-4014-4433-919b-9d956c034bad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ofxOpenVR\ofxOpenVRLib\ofxOpenVRLib.vcxproj">
+      <Project>{ac04435b-bc92-4767-9a55-d4fe338724d7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj">
       <Project>{68b9239b-5ae6-45c0-b1cb-6fc6b58bb6ee}</Project>

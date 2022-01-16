@@ -62,6 +62,7 @@ Scene::update()
 	this->renderDMX();
 	this->mesh->update();
 	this->groupSolve->update();
+	this->vrController->update();
 
 	// OSC
 	{
@@ -115,6 +116,7 @@ Scene::drawWorld()
 	this->mesh->drawWorld();
 	this->groupSolve->drawWorld();
 	this->groupControl->drawWorld();
+	this->vrController->drawWorld();
 }
 
 //----------
@@ -138,6 +140,8 @@ Scene::serialize(nlohmann::json& json)
 	this->groupSolve->notifySerialize(json["groupSolve"]);
 	this->enttecUSBPro->notifySerialize(json["enttecUSBPro"]);
 	this->groupControl->notifySerialize(json["groupControl"]);
+	this->vrController->notifySerialize(json["vrController"]);
+
 	Data::serialize(json["worldPanel"], this->panel->parameters);
 	Data::serialize(json["OSC"], this->oscParameters);
 
@@ -177,6 +181,10 @@ Scene::deserialize(const nlohmann::json& json)
 	if (json.contains("groupControl")) {
 		this->groupControl->notifyDeserialize(json["groupControl"]);
 	}
+	if (json.contains("vrController")) {
+		this->vrController->notifyDeserialize(json["vrController"]);
+	}
+
 	if (json.contains("worldPanel")) {
 		Data::deserialize(json["worldPanel"], this->panel->parameters);
 	}
@@ -385,6 +393,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 	
 
 	inspector->addSubMenu("Enttec USB Pro", this->enttecUSBPro);
+	inspector->addSubMenu("VR Controller", this->vrController);
 }
 
 //--------------------------------------------------------------
@@ -442,6 +451,13 @@ shared_ptr<Markers>
 Scene::getMarkers()
 {
 	return this->markers;
+}
+
+//----------
+shared_ptr<GroupControl>
+Scene::getGroupControl()
+{
+	return this->groupControl;
 }
 
 //----------
@@ -587,6 +603,179 @@ Scene::rotateScene()
 	{
 		for (const auto& movingHead : this->movingHeads) {
 			movingHead.second->getModel()->applyRotation(rotation);
+		}
+	}
+}
+
+//----------
+shared_ptr<DMX::MovingHead>
+Scene::getSoloMovingHead()
+{
+	shared_ptr<DMX::MovingHead> soloMovingHead;
+	for (auto it : this->movingHeads) {
+		if (it.second->parameters.shutter.get()) {
+			if (soloMovingHead) {
+				// more than one is selected - there is no solo
+				return shared_ptr<DMX::MovingHead>();
+			}
+			else {
+				soloMovingHead = it.second;
+			}
+		}
+	}
+	return soloMovingHead;
+}
+
+//----------
+void 
+Scene::soloNextFixture()
+{
+	if (this->movingHeads.empty()) {
+		return;
+	}
+
+
+	// Get prior selection
+	vector<string> priorSelectedLightsByName;
+	{
+		for (const auto& movingHeadIt : this->movingHeads) {
+			if (movingHeadIt.second->parameters.shutter.get()) {
+				priorSelectedLightsByName.push_back(movingHeadIt.first);
+			}
+		}
+	}
+
+	if (priorSelectedLightsByName.empty()) {
+		// If none are selected then select the first
+		this->movingHeads.begin()->second->setSolo(true);
+	}
+
+	else if (priorSelectedLightsByName.size() == 1) {
+		// If last is selected, select all
+		if (this->movingHeads.rbegin()->first == priorSelectedLightsByName[0]) {
+			for (auto it : this->movingHeads) {
+				it.second->parameters.shutter.set(true);
+			}
+		}
+		// If 1 is selected, select the next
+		else {
+			for (auto it = this->movingHeads.begin()
+				; it != this->movingHeads.end()
+				; it++) {
+				if (it->first == priorSelectedLightsByName[0]) {
+					it++;
+					if (it == this->movingHeads.end()) {
+						it = this->movingHeads.begin();
+					}
+					it->second->setSolo(true);
+					break;
+				}
+			}
+		}
+	}
+
+	else {
+		// If more than 1 is selected, solo the first of the selection
+		this->movingHeads[*priorSelectedLightsByName.begin()]->setSolo(true);
+	}
+}
+
+//----------
+void 
+Scene::soloPreviousFixture()
+{
+	if (this->movingHeads.empty()) {
+		return;
+	}
+
+
+	// Get prior selection
+	vector<string> priorSelectedLightsByName;
+	{
+		for (const auto& movingHeadIt : this->movingHeads) {
+			if (movingHeadIt.second->parameters.shutter.get()) {
+				priorSelectedLightsByName.push_back(movingHeadIt.first);
+			}
+		}
+	}
+
+	if (priorSelectedLightsByName.empty()) {
+		// If none are selected then select the last
+		this->movingHeads.rbegin()->second->setSolo(true);
+	}
+
+	else if (priorSelectedLightsByName.size() == 1) {
+		// If first is selected, select all
+		if (this->movingHeads.begin()->first == priorSelectedLightsByName[0]) {
+			for (auto it : this->movingHeads) {
+				it.second->parameters.shutter.set(true);
+			}
+		}
+		else {
+			// If 1 is selected, select the next (in reverse)
+			for (auto it = this->movingHeads.rbegin()
+				; it != this->movingHeads.rend()
+				; it++) {
+				if (it->first == priorSelectedLightsByName[0]) {
+					it++;
+					if (it == this->movingHeads.rend()) {
+						it = this->movingHeads.rbegin();
+					}
+					it->second->setSolo(true);
+					break;
+				}
+			}
+		}
+		
+	}
+
+	else {
+		// If more than 1 is selected, solo the first of the selection
+		this->movingHeads[*priorSelectedLightsByName.rbegin()]->setSolo(true);
+	}
+}
+
+//----------
+void
+Scene::soloStoreDataPoint(const glm::vec3& position)
+{
+	auto soloMovingHead = this->getSoloMovingHead();
+	if (soloMovingHead) {
+		soloMovingHead->getSolver()->addCalibrationPointAt(position);
+	}
+}
+
+//----------
+void 
+Scene::soloCalibrate()
+{
+	auto soloMovingHead = this->getSoloMovingHead();
+	if (soloMovingHead) {
+		soloMovingHead->getSolver()->solve();
+	}
+}
+
+//----------
+void
+Scene::soloMovePanTilt(const glm::vec2& movement)
+{
+	for (auto it : this->movingHeads) {
+		if (it.second->parameters.shutter.get()) {
+			it.second->parameters.pan += movement.x;
+			it.second->parameters.tilt += movement.y;
+			it.second->clampPanTilt();
+		}
+	}
+}
+
+//----------
+void
+Scene::soloMoveFocus(float movement)
+{
+	for (auto it : this->movingHeads) {
+		if (it.second->parameters.shutter.get()) {
+			it.second->parameters.focus += movement;
+			it.second->clampFocus();
 		}
 	}
 }

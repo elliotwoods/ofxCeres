@@ -127,6 +127,9 @@
     <ClCompile Include="src\DMX\MovingHead.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
+    <ClCompile Include="src\VR\Controller.cpp">
+      <Filter>src\VR</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -194,6 +197,9 @@
     </Filter>
     <Filter Include="src\OSC">
       <UniqueIdentifier>{5925c99f-348f-4660-aa1d-16dfd53e3cdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\VR">
+      <UniqueIdentifier>{d279e682-90e7-4839-a2fc-bee85dc90d86}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -472,6 +478,9 @@
     </ClInclude>
     <ClInclude Include="src\DMX\MovingHead.h">
       <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VR\Controller.h">
+      <Filter>src\VR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

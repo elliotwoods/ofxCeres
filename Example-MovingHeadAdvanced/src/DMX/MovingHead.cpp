@@ -231,6 +231,36 @@ namespace DMX {
 
 	//---------
 	void
+	MovingHead::clampPanTilt()
+	{
+		if (this->parameters.pan.get() < this->parameters.pan.getMin()) {
+			this->parameters.pan.set(this->parameters.pan.getMin());
+		}
+		if (this->parameters.pan.get() > this->parameters.pan.getMax()) {
+			this->parameters.pan.set(this->parameters.pan.getMax());
+		}
+		if (this->parameters.tilt.get() < this->parameters.tilt.getMin()) {
+			this->parameters.tilt.set(this->parameters.tilt.getMin());
+		}
+		if (this->parameters.tilt.get() > this->parameters.tilt.getMax()) {
+			this->parameters.tilt.set(this->parameters.tilt.getMax());
+		}
+	}
+
+	//---------
+	void
+	MovingHead::clampFocus()
+	{
+		if (this->parameters.focus.get() < this->parameters.focus.getMin()) {
+			this->parameters.focus.set(this->parameters.focus.getMin());
+		}
+		if (this->parameters.focus.get() > this->parameters.focus.getMax()) {
+			this->parameters.focus.set(this->parameters.focus.getMax());
+		}
+	}
+
+	//---------
+	void
 	MovingHead::navigateToWorldTarget(const glm::vec3& world)
 	{
 		// Navigate pan-tilt values

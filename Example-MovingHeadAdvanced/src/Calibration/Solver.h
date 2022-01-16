@@ -35,6 +35,7 @@ namespace Calibration {
 		void populateInspector(ofxCvGui::InspectArguments&);
 
 		void addCalibrationPoint();
+		void addCalibrationPointAt(const glm::vec3&);
 
 		bool solve();
 		bool solveBasic();
