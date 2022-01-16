@@ -134,9 +134,15 @@ namespace DMX {
 							// beam
 							ofPushMatrix();
 							{
-								ofTranslate(0.0f, 0.05 + 0.5f / 2.0f, 0.0f);
 								ofSetColor(this->isBeingInspected() ? 255 : 100);
-								ofDrawCylinder(0.02, 0.5f);
+								if (this->parameters.shutter.get()) {
+									ofTranslate(0.0f, 0.05 + 0.5f / 2.0f, 0.0f);
+									ofDrawCylinder(0.02, 0.5f);
+								}
+								else {
+									ofDrawLine(glm::vec3(0, 0, 0)
+										, glm::vec3(0.f, 0.5f, 0.f));
+								}
 							}
 							ofPopMatrix();
 						}

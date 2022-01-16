@@ -81,6 +81,46 @@ namespace VR {
 				Scene::X()->getGroupControl()->navigateTo(this->getControllerPosition(controllerRole));
 			}
 		}
+
+		// Marker proximity preview
+		if (this->parameters.markerProximityPreview.enabled) {
+			bool markerIsCloseToCursor = false;
+			auto markers = Scene::X()->getMarkers()->getSelection();
+			const auto& distanceThreshold = this->parameters.markerProximityPreview.distanceThreshold.get();
+
+			// For all controllers
+			for (int i = 0; i < 2; i++) {
+				auto controllerPosition = this->getControllerPosition(i == 0
+					? vr::ETrackedControllerRole::TrackedControllerRole_LeftHand
+					: vr::ETrackedControllerRole::TrackedControllerRole_RightHand);
+
+				for (auto marker : markers) {
+					auto distance = glm::distance(marker->position.get()
+						, controllerPosition);
+					if (distance < distanceThreshold) {
+						markerIsCloseToCursor = true;
+						break;
+					}
+				}
+				if (markerIsCloseToCursor) {
+					break;
+				}
+			}
+
+			// Apply the color to all moving heads
+			const auto & movingHeads = Scene::X()->getMovingHeads();
+			for (auto it : movingHeads) {
+				it.second->channels[this->parameters.markerProximityPreview.colorChannel.get()]->setValue(markerIsCloseToCursor
+					? this->parameters.markerProximityPreview.colorValue.get()
+					: 0);
+			}
+		}
+
+		// Draw to VR
+		if (this->parameters.headset.enabled) {
+			this->openVR.render();
+			this->openVR.renderDistortion();
+		}
 	}
 
 	//---------
@@ -89,6 +129,27 @@ namespace VR {
 	{
 		this->drawController(vr::ETrackedControllerRole::TrackedControllerRole_LeftHand);
 		this->drawController(vr::ETrackedControllerRole::TrackedControllerRole_RightHand);
+
+		if (this->parameters.headset.draw) {
+			ofPushStyle();
+			{
+				ofNoFill();
+				ofPushMatrix();
+				{
+					ofMultMatrix(glm::inverse(this->openVR.getCurrentViewProjectionMatrix(vr::Hmd_Eye::Eye_Left)));
+					ofDrawBox(2.0f);
+				}
+				ofPopMatrix();
+
+				ofPushMatrix();
+				{
+					ofMultMatrix(glm::inverse(this->openVR.getCurrentViewProjectionMatrix(vr::Hmd_Eye::Eye_Right)));
+					ofDrawBox(2.0f);
+				}
+				ofPopMatrix();
+			}
+			ofPopStyle();
+		}
 	}
 
 	//---------
@@ -152,14 +213,27 @@ namespace VR {
 	//---------
 	void
 		Controller::renderVR(vr::Hmd_Eye nEye)
-	{
-		if (!this->parameters.headset.enabled) {
-			return;
-		}
-		
-		glm::mat4x4 currentViewProjectionMatrix = this->openVR.getCurrentViewProjectionMatrix(nEye);
+	{		
+		ofSetMatrixMode(ofMatrixMode::OF_MATRIX_PROJECTION);
+		ofPushMatrix();
+		{
+			ofLoadMatrix(this->openVR.getCurrentProjectionMatrix(nEye));
 
-		Scene::X()->drawWorld();
+			ofSetMatrixMode(ofMatrixMode::OF_MATRIX_MODELVIEW);
+			ofPushMatrix();
+			{
+				ofLoadIdentityMatrix();
+				ofScale(1, -1, 1);
+				ofMultMatrix(this->openVR.getCurrentViewMatrix(nEye));
+				auto scene = Scene::X();
+				scene->getPanel()->drawGridFromOther();
+				scene->drawWorld();
+			}
+			ofPopMatrix();
+		}
+		ofSetMatrixMode(ofMatrixMode::OF_MATRIX_PROJECTION);
+		ofPopMatrix();
+		ofSetMatrixMode(ofMatrixMode::OF_MATRIX_MODELVIEW);
 	}
 
 	//---------

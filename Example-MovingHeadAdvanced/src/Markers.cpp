@@ -109,6 +109,7 @@ Markers::addNewMarker(const string& name, const glm::vec3& position, bool useExi
 		marker = make_shared<Marker>();
 		marker->position.set(position);
 		marker->name.set(name);
+		this->add(marker);
 	}
 	
 	return marker;

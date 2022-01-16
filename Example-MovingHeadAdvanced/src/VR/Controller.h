@@ -3,6 +3,7 @@
 #include "ofxOpenVR.h"
 #include "Data/Serializable.h"
 #include "ofxCvGui.h"
+#include "../DMX/Types.h"
 
 namespace VR {
 	class Controller : public ofxCvGui::IInspectable, public Data::Serializable {
@@ -28,7 +29,8 @@ namespace VR {
 		struct : ofParameterGroup {
 			struct : ofParameterGroup {
 				ofParameter<bool> enabled { "Enabled", false };
-				PARAM_DECLARE("Heaset", enabled);
+				ofParameter<bool> draw{ "Draw",true };
+				PARAM_DECLARE("Heaset", enabled, draw);
 			} headset;
 
 			struct : ofParameterGroup {
@@ -41,7 +43,15 @@ namespace VR {
 				PARAM_DECLARE("Controllers", trackPad, focusSensitivity);
 				} controllers;
 
-			PARAM_DECLARE("Controller", headset, controllers);
+			struct : ofParameterGroup {
+				ofParameter<bool> enabled{ "Enabled", false };
+				ofParameter<float> distanceThreshold{ "Distance threshold", 0.1f };
+				ofParameter<DMX::ChannelIndex> colorChannel{ "Color channel", 0 };
+				ofParameter<DMX::Value> colorValue{ "Color value", 38 };
+				PARAM_DECLARE("Marker proximity preview", enabled, distanceThreshold, colorChannel, colorValue);
+			} markerProximityPreview;
+
+			PARAM_DECLARE("Controller", headset, controllers, markerProximityPreview);
 		} parameters;
 
 		ofxOpenVR openVR;
