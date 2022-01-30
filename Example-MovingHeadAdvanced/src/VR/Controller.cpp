@@ -20,6 +20,12 @@ namespace VR {
 	}
 
 	//---------
+	Controller::~Controller()
+	{
+		this->openVR.exit();
+	}
+
+	//---------
 	string
 		Controller::getTypeName() const
 	{
@@ -46,33 +52,36 @@ namespace VR {
 				controllerState.pose.current = newPose;
 			}
 
-			// Trackpads
-			if (controllerState.trackPad.isDown) {
-				// Apply the movement
-				{
+			if (this->parameters.controllers.calibrateEnabled) {
+				// Trackpads
+				if (controllerState.trackPad.isDown) {
+					// Apply the movement
+					{
 
-					auto newPosition = this->openVR.getTrackpadPosition(controllerRole);
-					controllerState.trackPad.movement = newPosition - controllerState.trackPad.position;
-					controllerState.trackPad.position = newPosition;
+						auto newPosition = this->openVR.getTrackpadPosition(controllerRole);
+						controllerState.trackPad.movement = newPosition - controllerState.trackPad.position;
+						controllerState.trackPad.position = newPosition;
 
-					if (controllerState.trackPad.movement != glm::vec2(0, 0)) {
-						Scene::X()->soloMovePanTilt(controllerState.trackPad.movement
-							* this->parameters.controllers.trackPad.panTiltMovement.get()
-							* (
-								this->parameters.controllers.trackPad.delicateCenter
-								? glm::length(controllerState.trackPad.position)
-								: 1.0f
-							)
-						);
+						auto movementAmount = glm::length(controllerState.trackPad.movement);
+						if (movementAmount > 0 && movementAmount < 0.2f) { // sometimes we get a jump
+							Scene::X()->soloMovePanTilt(controllerState.trackPad.movement
+								* this->parameters.controllers.trackPad.panTiltMovement.get()
+								* (
+									this->parameters.controllers.trackPad.delicateCenter
+									? glm::length(controllerState.trackPad.position)
+									: 1.0f
+									)
+							);
+						}
 					}
-				}
 
-				// Apply the relative pose
-				{
-					auto frameRotation = glm::quat(controllerState.pose.frameRelative);
-					auto frameRotationVector = glm::eulerAngles(frameRotation);
-					Scene::X()->soloMoveFocus(frameRotationVector[2]
-						* this->parameters.controllers.focusSensitivity.get());
+					// Apply the relative pose (focus control)
+					{
+						auto frameRotation = glm::quat(controllerState.pose.frameRelative);
+						auto frameRotationVector = glm::eulerAngles(frameRotation);
+						Scene::X()->soloMoveFocus(frameRotationVector[2]
+							* this->parameters.controllers.focusSensitivity.get());
+					}
 				}
 			}
 
@@ -83,7 +92,8 @@ namespace VR {
 		}
 
 		// Marker proximity preview
-		if (this->parameters.markerProximityPreview.enabled) {
+		if (this->parameters.markerProximityPreview.enabled
+			&& this->parameters.controllers.calibrateEnabled) {
 			bool markerIsCloseToCursor = false;
 			auto markers = Scene::X()->getMarkers()->getSelection();
 			const auto& distanceThreshold = this->parameters.markerProximityPreview.distanceThreshold.get();
@@ -178,8 +188,19 @@ namespace VR {
 	glm::vec3
 		Controller::getControllerPosition(vr::ETrackedControllerRole controller)
 	{
-		return ofxCeres::VectorMath::applyTransform(this->getControllerPose(controller)
-			, glm::vec3(0, 0, 0));
+		if (this->parameters.aimOffset.enabled) {
+			glm::vec3 aimOffset(
+				this->parameters.aimOffset.x.get()
+				, this->parameters.aimOffset.y.get()
+				, this->parameters.aimOffset.z.get()
+			);
+			return ofxCeres::VectorMath::applyTransform(this->getControllerPose(controller)
+				, aimOffset);
+		}
+		else {
+			return ofxCeres::VectorMath::applyTransform(this->getControllerPose(controller)
+				, glm::vec3(0, 0, 0));
+		}
 	}
 
 	//---------
@@ -253,14 +274,13 @@ namespace VR {
 			auto& triggerState= this->controllerStates[controllerIndex].trigger;
 
 			switch (args.eventType) {
-			case EventType::ButtonTouch:
 			case EventType::ButtonPress:
 			{
 				scene->getGroupControl()->navigateTo(position);
 				triggerState.isDown = true;
 				break;
 			}
-			case EventType::ButtonUntouch:
+			case EventType::ButtonUnpress:
 			{
 				triggerState.isDown = false;
 			}
@@ -272,7 +292,8 @@ namespace VR {
 		}
 		case ButtonType::ButtonApplicationMenu:
 		{
-			if (args.eventType == EventType::ButtonPress) {
+			if (args.eventType == EventType::ButtonPress
+				&& this->parameters.controllers.calibrateEnabled) {
 				scene->soloNextFixture();
 			}
 			break;
@@ -284,33 +305,36 @@ namespace VR {
 		}
 		case ButtonType::ButtonTouchpad:
 		{
-			auto& trackpadState = this->controllerStates[controllerIndex].trackPad;
+			if (this->parameters.controllers.calibrateEnabled) {
+				auto& trackpadState = this->controllerStates[controllerIndex].trackPad;
 
-			switch (args.eventType) {
-			case EventType::ButtonPress:
-				// Store data point
-				scene->soloStoreDataPoint(this->getControllerPosition(args.controllerRole));
-				break;
+				switch (args.eventType) {
+				case EventType::ButtonPress:
+					// Store data point
+					scene->soloStoreDataPoint(this->getControllerPosition(args.controllerRole));
+					break;
 
-			case EventType::ButtonTouch:
-				trackpadState.position = {
-					args.analogInput_xAxis
-					, args.analogInput_yAxis
-				};
-				trackpadState.movement = { 0, 0 };
-				trackpadState.isDown = true;
-				break;
+				case EventType::ButtonTouch:
+					trackpadState.position = {
+						args.analogInput_xAxis
+						, args.analogInput_yAxis
+					};
+					trackpadState.movement = { 0, 0 };
+					trackpadState.isDown = true;
+					break;
 
-			case EventType::ButtonUntouch:
-				trackpadState.isDown = false;
-				break;
+				case EventType::ButtonUntouch:
+					trackpadState.isDown = false;
+					break;
+				}
 			}
 
 			break;
 		}
 		case ButtonType::ButtonGrip:
 		{
-			if (args.eventType == EventType::ButtonPress) {
+			if (args.eventType == EventType::ButtonPress
+				&& this->parameters.controllers.calibrateEnabled) {
 				scene->soloCalibrate();
 			}
 			break;

@@ -9,6 +9,8 @@ namespace VR {
 	class Controller : public ofxCvGui::IInspectable, public Data::Serializable {
 	public:
 		Controller();
+		~Controller();
+
 		string getTypeName() const override;
 
 		void update();
@@ -34,13 +36,15 @@ namespace VR {
 			} headset;
 
 			struct : ofParameterGroup {
+				ofParameter<bool> calibrateEnabled{ "Calibrate enabled", true };
+
 				struct : ofParameterGroup {
 					ofParameter<float> panTiltMovement{ "Pan tilt movement", 20.0, 0, 90 };
 					ofParameter<bool> delicateCenter{ "Delicate center", true };
 					PARAM_DECLARE("Trackpad", panTiltMovement, delicateCenter);
 				} trackPad;
 				ofParameter<float> focusSensitivity{ "Focus sensitivity", 0.1, 0, 1 };
-				PARAM_DECLARE("Controllers", trackPad, focusSensitivity);
+				PARAM_DECLARE("Controllers", calibrateEnabled, trackPad, focusSensitivity);
 				} controllers;
 
 			struct : ofParameterGroup {
@@ -51,7 +55,14 @@ namespace VR {
 				PARAM_DECLARE("Marker proximity preview", enabled, distanceThreshold, colorChannel, colorValue);
 			} markerProximityPreview;
 
-			PARAM_DECLARE("Controller", headset, controllers, markerProximityPreview);
+			struct : ofParameterGroup {
+				ofParameter<bool> enabled{ "Enabled", false };
+				ofParameter<float> x{ "X", 0, -0.2, 0.2 };
+				ofParameter<float> y{ "Y", 0, -0.2, 0.2 };
+				ofParameter<float> z{ "Z", 0, -0.2, 0.2 };
+				PARAM_DECLARE("Aim offset", enabled, x, y, z);
+			} aimOffset;
+			PARAM_DECLARE("Controller", headset, controllers, markerProximityPreview, aimOffset);
 		} parameters;
 
 		ofxOpenVR openVR;

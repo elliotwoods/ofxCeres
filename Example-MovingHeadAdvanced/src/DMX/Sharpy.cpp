@@ -23,9 +23,10 @@ namespace DMX {
 			, make_shared<Channel>("Dimmer", [this]() {
 				return Fixture::get8bit(this->parameters.dimmer);
 				})
-			, make_shared<Channel>("Gobo Wheel", [this]() {
+			/*, make_shared<Channel>("Gobo Wheel", [this]() {
 				return ofMap(this->customParameters.iris.get(), 0, 1, 11, 0, true);
-				})
+				})*/
+			, make_shared<Channel>("Gobo Wheel")
 			, make_shared<Channel>("Prism Insertion")
 			, make_shared<Channel>("Prism Rotation")
 			, make_shared<Channel>("Effects Movement")
