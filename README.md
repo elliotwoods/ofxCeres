@@ -16,7 +16,7 @@ Here we exploit the feature of glm whereby all major maths functions are templat
 
 ## Fudge to `openFrameworks\libs\glm\include\glm\detail\glmtype_quat.hpp`
 
-We change lines from 42-59 to:
+We previously would change lines from 42-59 to:
 
 ```c++
 #		if GLM_LANG & GLM_LANG_CXXMS_FLAG
@@ -50,6 +50,10 @@ We change lines from 42-59 to:
 You can find a version of the corrected file in `docs/type_quat.hpp` for GLM 0.9.9.7
 
 This is because the default constructor will be confused with the union working on Jet types
+
+We don't actually do this any more (it seems that simply having the defines set in the project settings is enough).
+
+Meanwhile : watch out for include orders if you get errors about quaternions. Try to include ofxCeres LATER (that worked last time I needed to fix it).
 
 # General notes on usage
 
