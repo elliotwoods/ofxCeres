@@ -12,10 +12,21 @@ namespace ofxCeres {
 		class DistortedMovingHead : Base {
 		public:
 			struct Solution {
+                Solution() {}
+                Solution(const MovingHead::Solution& _solution,
+                         const glm::dvec3& pan,
+                         const glm::dvec3& tilt
+                         ):basicSolution(_solution),
+                        panDistortion(pan),
+                        tiltDistortion(tilt)
+                {}
+                
 				MovingHead::Solution basicSolution;
 
-				double panDistortion[OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT]{ 0, 1, 0 };
-				double tiltDistortion[OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT]{ 0, 1, 0 };
+//				double panDistortion[OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT]{ 0, 1, 0 };
+//				double tiltDistortion[OFXCERES_DISTORTEDMOVINGHEAD_PARAMETER_COUNT]{ 0, 1, 0 };
+                glm::dvec3 panDistortion = { 0, 1, 0 };
+                glm::dvec3 tiltDistortion = { 0, 1, 0 };
 			};
 
 			static SolverSettings defaultSolverSettings();
