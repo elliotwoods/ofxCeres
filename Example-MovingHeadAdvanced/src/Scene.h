@@ -27,7 +27,7 @@ public:
 	void deserialize(const nlohmann::json&);
 	void populateInspector(ofxCvGui::InspectArguments&);
 	void load(const string& path);
-	void save(string& path);
+	void save(const string& path);
 
 	map<string, shared_ptr<DMX::MovingHead>> & getMovingHeads();
 	void deleteMovingHead(const string&);

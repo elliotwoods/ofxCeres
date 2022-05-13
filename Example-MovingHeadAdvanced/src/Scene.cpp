@@ -408,26 +408,27 @@ Scene::load(const string& path)
 
 //--------------------------------------------------------------
 void
-Scene::save(string& path)
+Scene::save(const string& path)
 {
 	// get json
 	nlohmann::json json;
 	this->serialize(json);
 
+    auto newPath  = path;
 	// check extension
 	{
-		auto extension = ofToLower(ofFilePath::getFileExt(path));
+		auto extension = ofToLower(ofFilePath::getFileExt(newPath));
 		if (extension != "json") {
-			path = path + ".json";
+			newPath = newPath + ".json";
 		}
 	}
 
 	// open file and put contents of json
 	ofFile file;
-	file.open(path, ofFile::Mode::WriteOnly);
+	file.open(newPath, ofFile::Mode::WriteOnly);
 	file << std::setw(4) << json;
 
-	this->panel->saveCamera(path + "-camera.txt");
+	this->panel->saveCamera(newPath + "-camera.txt");
 }
 
 //----------

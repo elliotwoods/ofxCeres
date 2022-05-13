@@ -47,7 +47,7 @@ namespace Data {
 	void deserializeEnum(const nlohmann::json& json, ofParameter<EnumType>& parameter)
 	{
 		if (json.contains(parameter.getName())) {
-			auto valueString = json[parameter.getName()].get<string>();
+			auto valueString = json[parameter.getName()].template get<string>();
 			auto value = parameter.get();
 			value.fromString(valueString);
 			parameter.set(value);
