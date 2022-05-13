@@ -1,5 +1,5 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2015 Google Inc. All rights reserved.
+// Copyright 2022 Google Inc. All rights reserved.
 // http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -53,6 +53,20 @@
 // If defined, Ceres was compiled without CXSparse.
 // #define CERES_NO_CXSPARSE
 
+// If defined, Ceres was compiled without CUDA.
+#define CERES_NO_CUDA
+
+// If defined, Ceres was compiled without Apple's Accelerate framework solvers.
+// #define CERES_NO_ACCELERATE_SPARSE
+
+#if defined(CERES_NO_SUITESPARSE) &&              \
+    defined(CERES_NO_ACCELERATE_SPARSE) &&        \
+    defined(CERES_NO_CXSPARSE) &&                 \
+    !defined(CERES_USE_EIGEN_SPARSE)  // NOLINT
+// If defined Ceres was compiled without any sparse linear algebra support.
+#define CERES_NO_SPARSE
+#endif
+
 // If defined, Ceres was compiled without Schur specializations.
 // #define CERES_RESTRICT_SCHUR_SPECIALIZATION
 
@@ -60,41 +74,50 @@
 // routines.
 // #define CERES_NO_CUSTOM_BLAS
 
-// If defined, Ceres was compiled with C++11.
-// #define CERES_USE_CXX11
-
 // If defined, Ceres was compiled without multithreading support.
-#define CERES_NO_THREADS
-// If defined Ceres was compiled with OpenMP multithreading support.
+// #define CERES_NO_THREADS
+// If defined Ceres was compiled with OpenMP multithreading.
 // #define CERES_USE_OPENMP
-// If defined Ceres was compiled with TBB multithreading support.
-// #define CERES_USE_TBB
-// If defined Ceres was compiled with C++11 thread support.
-// #define CERES_USE_CXX11_THREADS
-// Additionally defined on *nix if Ceres was compiled with OpenMP or TBB
-// support, as in this case pthreads is also required.
-// #define CERES_HAVE_PTHREAD
-// #define CERES_HAVE_RWLOCK
-
-// Which version of unordered map was used when Ceres was compiled. Exactly
-// one of these will be defined for any given build.
-#define CERES_STD_UNORDERED_MAP
-// #define CERES_STD_UNORDERED_MAP_IN_TR1_NAMESPACE
-// #define CERES_TR1_UNORDERED_MAP
-// #define CERES_NO_UNORDERED_MAP
-
-// If defined, the memory header is in <tr1/memory>, otherwise <memory>.
-// #define CERES_TR1_MEMORY_HEADER
-
-// If defined shared_ptr is in std::tr1 namespace, otherwise std.
-// #define CERES_TR1_SHARED_PTR
-
-// If defined, Ceres was built as a shared library.
-#define CERES_USING_SHARED_LIBRARY
+// If defined Ceres was compiled with modern C++ multithreading.
+#define CERES_USE_CXX_THREADS
 
 // If defined, Ceres was compiled with a version MSVC >= 2005 which
 // deprecated the standard POSIX names for bessel functions, replacing them
 // with underscore prefixed versions (e.g. j0() -> _j0()).
 // #define CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS
+
+#if defined(CERES_USE_OPENMP)
+#if defined(CERES_USE_CXX_THREADS) || defined(CERES_NO_THREADS)
+#error CERES_USE_OPENMP is mutually exclusive to CERES_USE_CXX_THREADS and CERES_NO_THREADS
+#endif
+#elif defined(CERES_USE_CXX_THREADS)
+#if defined(CERES_USE_OPENMP) || defined(CERES_NO_THREADS)
+#error CERES_USE_CXX_THREADS is mutually exclusive to CERES_USE_OPENMP, CERES_USE_CXX_THREADS and CERES_NO_THREADS
+#endif
+#elif defined(CERES_NO_THREADS)
+#if defined(CERES_USE_OPENMP) || defined(CERES_USE_CXX_THREADS)
+#error CERES_NO_THREADS is mutually exclusive to CERES_USE_OPENMP and CERES_USE_CXX_THREADS
+#endif
+#else
+#  error One of CERES_USE_OPENMP, CERES_USE_CXX_THREADS or CERES_NO_THREADS must be defined.
+#endif
+
+// CERES_NO_SPARSE should be automatically defined by config.h if Ceres was
+// compiled without any sparse back-end.  Verify that it has not subsequently
+// been inconsistently redefined.
+#if defined(CERES_NO_SPARSE)
+#if !defined(CERES_NO_SUITESPARSE)
+#error CERES_NO_SPARSE requires CERES_NO_SUITESPARSE.
+#endif
+#if !defined(CERES_NO_CXSPARSE)
+#error CERES_NO_SPARSE requires CERES_NO_CXSPARSE
+#endif
+#if !defined(CERES_NO_ACCELERATE_SPARSE)
+#error CERES_NO_SPARSE requires CERES_NO_ACCELERATE_SPARSE
+#endif
+#if defined(CERES_USE_EIGEN_SPARSE)
+#error CERES_NO_SPARSE requires !CERES_USE_EIGEN_SPARSE
+#endif
+#endif
 
 #endif  // CERES_PUBLIC_INTERNAL_CONFIG_H_

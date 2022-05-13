@@ -1,5 +1,5 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2018 Google Inc. All rights reserved.
+// Copyright 2019 Google Inc. All rights reserved.
 // http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 #ifndef CERES_PUBLIC_CONTEXT_H_
 #define CERES_PUBLIC_CONTEXT_H_
 
-#include "ceres/internal/macros.h"
+#include "ceres/internal/export.h"
 
 namespace ceres {
 
@@ -41,16 +41,16 @@ namespace ceres {
 // Problems, either serially or in parallel. When using it with multiple
 // Problems at the same time, they may end up contending for resources
 // (e.g. threads) managed by the Context.
-class Context {
+class CERES_EXPORT Context {
  public:
-  Context() {}
-  virtual ~Context() {}
+  Context();
+  Context(const Context&) = delete;
+  void operator=(const Context&) = delete;
+
+  virtual ~Context();
 
   // Creates a context object and the caller takes ownership.
   static Context* Create();
-
- private:
-  CERES_DISALLOW_COPY_AND_ASSIGN(Context);
 };
 
 }  // namespace ceres

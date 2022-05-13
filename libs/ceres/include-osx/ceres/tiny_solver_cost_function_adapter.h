@@ -1,5 +1,5 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2017 Google Inc. All rights reserved.
+// Copyright 2019 Google Inc. All rights reserved.
 // http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 // Author: sameeragarwal@google.com (Sameer Agarwal)
-
 
 #ifndef CERES_PUBLIC_TINY_SOLVER_COST_FUNCTION_ADAPTER_H_
 #define CERES_PUBLIC_TINY_SOLVER_COST_FUNCTION_ADAPTER_H_
@@ -72,16 +71,21 @@ namespace ceres {
 //
 //   TinySolverCostFunctionAdapter cost_function_adapter(*cost_function);
 //
-template <int kNumResiduals = Eigen::Dynamic, int kNumParameters = Eigen::Dynamic>
+template <int kNumResiduals = Eigen::Dynamic,
+          int kNumParameters = Eigen::Dynamic>
 class TinySolverCostFunctionAdapter {
  public:
-  typedef double Scalar;
+  using Scalar = double;
   enum ComponentSizeType {
     NUM_PARAMETERS = kNumParameters,
     NUM_RESIDUALS = kNumResiduals
   };
 
-  TinySolverCostFunctionAdapter(const CostFunction& cost_function)
+  // This struct needs to have an Eigen aligned operator new as it contains
+  // fixed-size Eigen types.
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  explicit TinySolverCostFunctionAdapter(const CostFunction& cost_function)
       : cost_function_(cost_function) {
     CHECK_EQ(cost_function_.parameter_block_sizes().size(), 1)
         << "Only CostFunctions with exactly one parameter blocks are allowed.";
@@ -104,7 +108,7 @@ class TinySolverCostFunctionAdapter {
                   double* residuals,
                   double* jacobian) const {
     if (!jacobian) {
-      return cost_function_.Evaluate(&parameters, residuals, NULL);
+      return cost_function_.Evaluate(&parameters, residuals, nullptr);
     }
 
     double* jacobians[1] = {row_major_jacobian_.data()};
@@ -116,7 +120,7 @@ class TinySolverCostFunctionAdapter {
     // column-major layout, and the CostFunction objects use row-major
     // Jacobian matrices. So the following bit of code does the
     // conversion from row-major Jacobians to column-major Jacobians.
-    Eigen::Map<Eigen::Matrix<double, NUM_RESIDUALS, NUM_PARAMETERS> >
+    Eigen::Map<Eigen::Matrix<double, NUM_RESIDUALS, NUM_PARAMETERS>>
         col_major_jacobian(jacobian, NumResiduals(), NumParameters());
     col_major_jacobian = row_major_jacobian_;
     return true;
@@ -127,6 +131,7 @@ class TinySolverCostFunctionAdapter {
     return cost_function_.parameter_block_sizes()[0];
   }
 
+ private:
   const CostFunction& cost_function_;
   mutable Eigen::Matrix<double, NUM_RESIDUALS, NUM_PARAMETERS, Eigen::RowMajor>
       row_major_jacobian_;
