@@ -1,22 +1,22 @@
 #include "pch_ofApp.h"
-#include "Marker.h"
+#include "ofxMarker.h"
 
 //----------
-Marker::Marker()
+ofxMarker::ofxMarker()
 {
 	RULR_SERIALIZE_LISTENERS;
 }
 
 //----------
 string
-Marker::getTypeName() const
+ofxMarker::getTypeName() const
 {
 	return "Marker";
 }
 
 //----------
 string
-Marker::getGlyphForConstraint(const Constraint& constraint)
+ofxMarker::getGlyphForConstraint(const Constraint& constraint)
 {
 	switch (constraint.get()) {
 	case Constraint::Free:
@@ -32,7 +32,7 @@ Marker::getGlyphForConstraint(const Constraint& constraint)
 
 //----------
 void
-Marker::serialize(nlohmann::json& json) const
+ofxMarker::serialize(nlohmann::json& json) const
 {
 	json << this->position;
 	json << this->name;
@@ -41,7 +41,7 @@ Marker::serialize(nlohmann::json& json) const
 
 //----------
 void
-Marker::deserialize(const nlohmann::json& json)
+ofxMarker::deserialize(const nlohmann::json& json)
 {
 	json >> this->position;
 	json >> this->name;
@@ -50,7 +50,7 @@ Marker::deserialize(const nlohmann::json& json)
 
 //----------
 ofxCvGui::ElementPtr
-Marker::getDataDisplay()
+ofxMarker::getDataDisplay()
 {
 	auto element = ofxCvGui::makeElement();
 
@@ -62,7 +62,7 @@ Marker::getDataDisplay()
 		vector<string> glyphs;
 		auto optionsCount = this->constraint.get().getOptionStrings().size();
 		for (size_t i = 0; i < optionsCount; i++) {
-			glyphs.push_back(Marker::getGlyphForConstraint((Constraint::Options) i));
+			glyphs.push_back(ofxMarker::getGlyphForConstraint((Constraint::Options) i));
 		}
 		selectConstraint->setGlyphs(glyphs);
 	}

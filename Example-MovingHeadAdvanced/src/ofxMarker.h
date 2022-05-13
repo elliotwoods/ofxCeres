@@ -3,14 +3,14 @@
 #include "Data/CalibrationPointSet.h"
 #include "ofxCvGui.h"
 
-class Marker : public Data::AbstractCalibrationPoint {
+class ofxMarker : public Data::AbstractCalibrationPoint {
 public:
 	MAKE_ENUM(Constraint
 		, (Free, Fixed, Plane)
 		, ("Free", "Fixed", "Plane")
 	);
 
-	Marker();
+	ofxMarker();
 	string getTypeName() const override;
 
 	static string getGlyphForConstraint(const Constraint&);
@@ -25,5 +25,5 @@ public:
 protected:
 	ofxCvGui::ElementPtr getDataDisplay() override;
 
-	static map<Marker::Constraint::Options, string> glyphs;
+	static map<ofxMarker::Constraint::Options, string> glyphs;
 };

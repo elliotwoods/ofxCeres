@@ -67,7 +67,7 @@ namespace Calibration {
 		} parameters;
 
 		ofxCeres::ParameterisedSolverSettings solverSettings;
-		weak_ptr<Marker> markerClosestToCursor;
+		weak_ptr<ofxMarker> markerClosestToCursor;
 		shared_ptr<Scene> scene;
 
 		bool needsToCalculateResiduals = true;

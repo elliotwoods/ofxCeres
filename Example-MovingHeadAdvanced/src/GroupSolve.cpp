@@ -116,7 +116,7 @@ GroupSolve::prepareMarkers()
 		else if (movingHeadsThatSeeMarker.size() == 1) {
 			// Seen only once - fix
 			auto constraint = marker->constraint.get();
-			constraint.set(Marker::Constraint::Options::Fixed);
+			constraint.set(ofxMarker::Constraint::Options::Fixed);
 			marker->constraint.set(constraint);
 		}
 	}
@@ -194,7 +194,7 @@ GroupSolve::solve()
 		uint32_t markerIndex = 0;
 		for (auto marker : markers) {
 			switch (marker->constraint.get()) {
-			case Marker::Constraint::Free:
+			case ofxMarker::Constraint::Free:
 			{
 				// If it's free, we have to check that it's seen in at least 2 views
 				uint32_t countOfMovingHeadsThatSawThisPoint = 0;
@@ -217,7 +217,7 @@ GroupSolve::solve()
 
 				break;
 			}
-			case Marker::Constraint::Fixed:
+			case ofxMarker::Constraint::Fixed:
 			{
 				// Record fixed markers
 				fixedMarkers.push_back(markerIndex);
@@ -228,7 +228,7 @@ GroupSolve::solve()
 				constraints.push_back(constraint);
 				break;
 			}
-			case Marker::Constraint::Plane:
+			case ofxMarker::Constraint::Plane:
 			{
 				// Record for later (do these at the end because we need the fixed markers also)
 				planeMarkers.push_back(markerIndex);
@@ -274,7 +274,7 @@ GroupSolve::solve()
 	{
 		for (size_t i = 0; i < markers.size(); i++) {
 			auto marker = markers[i];
-			if (marker->constraint.get() == Marker::Constraint::Fixed) {
+			if (marker->constraint.get() == ofxMarker::Constraint::Fixed) {
 				continue;
 			}
 
