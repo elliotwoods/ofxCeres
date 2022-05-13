@@ -1,2 +1,10 @@
+ofxAssets
+ofxAssimpModelLoader
 ofxCeres
+ofxLiquidEvent
 ofxGrabCam
+ofxCvGui
+ofxOsc
+ofxPlugin
+ofxSingleton
+ofxTextInputField

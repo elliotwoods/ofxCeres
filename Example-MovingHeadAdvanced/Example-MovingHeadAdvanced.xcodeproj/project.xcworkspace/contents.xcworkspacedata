@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/mimison/dev/of_v0.10.1_osx_release/addons/ofxCeres/Example-MovingHeadAdvanced/Example-MovingHeadAdvanced.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>
