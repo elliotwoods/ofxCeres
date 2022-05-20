@@ -79,3 +79,14 @@ You need to:
 
 1. Clone recursively
 2. Build Debug/Release x Win32/x64
+
+
+# Install on macos.
+Currenlty this branch builds on macos both with M1 and intel processors.
+For such use this branch as well as my branches following addons
+
+* https://github.com/roymacdonald/ofxAssets
+* https://github.com/roymacdonald/ofxTextInputField
+* https://github.com/roymacdonald/ofxPlugin
+* https://github.com/roymacdonald/ofxGrabCam
+* https://github.com/roymacdonald/ofxCvGui
