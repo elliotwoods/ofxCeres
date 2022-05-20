@@ -83,7 +83,12 @@ You need to:
 
 # Install on macos.
 Currenlty this branch builds on macos both with M1 and intel processors.
-For such use this branch as well as my branches following addons
+
+It requires you to use the an openFrameworks nightly build older than of_v20220520_osx_nightly.zip or the current github master branch.
+
+To get the nightly builds go to https://openframeworks.cc/download/ and scroll down to the end of the page.
+
+This branch as well needs my branches for the following addons:
 
 * https://github.com/roymacdonald/ofxAssets
 * https://github.com/roymacdonald/ofxTextInputField
