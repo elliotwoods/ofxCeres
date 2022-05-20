@@ -150,7 +150,7 @@ void ofApp::draw(){
 					int index = 0;
 					for (const auto & panTiltAngle : this->panTiltAngles) {
 						ofSetColor(*previewColor++);
-						auto transmission = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(panTiltAngle, this->parameters.tiltOffset.get());
+						auto transmission = ofxCeres::VectorMath::getObjectSpaceRayForPanTilt(panTiltAngle);
 
 						ofDrawLine(glm::vec3(), transmission);
 						transmissionsInObjectSpace.push_back(transmission);
@@ -190,11 +190,11 @@ void ofApp::solve() {
 		, ofxCeres::Models::MovingHead::Solution {
 			this->parameters.translation.get()
 			, this->parameters.rotation.get()
-			, this->parameters.tiltOffset.get()
+			
 		});
 	this->parameters.translation = result.solution.translation;
 	this->parameters.rotation = result.solution.rotationVector;
-	this->parameters.tiltOffset = result.solution.tiltOffset;
+//	this->parameters.tiltOffset = result.solution.tiltOffset;
 
 	this->camera.lookAt(this->parameters.translation.get());
 }
