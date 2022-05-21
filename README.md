@@ -82,9 +82,8 @@ You need to:
 
 
 # Install on macos.
-Currenlty this branch builds on macos both with M1 and intel processors.
-
-
+Currenlty the master branch builds on macos M1.
+branch [macosIntel](https://github.com/roymacdonald/ofxceres/tree/macosIntel) contains the libraries to compile on macos (min. 10.15) running on an intel processor.
 
 It requires you to use the an openFrameworks nightly build older than of_v20220520_osx_nightly.zip or the current github master branch.
 
