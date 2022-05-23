@@ -93,7 +93,7 @@ To get the nightly builds go to https://openframeworks.cc/download/ and scroll d
 
 ## Ceres library
 
-In order to make it easier to compile and use you need to install the ceres library using (Homebrew)[https://brew.sh/]. Once you have installed homebrew run the following command in your Terminal.
+In order to make it easier to compile and use you need to install the ceres library using [Homebrew](https://brew.sh/). Once you have installed homebrew run the following command in your Terminal.
 ```
 brew install ceres-solver
 ```
