@@ -81,13 +81,31 @@ You need to:
 2. Build Debug/Release x Win32/x64
 
 
+
 # Install on macos.
-Currenlty the master branch builds on macos M1.
-branch [macosIntel](https://github.com/roymacdonald/ofxceres/tree/macosIntel) contains the libraries to compile on macos (min. 10.15) running on an intel processor.
+Currenlty this branch builds on macos both with M1 and intel processors.
+
+## openFrameworks version
 
 It requires you to use the an openFrameworks nightly build older than of_v20220520_osx_nightly.zip or the current github master branch.
 
 To get the nightly builds go to https://openframeworks.cc/download/ and scroll down to the end of the page.
+
+## Ceres library
+
+In order to make it easier to compile and use you need to install the ceres library using (Homebrew)[https://brew.sh/]. Once you have installed homebrew run the following command in your Terminal.
+```
+brew install ceres-solver
+```
+
+once installed open addon_config.mk and check that the route in ADDON_LIBS pointing to libceres.dylib correct. Otherwise modify it so it points to the correct place. you can type in the terminal 
+```
+brew info ceres-solver
+``` 
+and it will tell you where it is installed.
+also change accorgingly in ADDON_INCLUDES
+
+## Addons needed.
 
 This branch as well needs my branches for the following addons:
 
