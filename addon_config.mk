@@ -65,7 +65,7 @@ common:
 	ADDON_DEFINES = GLM_FORCE_UNRESTRICTED_GENTYPE 
 	ADDON_DEFINES += GLM_FORCE_XYZW_ONLY
 # 	ADDON_DEFINES += CERES_USE_OPENMP 
-	ADDON_DEFINES += CERES_USE_CXX_THREADS
+#	ADDON_DEFINES += CERES_USE_CXX_THREADS
 # 	ADDON_DEFINES += CERES_NO_THREADS
 	
 	# some addons need resources to be copied to the bin/data folder of the project
@@ -103,7 +103,15 @@ android/armeabi-v7a:
 osx:
 	# osx/iOS only, any framework that should be included in the project
 	# ADDON_FRAMEWORKS =
-	
+    
+    ADDON_INCLUDES = src/
+    ADDON_INCLUDES += /usr/local/include
+    ADDON_INCLUDES += /usr/local/include/eigen3
+     
+    ADDON_LIBS = /usr/local/lib/libceres.dylib
+    ADDON_LIBS += /usr/local/lib/libglog.dylib
+    
+    
 	ADDON_SOURCES_EXCLUDE = libs/ceres/lib/VS
 	ADDON_SOURCES_EXCLUDE += libs/ceres/include-vs
 	ADDON_SOURCES_EXCLUDE += libs/ceres/include-vs/%
