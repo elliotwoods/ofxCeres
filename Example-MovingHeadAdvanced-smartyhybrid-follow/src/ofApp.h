@@ -11,7 +11,8 @@ public:
 	void setup();
 	void update();
 	void draw();
-
+    void drawWorld();
+    
     void keyPressed(int key);
     void keyReleased (int key);
     
