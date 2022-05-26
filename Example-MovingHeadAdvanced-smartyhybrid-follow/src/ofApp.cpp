@@ -48,24 +48,28 @@ ofApp::setup()
 	}
     
     allTowers.resize(3);
-    allTowers[0].setup();
-//    scene->getMovingHeads();
-    const auto& movingHeads =scene->getMovingHeads();
-    for (const auto& it : movingHeads) {
-//    for(int i=0; i<movingHeads.size(); i++){
-//        if (it.second.get() == &this->movingHead) {
-//            //ignore
-//            continue;
-//        }
-
-        // Navigate it to target
-//        it.second->navigateToWorldTarget(position);
-        if(it.first == "a-01-head") allTowers[0].movingHeads.emplace("head", make_shared<DMX::MovingHead>());
+    auto& movingHeads =scene->getMovingHeads();
+    for ( auto& head : movingHeads) {
+        auto nameParts = ofSplitString(head.first, "-", true, true);
         
-//        if(movingHeads[i].first == "a-01-head") allTowers[0].movingHead_head = movingHeads[i].second.get();
-        // this->movingHeads.emplace(ofToString(i+1,2,'0'), make_shared<MovingHead>());
+        bool bValidName = false;
+        if(nameParts.size() >= 2){
+            int towerNumber = nameParts[0][0] - 'a';
+            if(towerNumber >= 0  &&  towerNumber < 3){
+                int fixtureNum = ofToInt(nameParts[1]);
+                if(fixtureNum >= 0 && fixtureNum < 9){
+                    bValidName = true;
+                    allTowers[towerNumber].addMovingHead(ElbSleketonParts(fixtureNum), head.second);
+                }
+            }
+        }
+        
+        if(!bValidName){
+        
+            ofLogWarning("ofApp::setup") << "invalid name for assigning to tower";
+        }
+        
     }
-//    allTowers[0].movingHeads.emplace("head", make_shared<MovingHead>());
     
 }
 
