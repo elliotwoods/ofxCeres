@@ -11,7 +11,8 @@ public:
 	void setup();
 	void update();
 	void draw();
-
+    void drawWorld();
+    
     void keyPressed(int key);
     void keyReleased (int key);
     
@@ -21,4 +22,6 @@ public:
 	shared_ptr<ofxCvGui::Panels::Groups::Strip> stripPanel;
     
     vector<oneTower> allTowers;
+    
+    
 };
