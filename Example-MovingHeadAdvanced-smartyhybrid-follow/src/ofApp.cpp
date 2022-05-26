@@ -46,6 +46,27 @@ ofApp::setup()
 			ofxCvGui::inspect(this->scene);
 		}
 	}
+    
+    allTowers.resize(3);
+    allTowers[0].setup();
+//    scene->getMovingHeads();
+    const auto& movingHeads =scene->getMovingHeads();
+    for (const auto& it : movingHeads) {
+//    for(int i=0; i<movingHeads.size(); i++){
+//        if (it.second.get() == &this->movingHead) {
+//            //ignore
+//            continue;
+//        }
+
+        // Navigate it to target
+//        it.second->navigateToWorldTarget(position);
+        if(it.first == "a-01-head") allTowers[0].movingHeads.emplace("head", make_shared<DMX::MovingHead>());
+        
+//        if(movingHeads[i].first == "a-01-head") allTowers[0].movingHead_head = movingHeads[i].second.get();
+        // this->movingHeads.emplace(ofToString(i+1,2,'0'), make_shared<MovingHead>());
+    }
+//    allTowers[0].movingHeads.emplace("head", make_shared<MovingHead>());
+    
 }
 
 //--------------------------------------------------------------
@@ -62,4 +83,12 @@ void
 ofApp::draw()
 {
 
+}
+
+void ofApp::keyPressed(int key){
+    
+}
+
+void ofApp::keyReleased(int key) {
+    
 }
