@@ -11930,6 +11930,28 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>E2656160D683F92D6B033C03</key>
+			<dict>
+				<key>fileRef</key>
+				<string>8888811D4928A65FCBAC3A4E</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>8888811D4928A65FCBAC3A4E</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>SmartyHybrid.cpp</string>
+				<key>path</key>
+				<string>src/DMX/SmartyHybrid.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>9EC15D5D6E2C0E689A8458DE</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -11942,6 +11964,21 @@
 				<string>MovingHead.h</string>
 				<key>path</key>
 				<string>src/DMX/MovingHead.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>30D5649B6EE269174153FB99</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>SmartyHybrid.h</string>
+				<key>path</key>
+				<string>src/DMX/SmartyHybrid.h</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
@@ -12184,7 +12221,9 @@
 					<string>86CCE83FDF50A4FAE25B5BC5</string>
 					<string>D88A343D371AAE7EEEB34924</string>
 					<string>297992F30B28C2ECC908C43D</string>
+					<string>30D5649B6EE269174153FB99</string>
 					<string>9EC15D5D6E2C0E689A8458DE</string>
+					<string>8888811D4928A65FCBAC3A4E</string>
 					<string>AB38B6CBAEBBBBE33570F595</string>
 				</array>
 				<key>isa</key>
@@ -15844,6 +15883,7 @@ fi
 					<string>8717C27EB0801B96F7FB981F</string>
 					<string>DD6AB5AFEDC5C990071CA5C1</string>
 					<string>3C1ADABC98E5434D6DF91310</string>
+					<string>E2656160D683F92D6B033C03</string>
 					<string>A41EAEB44AA7758B499708F2</string>
 					<string>51253427680ACC223CEE9361</string>
 					<string>C4F70FE1C6BAC8FC1A0E4DD7</string>
@@ -15985,7 +16025,7 @@ fi
 				<key>isa</key>
 				<string>PBXNativeTarget</string>
 				<key>name</key>
-				<string>Example-MovingHeadAdvanced</string>
+				<string>Example-MovingHeadAdvanced-smartyhybrid</string>
 				<key>productName</key>
 				<string>myOFApp</string>
 				<key>productReference</key>
@@ -16002,7 +16042,7 @@ fi
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>path</key>
-				<string>Example-MovingHeadAdvancedDebug.app</string>
+				<string>Example-MovingHeadAdvanced-smartyhybridDebug.app</string>
 				<key>sourceTree</key>
 				<string>BUILT_PRODUCTS_DIR</string>
 			</dict>
