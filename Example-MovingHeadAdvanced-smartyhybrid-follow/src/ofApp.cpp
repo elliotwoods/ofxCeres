@@ -38,8 +38,7 @@ ofApp::setup()
             this->stripPanel->add(this->scene->getPanel());
         }
         
-        
-        
+        //this is needed to get access and add to the 3d world drawing
         this->scene->getPanel()->onDrawWorld += [this](ofCamera&) {
             this->drawWorld();
         };
@@ -55,31 +54,11 @@ ofApp::setup()
     }
     
     allTowers.resize(3);
-    //    for(int i=0; i< allTowers.size(); i++){
-    //        allTowers[i].setup(i);
-    //    }
+    
     allTowers[0].setup(0, "north");
     allTowers[1].setup(1, "way");
     allTowers[2].setup(2, "forest");
     
-    //    allTowers[0].setup();
-    ////    scene->getMovingHeads();
-    //    const auto& movingHeads =scene->getMovingHeads();
-    //    for (const auto& it : movingHeads) {
-    ////    for(int i=0; i<movingHeads.size(); i++){
-    ////        if (it.second.get() == &this->movingHead) {
-    ////            //ignore
-    ////            continue;
-    ////        }
-    //
-    //        // Navigate it to target
-    ////        it.second->navigateToWorldTarget(position);
-    //        if(it.first == "a-01-head") allTowers[0].movingHeads.emplace("head", make_shared<DMX::MovingHead>());
-    //        
-    ////        if(movingHeads[i].first == "a-01-head") allTowers[0].movingHead_head = movingHeads[i].second.get();
-    //        // this->movingHeads.emplace(ofToString(i+1,2,'0'), make_shared<MovingHead>());
-    //    }
-    //    allTowers[0].movingHeads.emplace("head", make_shared<MovingHead>());
     
 }
 

@@ -12,10 +12,6 @@ class oneTower {
 private:
     
 public:
-//    map<string, shared_ptr<MovingHead>> movingHeads;
-//    map<string, shared_ptr<DMX::MovingHead>> movingHeads; //& getMovingHeads();
-    
-//    shared_ptr<MovingHead> & movingHead_head;
     
     int towerID = -1;
     string towerLabel = "?";
@@ -31,7 +27,7 @@ public:
     
     void draw(){
         ofPushStyle();
-//        pointLight.setPosition((ofGetWidth()*.5)+ cos(ofGetElapsedTimef()*.5)*(ofGetWidth()*.3), ofGetHeight()/2, 500);
+        
         float temp_x = cos(ofGetElapsedTimef()*.5);
         temp_x *= 2*(towerID+1);
         float temp_z = sin(ofGetElapsedTimef()*.5);
