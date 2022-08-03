@@ -1,6 +1,6 @@
 #include "pch_ofxCeres.h"
 #include "../VectorMath/VectorMath.h"
-
+#include "../Exception.h"
 #include "RigidBodyTransform.h"
 
 #include "ofLog.h"
