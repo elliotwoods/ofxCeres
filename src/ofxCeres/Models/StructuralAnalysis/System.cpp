@@ -1,7 +1,8 @@
 #include "pch_ofxCeres.h"
 #include "System.h"
 #include "ofMain.h"
-#include "ofxCeres/Exception.h"
+
+#include "ofxCeres.h"
 
 #ifdef HAS_OFXCVGUI
 	#define ANNOTATE(text, position, color) ofxCvGui::Utils::AnnotationManager::X().annotate(text, position, color)

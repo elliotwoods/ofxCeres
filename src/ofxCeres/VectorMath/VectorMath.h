@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofVectorMath.h"
-
+#include "../Exception.h"
 #include <utility>
 
 namespace ofxCeres {
