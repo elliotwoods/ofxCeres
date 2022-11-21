@@ -230,6 +230,24 @@ namespace ofxCeres {
 		}
 
 		//----------
+		// Notes ReMarkable November 2022 Page 5
+		template<typename T>
+		glm::tvec2<T> refract(const glm::tvec2<T>& incident
+			, const glm::tvec2<T>& normalTowardsExit
+			, const T& exitIORvsIncidentIOR)
+		{
+			const auto incidentDotNormal = dot(incident, normalTowardsExit);
+			const auto theta1 = acos(incidentDotNormal);
+			const auto sin_theta1 = sin(theta1);
+			const auto sin_theta2 = sin_theta1 / exitIORvsIncidentIOR;
+			const auto theta2 = asin(sin_theta2);
+
+			const auto p = normalize(incident - incidentDotNormal * normalTowardsExit);
+
+			return p * sin_theta2 + normalTowardsExit * cos(theta2);
+		}
+
+		//----------
 		template<typename T>
 		glm::tvec3<T> applyTransform(glm::tmat4x4<T> matrix, glm::tvec3<T> vector)
 		{
