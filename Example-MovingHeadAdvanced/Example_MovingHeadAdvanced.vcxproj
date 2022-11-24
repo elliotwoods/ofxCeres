@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -124,7 +124,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -135,7 +135,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
@@ -147,7 +147,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -157,7 +157,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
@@ -172,7 +172,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -182,7 +182,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\include;$(OF_ROOT)addons\ofxAssimpModelLoader\src;$(ProjectDir)src;$(OF_ROOT)addons\ofxOsc\src;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\osc;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src\ip;$(OF_ROOT)addons\ofxOsc\libs\oscpack\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -196,7 +196,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
