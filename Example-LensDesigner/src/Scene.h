@@ -3,12 +3,7 @@
 #include "ofxCvGui.h"
 #include "Elements/Base.h"
 #include "Models/Ray.h"
-
-struct RayChainLink {
-	Models::Ray ray;
-	shared_ptr<Elements::Base> source;
-	shared_ptr<RayChainLink> nextRay;
-};
+#include "Models/OpticalSystem.h"
 
 class Scene : public ofxCvGui::IInspectable {
 public:
@@ -43,10 +38,27 @@ public:
 		return nullptr;
 	}
 
-	void test();
-	void drawTest();
+	void cast();
+	void drawPreviewRays();
+
+	Models::OpticalSystem getOpticalSystem() const;
+	void solve();
 protected:
 	struct {
-		vector<shared_ptr<RayChainLink>> rayChains;
-	} testResults;
+		vector<Models::RayChain> rayChains;
+	} preview;
+
+	struct : ofParameterGroup {
+		ofParameter<int> resolution{ "Resolution", 64 };
+		ofParameter<bool> continuousSolve{ "Continuous solve", false };
+
+		struct : ofParameterGroup {
+			ofParameter<float> brightness{ "Brightness", 50.0f/255.0f, 0.0f, 1.0f };
+			ofParameter<float> finalLength{ "Final length", 2.0f, 0.1f, 10.0f };
+			PARAM_DECLARE("Preview", brightness, finalLength);
+		} preview;
+		PARAM_DECLARE("Scene", resolution, continuousSolve, preview);
+	} parameters;
+
+	ofxCeres::ParameterisedSolverSettings solverSettings;
 };

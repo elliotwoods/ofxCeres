@@ -10,9 +10,6 @@
     <ClCompile Include="src\Data\Serializable.cpp">
       <Filter>src\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\Exception.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.cpp">
       <Filter>addons\ofxAssimpModelLoader\src</Filter>
     </ClCompile>
@@ -82,6 +79,15 @@
     <ClCompile Include="src\Elements\Boundaries\Mesh.cpp">
       <Filter>src\Elements\Boundaries</Filter>
     </ClCompile>
+    <ClCompile Include="src\Models\OpticalSystem.cpp">
+      <Filter>src\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Solvers\OpticalSystemSolver.cpp">
+      <Filter>src\Solvers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Elements\Target.cpp">
+      <Filter>src\Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -147,6 +153,9 @@
     <Filter Include="src\Models">
       <UniqueIdentifier>{fa8bc460-c3fb-4261-b499-d13a15329576}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Solvers">
+      <UniqueIdentifier>{c2f07d64-30ff-4936-ac57-b4e56957e927}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
@@ -157,9 +166,6 @@
     </ClInclude>
     <ClInclude Include="src\Data\Serializable.h">
       <Filter>src\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Exception.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpAnimation.h">
       <Filter>addons\ofxAssimpModelLoader\src</Filter>
@@ -382,6 +388,18 @@
     </ClInclude>
     <ClInclude Include="src\Models\MeshBoundary.h">
       <Filter>src\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Models\OpticalSystem.h">
+      <Filter>src\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Models\OpticalElement.h">
+      <Filter>src\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Solvers\OpticalSystemSolver.h">
+      <Filter>src\Solvers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Elements\Target.h">
+      <Filter>src\Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

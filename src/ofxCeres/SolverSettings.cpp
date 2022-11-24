@@ -35,6 +35,8 @@ namespace ofxCeres {
 		solverSettings.options.function_tolerance = this->functionTolerance.get();
 		solverSettings.options.gradient_tolerance = this->gradientTolerance.get();
 		solverSettings.options.parameter_tolerance = this->parameterTolerance.get();
+		
+		solverSettings.options.num_threads = std::thread::hardware_concurrency();
 
 		return solverSettings;
 	}

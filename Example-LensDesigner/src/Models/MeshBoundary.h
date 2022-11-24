@@ -1,11 +1,12 @@
 #pragma once
 
+#include "OpticalElement.h"
 #include "Ray.h"
 #include <map>
 
 namespace Models {
 	template<typename T>
-	struct MeshBoundary_ {
+	struct MeshBoundary_ : OpticalElement_<T> {
 		std::map<float, T> vertices;
 
 		T exitVsEntranceIOR;
@@ -53,7 +54,7 @@ namespace Models {
 
 				// Test if in positive ray direction and within line segment
 				auto uv = MeshBoundary_<T>::intersectUV(ray, p1, p2, normalTowardsExit);
-				if (uv.x >= 0 && uv.y >= 0 && uv.y <= 1) {
+				if (uv.x >= (T) 0 && uv.y >= (T) 0 && uv.y <= (T) 1) {
 					{
 						intersectUVResult.uv = uv;
 						intersectUVResult.p1 = p1;
@@ -73,7 +74,7 @@ namespace Models {
 			if (!this->intersectUV(ray, result)) {
 				return false;
 			}
-			point = ray.s + ray.t * result.uv.u;
+			point = ray.s + ray.t * result.uv.x;
 			return true;
 		}
 
@@ -96,22 +97,39 @@ namespace Models {
 		}
 
 		template<typename T2>
-		MeshBoundary_<T2> castTo()
+		shared_ptr<MeshBoundary_<T2>> castTo()
 		{
-			MeshBoundary_<T2> instance2;
+			auto instance2 = make_shared<MeshBoundary_<T2>>();
 			{
 				for (const auto& vertex : this->vertices) {
-					instance2.vertices.emplace(vertex->first, (T2)vertex->second);
+					instance2->vertices.emplace(vertex.first, (T2)vertex.second);
 				}
-				
-				// Base
-				{
-					instance2.center = (glm::tvec2<T2>) this->center;
-					instance2.entranceIOR = (T2)this->entranceIOR;
-					instance2.exitIOR = (T2)this->exitIOR;
-				}
+				instance2->exitVsEntranceIOR = (T2)this->exitVsEntranceIOR;
+				this->copyBaseTo<T2>(instance2);
 			}
 			return instance2;
+		}
+
+		size_t
+			getParameterCount() const override
+		{
+			return this->vertices.size();
+		}
+
+		void
+			setParameters(const T* parameters) override
+		{
+			for (auto& vertex : this->vertices) {
+				vertex.second = *(parameters++);
+			}
+		}
+
+		void
+			getParameters(T* parameters) override
+		{
+			for (auto& vertex : this->vertices) {
+				*parameters++ = vertex.second;
+			}
 		}
 	};
 

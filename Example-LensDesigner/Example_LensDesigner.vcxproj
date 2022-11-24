@@ -303,8 +303,9 @@
     <ClCompile Include="src\Elements\Boundaries\Flat.cpp" />
     <ClCompile Include="src\Elements\Boundaries\Mesh.cpp" />
     <ClCompile Include="src\Elements\PointSource.cpp" />
-    <ClCompile Include="src\Exception.cpp" />
+    <ClCompile Include="src\Elements\Target.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Models\OpticalSystem.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\pch_ofApp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -313,6 +314,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Solvers\OpticalSystemSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\ai_assert.h" />
@@ -386,13 +388,16 @@
     <ClInclude Include="src\Elements\Boundaries\Flat.h" />
     <ClInclude Include="src\Elements\Boundaries\Mesh.h" />
     <ClInclude Include="src\Elements\PointSource.h" />
-    <ClInclude Include="src\Exception.h" />
+    <ClInclude Include="src\Elements\Target.h" />
+    <ClInclude Include="src\Models\OpticalElement.h" />
     <ClInclude Include="src\Models\FlatBoundary.h" />
     <ClInclude Include="src\Models\MeshBoundary.h" />
+    <ClInclude Include="src\Models\OpticalSystem.h" />
     <ClInclude Include="src\Models\Ray.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\pch_ofApp.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Solvers\OpticalSystemSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

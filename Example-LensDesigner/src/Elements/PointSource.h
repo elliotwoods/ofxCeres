@@ -30,10 +30,9 @@ namespace Elements {
 			return rays;
 		}
 
-	protected:
 		struct : ofParameterGroup {
 			ofParameter<float> angle{ "Angle (deg)", 90, 0, 360 };
-			ofParameter<float> spread{ "Spread (deg)", 90, 0, 360 };
+			ofParameter<float> spread{ "Spread (deg)", 60, 0, 360 };
 			PARAM_DECLARE("PointSource", angle, spread);
 		} parameters;
 	};
