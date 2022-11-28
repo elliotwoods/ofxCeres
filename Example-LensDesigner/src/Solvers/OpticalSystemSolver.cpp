@@ -53,7 +53,7 @@ struct RayTargetCost
 			, const glm::vec2& target
 			, const Models::OpticalSystem_<double>& opticalSystem)
 	{
-		auto costFunction = new ceres::DynamicAutoDiffCostFunction<RayTargetCost, 2>(
+		auto costFunction = new ceres::DynamicAutoDiffCostFunction<RayTargetCost, 4>(
 			new RayTargetCost(ray, target, opticalSystem)
 			);
 		{

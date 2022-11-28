@@ -137,13 +137,14 @@ namespace Elements {
 			ofSetBackgroundAuto(false);
 			ofBeginSaveScreenAsSVG(result.filePath);
 			{
-				ofTranslate(this->getPosition());
+				ofScale(1000.f, -1000.0f, 1000.0f);
+
 				ofDrawLine({ -1, 0, 0 }, { 1, 0, 0 });
 				ofDrawLine({ 0, -1, 0 }, { 0, 1, 0 });
 
 				ofPushMatrix();
 				{
-					ofScale(1000.f, -1000.0f, 1000.0f);
+					ofTranslate(this->getPosition());
 
 					ofPolyline line;
 

@@ -201,102 +201,6 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpAnimation.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpTexture.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\ip\IpEndpointName.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\ip\win32\NetworkingUtils.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\ip\win32\UdpSocket.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\osc\OscOutboundPacketStream.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\src\ofxOscBundle.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\src\ofxOscMessage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\src\ofxOscParameterSync.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\src\ofxOscReceiver.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\ofxOsc\src\ofxOscSender.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="src\Data\Serializable.cpp" />
     <ClCompile Include="src\Elements\Base.cpp" />
     <ClCompile Include="src\Elements\Boundaries\Base.cpp" />
@@ -317,71 +221,6 @@
     <ClCompile Include="src\Solvers\OpticalSystemSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\ai_assert.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\anim.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\camera.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\cexport.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\cfileio.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\cimport.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\color4.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Compiler\poppack1.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Compiler\pstdint.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Compiler\pushpack1.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\config.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\DefaultIOStream.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\DefaultIOSystem.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\DefaultLogger.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Defines.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\defs.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Exporter.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Importer.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\importerdesc.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\IOStream.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\IOSystem.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\light.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\Logger.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\LogStream.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\material.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix3x3.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix4x4.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\mesh.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\metadata.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\NullLogger.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\postprocess.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\ProgressHandler.hpp" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\quaternion.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\scene.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\SceneCombiner.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\texture.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\types.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector2.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector3.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\version.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpAnimation.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpModelLoader.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpTexture.h" />
-    <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpUtils.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\ip\IpEndpointName.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\ip\NetworkingUtils.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\ip\PacketListener.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\ip\TimerListener.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\ip\UdpSocket.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\MessageMappingOscPacketListener.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscException.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscHostEndianness.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscOutboundPacketStream.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscPacketListener.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.h" />
-    <ClInclude Include="..\..\ofxOsc\libs\oscpack\src\osc\OscTypes.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOsc.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOscArg.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOscBundle.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOscMessage.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOscParameterSync.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOscReceiver.h" />
-    <ClInclude Include="..\..\ofxOsc\src\ofxOscSender.h" />
     <ClInclude Include="src\Data\Serializable.h" />
     <ClInclude Include="src\Elements\Base.h" />
     <ClInclude Include="src\Elements\Boundaries\Base.h" />
@@ -419,16 +258,6 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\color4.inl" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\config.h.in" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\material.inl" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix3x3.inl" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\matrix4x4.inl" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\quaternion.inl" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector2.inl" />
-    <None Include="..\..\ofxAssimpModelLoader\libs\assimp\assimp\include\assimp\vector3.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>
