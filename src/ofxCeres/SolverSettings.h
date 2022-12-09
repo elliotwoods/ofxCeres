@@ -18,6 +18,8 @@ namespace ofxCeres {
 	class ParameterisedSolverSettings : public ofParameterGroup {
 	public:
 		ParameterisedSolverSettings();
+		ParameterisedSolverSettings(const ofxCeres::SolverSettings&);
+
 		SolverSettings getSolverSettings();
 
 		ofParameter<bool> printReport{ "Print report", true };
@@ -26,5 +28,6 @@ namespace ofxCeres {
 		ofParameter<float> functionTolerance{ "Function tolerance", 1e-6 };
 		ofParameter<float> gradientTolerance{ "Gradient tolerance", 1e-10 };
 		ofParameter<float> parameterTolerance{ "Parameter tolerance", 1e-8 };
+		ofParameter<int> minimizerType{ "Minimizer type", 1 };
 	};
 }

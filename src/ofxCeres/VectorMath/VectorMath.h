@@ -248,6 +248,26 @@ namespace ofxCeres {
 		}
 
 		//----------
+		// As defined https://registry.khronos.org/OpenGL-Refpages/gl4/html/refract.xhtml
+		template<typename T>
+		glm::tvec3<T> refract(const glm::tvec3<T>& incident
+			, const glm::tvec3<T>& normalTowardsExit
+			, const T& exitIORvsIncidentIOR)
+		{
+			const auto& I = incident;
+			const auto N = -normalTowardsExit;
+			const auto& eta = exitIORvsIncidentIOR;
+
+			auto k = 1.0 - eta * eta * (1.0 - dot(N, I) * dot(N, I));
+			if (k < (T)0.0) {
+				return { 0, 0, 0 };
+			}
+			else {
+				return eta * I - (eta * dot(N, I) + sqrt(k)) * N;
+			}
+		}
+
+		//----------
 		template<typename T>
 		glm::tvec3<T> applyTransform(glm::tmat4x4<T> matrix, glm::tvec3<T> vector)
 		{
