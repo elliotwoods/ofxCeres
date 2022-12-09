@@ -29,5 +29,6 @@ namespace ofxCeres {
 		ofParameter<float> gradientTolerance{ "Gradient tolerance", 1e-10 };
 		ofParameter<float> parameterTolerance{ "Parameter tolerance", 1e-8 };
 		ofParameter<int> minimizerType{ "Minimizer type", 1 };
+		ofParameter<int> loggingType{ "Logging type", 1 };
 	};
 }

@@ -22,7 +22,8 @@ namespace ofxCeres {
 			, this->functionTolerance
 			, this->gradientTolerance
 			, this->parameterTolerance
-			, this->minimizerType);
+			, this->minimizerType
+			, this->loggingType);
 	}
 
 	//----------
@@ -35,7 +36,8 @@ namespace ofxCeres {
 		this->functionTolerance = solverSettings.options.function_tolerance;
 		this->gradientTolerance = solverSettings.options.gradient_tolerance;
 		this->parameterTolerance = solverSettings.options.parameter_tolerance;
-		this->minimizerType = (int) solverSettings.options.minimizer_type;
+		this->minimizerType = (int)solverSettings.options.minimizer_type;
+		this->loggingType = (int) solverSettings.options.logging_type;
 	}
 
 	//----------
@@ -50,7 +52,8 @@ namespace ofxCeres {
 		solverSettings.options.function_tolerance = this->functionTolerance.get();
 		solverSettings.options.gradient_tolerance = this->gradientTolerance.get();
 		solverSettings.options.parameter_tolerance = this->parameterTolerance.get();
-		solverSettings.options.minimizer_type = (ceres::MinimizerType) this->minimizerType.get();
+		solverSettings.options.minimizer_type = (ceres::MinimizerType)this->minimizerType.get();
+		solverSettings.options.logging_type = (ceres::LoggingType) this->loggingType.get();
 
 		solverSettings.options.num_threads = std::thread::hardware_concurrency();
 
