@@ -9,6 +9,7 @@ namespace ofxCeres {
 		this->options.minimizer_progress_to_stdout = true;
 		this->options.max_num_iterations = 100;
 		this->options.function_tolerance = 5e-6;
+		this->options.num_threads = std::thread::hardware_concurrency();
 	}
 
 	//----------

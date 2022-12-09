@@ -124,7 +124,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -147,7 +147,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -172,7 +172,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -196,7 +196,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>

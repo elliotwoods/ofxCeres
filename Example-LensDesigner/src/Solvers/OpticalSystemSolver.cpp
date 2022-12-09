@@ -182,6 +182,5 @@ namespace Solvers {
 			result.solution.opticalSystem = opticalSystem.castTo<float>();
 			return result;
 		}
-		return ofxCeres::Exception("Not implemented");
 	}
 }
