@@ -256,7 +256,7 @@ namespace ofxCeres {
 		{
 			const auto& I = incident;
 			const auto N = -normalTowardsExit;
-			const auto& eta = exitIORvsIncidentIOR;
+			const auto& eta = (T) 1.0 / exitIORvsIncidentIOR;
 
 			auto k = 1.0 - eta * eta * (1.0 - dot(N, I) * dot(N, I));
 			if (k < (T)0.0) {
