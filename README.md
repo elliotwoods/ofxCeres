@@ -6,7 +6,7 @@ http://ceres-solver.org/
 
 # Usage
 
-## Windows
+## Windows
 
 Generally we don't add the ofxCeres project in project generator, instead we follow the ofxAddonLib pattern. For instructions on how to do this, please check https://github.com/elliotwoods/ofxAddonLib#how-to-use-an-addon-which-uses-ofxaddonlib-pattern .
 
