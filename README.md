@@ -4,6 +4,12 @@ OpenFrameworks addon / helpers for working with Google Ceres solver
 
 http://ceres-solver.org/
 
+# Usage
+
+## Windows
+
+Generally we don't add the ofxCeres project in project generator, instead we follow the ofxAddonLib pattern. For instructions on how to do this, please check https://github.com/elliotwoods/ofxAddonLib#how-to-use-an-addon-which-uses-ofxaddonlib-pattern .
+
 # Notes on glm and ceres-solver
 
 To effectively use ceres, the solver requires the derivative of your cost function with respect to the model parameters. This derivative is called the Jacobian. The Jacobian can become complicated and intensive for the programmer to compute when you have complicated mathematics going on. Ceres therefore offers an automatic differentiation feature which will automatically compute the derivative for you. In order for this to work, it must pass a special data type through your math functions in order to calculate the differentiation, therefore your maths functions must be templated.
