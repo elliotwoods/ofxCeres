@@ -124,7 +124,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);..\..\..\addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -147,7 +147,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);..\..\..\addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -172,7 +172,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);..\..\..\addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -196,7 +196,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>assimp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);$(OF_ROOT)addons\ofxAssimpModelLoader\libs\assimp\lib\vs\$(Platform);..\..\..\addons\ofxAssimpModelLoader\libs\assimp\assimp\lib\vs\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -314,10 +314,10 @@
     <ClCompile Include="src\GroupControl.cpp" />
     <ClCompile Include="src\GroupSolve.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Marker.cpp" />
     <ClCompile Include="src\Markers.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="src\MarkerInWorld.cpp" />
     <ClCompile Include="src\OSC\Path.cpp" />
     <ClCompile Include="src\OSC\Router.cpp" />
     <ClCompile Include="src\pch_ofApp.cpp">
@@ -413,7 +413,7 @@
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\GroupControl.h" />
     <ClInclude Include="src\GroupSolve.h" />
-    <ClInclude Include="src\Marker.h" />
+    <ClInclude Include="src\MarkerInWorld.h" />
     <ClInclude Include="src\Markers.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\ofApp.h" />

@@ -28,9 +28,6 @@
     <ClCompile Include="src\Exception.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Marker.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.cpp">
       <Filter>addons\ofxAssimpModelLoader\src</Filter>
     </ClCompile>
@@ -127,6 +124,9 @@
     <ClCompile Include="src\DMX\MovingHead.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
+    <ClCompile Include="src\MarkerInWorld.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -222,9 +222,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Exception.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Marker.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ofxAssimpModelLoader\src\ofxAssimpAnimation.h">
@@ -472,6 +469,9 @@
     </ClInclude>
     <ClInclude Include="src\DMX\MovingHead.h">
       <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MarkerInWorld.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

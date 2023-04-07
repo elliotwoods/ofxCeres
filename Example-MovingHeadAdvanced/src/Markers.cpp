@@ -32,12 +32,12 @@ Markers::Markers(shared_ptr<Mesh> mesh, shared_ptr<ofxCvGui::Panels::WorldManage
 }
 
 //----------
-shared_ptr<ofxMarker>
+shared_ptr<MarkerInWorld>
 Markers::getMarkerClosestTo(const glm::vec3& position)
 {
 	auto minDistance2 = numeric_limits<float>::max();
 	auto markers = this->getSelection();
-	shared_ptr<ofxMarker> closestMarker;
+	shared_ptr<MarkerInWorld> closestMarker;
 	for (auto marker : markers) {
 		auto distance2 = glm::distance2(marker->position.get(), position);
 
@@ -50,7 +50,7 @@ Markers::getMarkerClosestTo(const glm::vec3& position)
 }
 
 //----------
-shared_ptr<ofxMarker>
+shared_ptr<MarkerInWorld>
 Markers::getMarkerByName(const string& name)
 {
 	auto selection = this->getSelection();
@@ -61,17 +61,17 @@ Markers::getMarkerByName(const string& name)
 	}
 
 	// None found. Return empty
-	return shared_ptr<ofxMarker>();
+	return shared_ptr<MarkerInWorld>();
 }
 
 //----------
-shared_ptr<ofxMarker>
+shared_ptr<MarkerInWorld>
 Markers::addNewMarker(const string& name, const glm::vec3& position, bool useExistingIfWeHaveAMatch)
 {
 	// Find if there's an existing marker which matches this description
 	auto priorMarkers = this->getAllCaptures();
 	bool foundPriorMarker = false;
-	shared_ptr<ofxMarker> marker;
+	shared_ptr<MarkerInWorld> marker;
 	for (const auto& priorMarker : priorMarkers) {
 		if (priorMarker->name.get() == name) {
 			// There's a marker in our a database with a matching name
@@ -93,7 +93,7 @@ Markers::addNewMarker(const string& name, const glm::vec3& position, bool useExi
 						}
 					}
 					if (!priorWithTransformedNameExists) {
-						marker = make_shared<ofxMarker>();
+						marker = make_shared<MarkerInWorld>();
 						marker->name.set(transformedName);
 						marker->position.set(position);
 						break;
@@ -106,7 +106,7 @@ Markers::addNewMarker(const string& name, const glm::vec3& position, bool useExi
 
 	// Make the marker if there is no prior
 	if (!marker) {
-		marker = make_shared<ofxMarker>();
+		marker = make_shared<MarkerInWorld>();
 		marker->position.set(position);
 		marker->name.set(name);
 	}
@@ -124,7 +124,7 @@ Markers::drawWorld()
 		auto constraint = marker->constraint.get();
 
 		// Check if constraint is free or other
-		if (constraint == ofxMarker::Constraint::Free) {
+		if (constraint == MarkerInWorld::Constraint::Free) {
 			// Draw using normal text annotation
 			ofxCvGui::Utils::drawTextAnnotation(marker->name.get()
 				, marker->position.get()
@@ -132,7 +132,7 @@ Markers::drawWorld()
 		}
 		else {
 			// Draw with glyph
-			auto glyph = ofxMarker::getGlyphForConstraint(marker->constraint.get());
+			auto glyph = MarkerInWorld::getGlyphForConstraint(marker->constraint.get());
 
 			auto glyphBounds = ofRectangle(0, 0, 25, 25);
 			auto textBounds = ofxCvGui::Utils::drawText(marker->name, 25, 5, false, 20, 0, false, ofColor(0), ofxCvGui::getDefaultTypeface(), true);
@@ -158,15 +158,15 @@ Markers::drawWorld()
 }
 
 //----------
-shared_ptr<ofxMarker>
+shared_ptr<MarkerInWorld>
 Markers::addMarker()
 {
 	auto name = ofSystemTextBoxDialog("Marker name");
 	if (name.empty()) {
-		return shared_ptr<ofxMarker>();
+		return shared_ptr<MarkerInWorld>();
 	}
 
-	shared_ptr<ofxMarker> marker;
+	shared_ptr<MarkerInWorld> marker;
 
 	// check if existing marker exists
 	{
@@ -181,7 +181,7 @@ Markers::addMarker()
 
 		// Otherwise make it
 		if (!marker) {
-			marker = make_shared<ofxMarker>();
+			marker = make_shared<MarkerInWorld>();
 			marker->name.set(name);
 		}
 	}
@@ -203,7 +203,7 @@ Markers::populateInspector(ofxCvGui::InspectArguments& args)
 	auto inspector = args.inspector;
 	AbstractCalibrationPointSet::populateInspector(args);
 	inspector->addButton("Sort by name", [this]() {
-		this->sortBy([](shared_ptr<ofxMarker> a, shared_ptr<ofxMarker> b) {
+		this->sortBy([](shared_ptr<MarkerInWorld> a, shared_ptr<MarkerInWorld> b) {
 			return a->name.get() < b->name.get();
 			});
 		});

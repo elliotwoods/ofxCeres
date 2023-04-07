@@ -486,7 +486,7 @@ Scene::mergeMarkers()
 	auto allMarkers = this->markers->getAllCaptures();
 
 	// Sort the markers by name
-	map<string, shared_ptr<ofxMarker>> sortedMarkers;
+	map<string, shared_ptr<MarkerInWorld>> sortedMarkers;
 	for (auto marker : allMarkers) {
 		sortedMarkers.emplace(marker->name.get(), marker);
 	}
