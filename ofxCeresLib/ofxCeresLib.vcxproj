@@ -28,7 +28,9 @@
     <ClInclude Include="..\src\ofxCeres\Models\InverseKinematics\System.h" />
     <ClInclude Include="..\src\ofxCeres\Models\MovingHeadGroup.h" />
     <ClInclude Include="..\src\ofxCeres\Models\MovingHeadError.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\Plane.h" />
     <ClInclude Include="..\src\ofxCeres\Models\PolyFit.h" />
+    <ClInclude Include="..\src\ofxCeres\Models\Ray.h" />
     <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\Builder.h" />
     <ClInclude Include="..\src\ofxCeres\Result.h" />
     <ClInclude Include="..\src\ofxCeres\Models\MovingHead.h" />
