@@ -71,8 +71,10 @@ Meanwhile : watch out for include orders if you get errors about quaternions. Tr
 For Visual Studio, please use [https://github.com/elliotwoods/ceres-windows/] branch `v2` which is configured for:
 Note that the submodules seem broken (and we already spent a tonne of time on recompiling ceres for windows). A working building folder can be found at https://www.dropbox.com/s/czuo6zpktsjrbuw/ceres-windows%2020211029.zip?dl=0
 
+* You might need to build glog first (it comes with the repo. Might only be in main branch)
+* Builds should be Debug and Release
 * Use CXSPARSE for sparse maths library
-* v2.0 of ceres-solver
+* v2.0 of ceres-solver (`git checkout v2`)
 * ceres built as shared library
 * No tests, benchmarks, samples, etc (library only)
 * glog (not miniglog)
