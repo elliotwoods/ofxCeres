@@ -36,6 +36,8 @@
     <ClInclude Include="..\src\ofxCeres\Models\MovingHead.h" />
     <ClInclude Include="..\src\ofxCeres\Models\RigidBodyTransform.h" />
     <ClInclude Include="..\src\ofxCeres\SolverSettings.h" />
+    <ClInclude Include="..\src\ofxCeres\VectorMath\Plane.h" />
+    <ClInclude Include="..\src\ofxCeres\VectorMath\Ray.h" />
     <ClInclude Include="..\src\ofxCeres\VectorMath\VectorMath.h" />
     <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\DrawProperties.h" />
     <ClInclude Include="..\src\ofxCeres\Models\StructuralAnalysis\System.h" />

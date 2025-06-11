@@ -15,6 +15,8 @@
 #include "ofxCeres/Models/InverseKinematics/System.h"
 
 #include "ofxCeres/VectorMath/VectorMath.h"
+#include "ofxCeres/VectorMath/Ray.h"
+#include "ofxCeres/VectorMath/Plane.h"
 #include "ofxCeres/Exception.h"
 
 #include <ceres/ceres.h>
