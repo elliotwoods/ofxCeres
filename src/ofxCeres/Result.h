@@ -22,6 +22,16 @@ namespace ofxCeres {
 			this->errorMessage = string(exception.what());
 		}
 
+		Result(bool success) { // Use this if you're making your own result
+			if (success) {
+				this->isError = false;
+				this->summary.termination_type == ceres::TerminationType::CONVERGENCE;
+			}
+			else {
+				this->isError = true;
+			}
+		}
+
 		bool isConverged() const {
 			if (this->isError) {
 				return false;

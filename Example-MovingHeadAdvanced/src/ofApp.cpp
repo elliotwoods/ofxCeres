@@ -11,6 +11,8 @@
 void
 ofApp::setup()
 {
+	ofSetWindowTitle("Moving Head Calibrator");
+
 	// Init the gui
 	this->gui.init();
 

@@ -250,12 +250,26 @@ Mesh::getMaxWorld()
 glm::mat4
 Mesh::getTransform() const
 {
-	return glm::scale(this->parameters.scale.get() * glm::vec3(1, 1, 1))
+	auto transform = glm::scale(this->parameters.scale.get() * glm::vec3(1, 1, 1))
 		* (glm::mat4) ofxCeres::VectorMath::eulerToQuat(glm::vec3{
 				this->parameters.rotation.x.get()
 				, this->parameters.rotation.y.get()
 				, this->parameters.rotation.z.get()
 			} *DEG_TO_RAD);
+
+	if (this->parameters.mirror.x.get()) {
+		transform *= glm::scale(glm::vec3(-1.0f, 1.0f, 1.0f));
+	}
+
+	if (this->parameters.mirror.y.get()) {
+		transform *= glm::scale(glm::vec3(1.0f, -1.0f, 1.0f));
+	}
+
+	if (this->parameters.mirror.z.get()) {
+		transform *= glm::scale(glm::vec3(1.0f, 1.0f, -1.0f));
+	}
+
+	return transform;
 }
 
 //---------

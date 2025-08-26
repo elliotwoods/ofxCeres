@@ -39,6 +39,13 @@ protected:
 			PARAM_DECLARE("Rotation", x, y, z);
 		} rotation;
 
+		struct : ofParameterGroup {
+			ofParameter<bool> x{ "X", false };
+			ofParameter<bool> y{ "Y", false };
+			ofParameter<bool> z{ "Z", false };
+			PARAM_DECLARE("Mirror", x, y, z);
+		} mirror;
+
 
 		struct : ofParameterGroup {
 			ofParameter<bool> enableMaterials{ "Enable materials", false };
@@ -53,7 +60,7 @@ protected:
 		} drawStyle;
 		
 
-		PARAM_DECLARE("Mesh", filename, scale, rotation, drawStyle);
+		PARAM_DECLARE("Mesh", filename, scale, rotation, mirror, drawStyle);
 	} parameters;
 
 	ofParameter<DrawStyle> drawStyle{ "Draw style", DrawStyle::Mix };

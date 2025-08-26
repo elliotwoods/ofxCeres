@@ -22,6 +22,16 @@ namespace ofxCeres {
 				this->t = end - this->s;
 			}
 
+			glm::tvec3<T> getStart() const
+			{
+				return this->s;
+			}
+
+			glm::tvec3<T> getEnd() const
+			{
+				return this->s + this->t;
+			}
+
 			T getLength() const {
 				return VectorMath::length(this->t);
 			}
@@ -95,6 +105,16 @@ namespace ofxCeres {
 
 			glm::tvec3<T> Ray::getMidpoint() const {
 				return s + t * 0.5;
+			}
+
+			Ray applyTransform(const glm::tmat4x4<T>& m) const {
+				auto s = m * glm::tvec4<T>(this->s, 1.0f);
+				auto t = (glm::tmat3x3<T>) m * this->t;
+
+				return TRay<T>(
+					{ s.x, s.y, s.z },
+					{ t.x, t.y, t.z }
+				);
 			}
 		};
 	}

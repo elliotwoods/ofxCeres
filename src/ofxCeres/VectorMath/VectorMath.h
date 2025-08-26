@@ -15,7 +15,7 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T dot(const glm::tvec3<T> & A, const glm::tvec3<T> & B) {
+		T dot(const glm::tvec3<T>& A, const glm::tvec3<T>& B) {
 			return A.x * B.x
 				+ A.y * B.y
 				+ A.z * B.z;
@@ -29,7 +29,7 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T length2(const glm::tvec3<T> & vector) {
+		T length2(const glm::tvec3<T>& vector) {
 			return dot(vector, vector);
 		}
 
@@ -41,45 +41,45 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T length(const glm::tvec3<T> & vector) {
+		T length(const glm::tvec3<T>& vector) {
 			return sqrt(length2(vector));
 		}
 
 		//----------
 		template<typename T>
-		T distance2(const glm::tvec3<T> & A, const glm::tvec3<T> & B) {
+		T distance2(const glm::tvec3<T>& A, const glm::tvec3<T>& B) {
 			auto delta = B - A;
 			return dot(delta, delta);
 		}
 
 		//----------
 		template<typename T>
-		T distance(const glm::tvec3<T> & A, const glm::tvec3<T> & B) {
+		T distance(const glm::tvec3<T>& A, const glm::tvec3<T>& B) {
 			return sqrt(distance2(A, B));
 		}
 
 		//----------
 		template<typename T>
-		T distance2(const glm::tvec2<T> & A, const glm::tvec2<T> & B) {
+		T distance2(const glm::tvec2<T>& A, const glm::tvec2<T>& B) {
 			const glm::tvec2<T> delta(B.x - A.x, B.y - A.y);
 			return dot(delta, delta);
 		}
 
 		//----------
 		template<typename T>
-		T distance(const glm::tvec2<T> & A, const glm::tvec2<T> & B) {
+		T distance(const glm::tvec2<T>& A, const glm::tvec2<T>& B) {
 			return sqrt(distance2(A, B));
 		}
 
 		//----------
 		template<typename T>
-		glm::tvec3<T> normalize(const glm::tvec3<T> & vector) {
+		glm::tvec3<T> normalize(const glm::tvec3<T>& vector) {
 			return vector / length(vector);
 		}
 
 		//----------
 		template<typename T>
-		glm::tvec3<T> cross(const glm::tvec3<T> & x, const glm::tvec3<T> & y) {
+		glm::tvec3<T> cross(const glm::tvec3<T>& x, const glm::tvec3<T>& y) {
 			return glm::tvec3<T>(
 				x.y * y.z - y.y * x.z,
 				x.z * y.x - y.z * x.x,
@@ -88,21 +88,21 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		glm::tquat<T> eulerToQuat(const glm::tvec3<T> & eulerAngles) {
+		glm::tquat<T> eulerToQuat(const glm::tvec3<T>& eulerAngles) {
 			glm::tvec3<T> c(cos(eulerAngles[0] * T(0.5)), cos(eulerAngles[1] * T(0.5)), cos(eulerAngles[2] * T(0.5)));
 			glm::tvec3<T> s(sin(eulerAngles[0] * T(0.5)), sin(eulerAngles[1] * T(0.5)), sin(eulerAngles[2] * T(0.5)));
 
 			return glm::tquat<T> {
 				c.x* c.y* c.z + s.x * s.y * s.z
-				, s.x* c.y* c.z - c.x * s.y * s.z
-				, c.x* s.y* c.z + s.x * c.y * s.z
-				, c.x* c.y* s.z - s.x * s.y * c.z
+					, s.x* c.y* c.z - c.x * s.y * s.z
+					, c.x* s.y* c.z + s.x * c.y * s.z
+					, c.x* c.y* s.z - s.x * s.y * c.z
 			};
 		}
 
 		//----------
 		template<typename T>
-		glm::tmat4x4<T> createTransform(const glm::tvec3<T> & translation, const glm::tvec3<T> & rotationVector)
+		glm::tmat4x4<T> createTransform(const glm::tvec3<T>& translation, const glm::tvec3<T>& rotationVector)
 		{
 			auto rotationQuat = eulerToQuat(rotationVector);
 			auto rotationMat = glm::tmat4x4<T>(rotationQuat);
@@ -111,10 +111,10 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T> & objectSpacePoint) {
+		glm::tvec2<T> getPanTiltToTargetInObjectSpace(const glm::tvec3<T>& objectSpacePoint) {
 
 			// Left (+) corresponds with positive atan, so we switch since professional fixtures are Right (+)
-			auto pan = - atan2(objectSpacePoint.x, objectSpacePoint.z) * (T) RAD_TO_DEG;
+			auto pan = -atan2(objectSpacePoint.x, objectSpacePoint.z) * (T)RAD_TO_DEG;
 
 			T distance2 = objectSpacePoint.x * objectSpacePoint.x
 				+ objectSpacePoint.y * objectSpacePoint.y
@@ -129,14 +129,14 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		glm::tvec3<T> getObjectSpaceRayForPanTilt(const glm::tvec2<T> & panTiltAngle) {
+		glm::tvec3<T> getObjectSpaceRayForPanTilt(const glm::tvec2<T>& panTiltAngle) {
 			auto actualTilt = panTiltAngle.y;
 
 			// Left (+) corresponds with positive atan, so we switch since professional fixtures are Right (+)
 			glm::tvec3<T> transmission(
-				sin(actualTilt * DEG_TO_RAD) * sin(- panTiltAngle.x * DEG_TO_RAD)
+				sin(actualTilt * DEG_TO_RAD) * sin(-panTiltAngle.x * DEG_TO_RAD)
 				, cos(actualTilt * DEG_TO_RAD)
-				, sin(actualTilt * DEG_TO_RAD) * cos(- panTiltAngle.x * DEG_TO_RAD)
+				, sin(actualTilt * DEG_TO_RAD) * cos(-panTiltAngle.x * DEG_TO_RAD)
 			);
 
 			return transmission;
@@ -144,7 +144,7 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T powerSeries2(const T & x, const T * const coefficients) {
+		T powerSeries2(const T& x, const T* const coefficients) {
 			return x * x * coefficients[0]
 				+ x * coefficients[1]
 				+ coefficients[2];
@@ -153,14 +153,14 @@ namespace ofxCeres {
 		//----------
 		// from Wolfram alpha 'y = a*x*x + b * x + c, solve for x'
 		template<typename T>
-		std::pair<T, T> powerSeries2Inverse(const T & y, const T * const coefficients) {
-			auto & a = coefficients[0];
-			auto & b = coefficients[1];
-			auto & c = coefficients[2];
+		std::pair<T, T> powerSeries2Inverse(const T& y, const T* const coefficients) {
+			auto& a = coefficients[0];
+			auto& b = coefficients[1];
+			auto& c = coefficients[2];
 
 			if (a != 0) {
-				auto solution_1 = -(sqrt(-4 * a*c + 4 * a*y + b * b) + b) / (2 * a);
-				auto solution_2 = (sqrt(4 * a*(y - c) + b * b) - b) / (2 * a);
+				auto solution_1 = -(sqrt(-4 * a * c + 4 * a * y + b * b) + b) / (2 * a);
+				auto solution_2 = (sqrt(4 * a * (y - c) + b * b) - b) / (2 * a);
 
 				return { solution_1, solution_2 };
 			}
@@ -175,7 +175,7 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T sphericalPolarDistance(const glm::tvec2<T> & panTilt1, const glm::tvec2<T> & panTilt2) {
+		T sphericalPolarDistance(const glm::tvec2<T>& panTilt1, const glm::tvec2<T>& panTilt2) {
 			auto projected1 = getObjectSpaceRayForPanTilt(panTilt1);
 			auto projected2 = getObjectSpaceRayForPanTilt(panTilt2);
 
@@ -187,7 +187,7 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		T pickClosest(const T & target, const T & option1, const T & option2) {
+		T pickClosest(const T& target, const T& option1, const T& option2) {
 			if (option1 == option1) {
 				if (option2 == option2) {
 					if (abs(target - option1) < abs(target - option2)) {
@@ -224,7 +224,7 @@ namespace ofxCeres {
 			auto intersection = rayS + u * rayT;
 
 			// follow the ray through the plane by 2x distance to get the reflection
-			return rayS + u * (T) 2 * rayT;
+			return rayS + u * (T)2 * rayT;
 		}
 
 		//----------
@@ -254,7 +254,7 @@ namespace ofxCeres {
 		{
 			const auto& I = incident;
 			const auto N = -normalTowardsExit;
-			const auto& eta = (T) 1.0 / exitIORvsIncidentIOR;
+			const auto& eta = (T)1.0 / exitIORvsIncidentIOR;
 
 			auto k = 1.0 - eta * eta * (1.0 - dot(N, I) * dot(N, I));
 			if (k < (T)0.0) {
@@ -267,12 +267,20 @@ namespace ofxCeres {
 
 		//----------
 		template<typename T>
-		glm::tvec3<T> applyTransform(glm::tmat4x4<T> matrix, glm::tvec3<T> vector)
+		glm::tvec3<T> applyTransform(const glm::tmat4x4<T>& matrix, const glm::tvec3<T>& vector)
 		{
-			glm::tvec4<T> vec4(vector.x, vector.y, vector.z, (T) 1.0f);
+			glm::tvec4<T> vec4(vector.x, vector.y, vector.z, (T)1.0f);
 			auto result4 = matrix * vec4;
 			result4 /= result4.w;
 			return glm::tvec3<T>(result4.x, result4.y, result4.z);
+		}
+
+		//----------
+		template<typename T>
+		glm::tvec3<T> applyRotationOnly(const glm::tmat4x4<T>& matrix, const glm::tvec3<T>& vector)
+		{
+			auto result = ((glm::tmat3x3<T>) matrix) * vector;
+			return result;
 		}
 
 		//----------

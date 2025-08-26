@@ -84,12 +84,6 @@
     <ClInclude Include="..\src\ofxCeres\Models\Plane.h">
       <Filter>src\ofxCeres\Models</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ofxCeres\VectorMath\Ray.h">
-      <Filter>src\ofxCeres\VectorMath</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ofxCeres\VectorMath\Plane.h">
-      <Filter>src\ofxCeres\VectorMath</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">
