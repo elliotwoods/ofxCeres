@@ -8,6 +8,8 @@ namespace ofxCeres {
 		SolverSettings();
 		ceres::Solver::Options options;
 
+		void setPrintingEnabled(bool);
+
 #ifdef _DEBUG
 		bool printReport = true;
 #else

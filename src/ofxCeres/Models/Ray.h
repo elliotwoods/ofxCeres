@@ -14,6 +14,18 @@ namespace ofxCeres {
 			glm::tvec3<T> s;
 			glm::tvec3<T> t;
 
+			template<typename T2>
+			Ray<T2>
+				castTo() const
+			{
+				Ray<T2> castRay;
+				{
+					castRay.s = (glm::tvec3<T2>) this->s;
+					castRay.t = (glm::tvec3<T2>) this->t;
+				}
+				return castRay;
+			}
+
 			void setStart(const glm::tvec3<T>& start) {
 				this->s = start;
 			}

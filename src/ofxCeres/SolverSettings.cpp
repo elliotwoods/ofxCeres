@@ -13,6 +13,14 @@ namespace ofxCeres {
 	}
 
 	//----------
+	void
+		SolverSettings::setPrintingEnabled(bool printingEnabled)
+	{
+		this->printReport = printingEnabled;
+		this->options.minimizer_progress_to_stdout = printingEnabled;
+	}
+
+	//----------
 	ParameterisedSolverSettings::ParameterisedSolverSettings()
 	{
 		this->setName("Solver settings");
