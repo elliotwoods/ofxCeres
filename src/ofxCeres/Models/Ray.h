@@ -111,11 +111,11 @@ namespace ofxCeres {
 				return VectorMath::length(VectorMath::cross(point - s, point - (s + t))) / VectorMath::length(t);
 			}
 
-			glm::tvec3<T> Ray::closestPointOnRayTo(const glm::tvec3<T>& point) const {
+			glm::tvec3<T> closestPointOnRayTo(const glm::tvec3<T>& point) const {
 				return s + (t * VectorMath::dot(point - s, t) / VectorMath::length2(t));
 			}
 
-			glm::tvec3<T> Ray::getMidpoint() const {
+			glm::tvec3<T> getMidpoint() const {
 				return s + t * 0.5;
 			}
 
