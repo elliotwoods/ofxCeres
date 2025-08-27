@@ -15,6 +15,20 @@ namespace ofxCeres {
 			glm::tvec3<T> center;
 			glm::tvec3<T> normal;
 
+
+			template<typename T2>
+			Plane<T2>
+				castTo()
+			{
+				Plane<T2> castPlane;
+				{
+					castPlane.center = (glm::tvec3<T2>) this->center;
+					castPlane.normal = (glm::tvec3<T2>) this->normal;
+				}
+				return castPlane;
+			}
+
+
 			glm::tvec4<T>
 				getABCD() const
 			{
