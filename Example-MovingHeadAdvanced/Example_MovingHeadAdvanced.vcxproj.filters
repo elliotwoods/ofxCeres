@@ -127,6 +127,9 @@
     <ClCompile Include="src\MarkerInWorld.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\DMX\VL6000.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -472,6 +475,9 @@
     </ClInclude>
     <ClInclude Include="src\MarkerInWorld.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\VL6000.h">
+      <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -202,6 +202,16 @@ namespace DMX {
 				}
 			};
 			inspector->add(trackpad);
+
+			inspector->addButton("Maximise trackpad", [trackpad]() {
+				auto panel = ofxCvGui::Panels::makeBlank();
+				panel->addChild(trackpad);
+				weak_ptr<ofxCvGui::Panels::Base> panelWeak(panel);
+				panel->onBoundsChange += [panelWeak, trackpad](ofxCvGui::BoundsChangeArguments& args) {
+					trackpad->setBounds(args.localBounds);
+					};
+				ofxCvGui::openDialog(panel);
+				})->setDrawGlyph(u8"\uf31e");
 		}
 		inspector->addButton("Home", [this]() {
 			this->parameters.pan.set(0);

@@ -172,7 +172,7 @@ Mesh::loadMesh()
 
 	ofxAssimpModelLoader modelLoader;
 
-	modelLoader.load(this->parameters.filename.get().string());
+	modelLoader.load(this->parameters.filename.get().string(), ofxAssimpModelLoader::OPTIMIZE_NONE);
 	if (!modelLoader.hasMeshes()) {
 		throw(Exception("File does not contain any meshes"));
 	}

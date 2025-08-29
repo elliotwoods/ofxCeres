@@ -310,6 +310,7 @@
     <ClCompile Include="src\DMX\MovingHead.cpp" />
     <ClCompile Include="src\DMX\Pointe.cpp" />
     <ClCompile Include="src\DMX\Sharpy.cpp" />
+    <ClCompile Include="src\DMX\VL6000.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\GroupControl.cpp" />
     <ClCompile Include="src\GroupSolve.cpp" />
@@ -410,6 +411,7 @@
     <ClInclude Include="src\DMX\Pointe.h" />
     <ClInclude Include="src\DMX\Sharpy.h" />
     <ClInclude Include="src\DMX\Types.h" />
+    <ClInclude Include="src\DMX\VL6000.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\GroupControl.h" />
     <ClInclude Include="src\GroupSolve.h" />
