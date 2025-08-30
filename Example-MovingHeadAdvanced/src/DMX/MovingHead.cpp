@@ -328,7 +328,7 @@ namespace DMX {
 				// ignore this
 				continue;
 			}
-			if (it.second->parameters.shutter.get()) {
+			if (it.second->parameters.shutterOpen.get()) {
 				return false;
 				break;
 			}
@@ -347,10 +347,10 @@ namespace DMX {
 				// ignore this
 				continue;
 			}
-			it.second->parameters.shutter.set(!solo);
+			it.second->parameters.shutterOpen.set(!solo);
 		}
 
 		// anyway turn this one on
-		this->parameters.shutter.set(true);
+		this->parameters.shutterOpen.set(true);
 	}
 }

@@ -130,6 +130,9 @@
     <ClCompile Include="src\DMX\VL6000.cpp">
       <Filter>src\DMX</Filter>
     </ClCompile>
+    <ClCompile Include="src\DMX\VL10.cpp">
+      <Filter>src\DMX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -477,6 +480,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\DMX\VL6000.h">
+      <Filter>src\DMX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DMX\VL10.h">
       <Filter>src\DMX</Filter>
     </ClInclude>
   </ItemGroup>

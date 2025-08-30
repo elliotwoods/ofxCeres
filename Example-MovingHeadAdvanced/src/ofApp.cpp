@@ -7,6 +7,7 @@
 #include "DMX/Sharpy.h"
 #include "DMX/Pointe.h"
 #include "DMX/VL6000.h"
+#include "DMX/VL10.h"
 
 //--------------------------------------------------------------
 void
@@ -21,6 +22,7 @@ ofApp::setup()
 	DMX::FixtureFactory::X().add<DMX::Sharpy>();
 	DMX::FixtureFactory::X().add<DMX::Pointe>();
 	DMX::FixtureFactory::X().add<DMX::VL6000>();
+	DMX::FixtureFactory::X().add<DMX::VL10>();
 
 	// Initialise the scene
 	this->scene = Scene::X(); // We want to do this after gui is init setup so we load graphics correctly

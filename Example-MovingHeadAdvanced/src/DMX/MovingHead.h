@@ -37,13 +37,13 @@ namespace DMX {
 		void setSolo(bool);
 
 		struct : ofParameterGroup {
-			ofParameter<bool> shutter{ "Shutter", false };
+			ofParameter<bool> shutterOpen{ "Shutter open", false }; // true = closed
 			ofParameter<float> pan{ "Pan", 0, -180, 180 };
 			ofParameter<float> tilt{ "Tilt", 0, -90, 90 };
 			ofParameter<float> dimmer{ "Dimmer", 0, 0, 1};
 			ofParameter<float> focus{ "Focus", 0, 0, 1};
 			ofParameter<ofRectangle> boundsLimit{ "Bounds limit", ofRectangle() };
-			PARAM_DECLARE("MovingHead", shutter, pan, tilt, dimmer, focus, boundsLimit);
+			PARAM_DECLARE("MovingHead", shutterOpen, pan, tilt, dimmer, focus, boundsLimit);
 		} parameters;
 
 	protected:

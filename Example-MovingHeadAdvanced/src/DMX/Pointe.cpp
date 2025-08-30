@@ -53,7 +53,7 @@ namespace DMX {
 					})
 			, make_shared<Channel>("Autofocus")
 			, make_shared<Channel>("Shutter/strobe", [this]() {
-				return this->parameters.shutter.get() ? 255 : 0;
+				return this->parameters.shutterOpen.get() ? 255 : 0;
 					})
 			, make_shared<Channel>("Dimmer intensity", [this]() {
 					return Fixture::get16bitMSB(this->parameters.dimmer);

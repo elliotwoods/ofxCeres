@@ -252,7 +252,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 			{
 				renameButton->setDrawGlyph(u8"\uf044"); // edit
 			}
-			auto shutterButton = make_shared<ofxCvGui::Widgets::Toggle>(it.second->parameters.shutter);
+			auto shutterButton = make_shared<ofxCvGui::Widgets::Toggle>(it.second->parameters.shutterOpen);
 			{
 				shutterButton->setDrawGlyph(u8"\uf0eb"); // lightbulb
 			}
@@ -281,7 +281,7 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		auto hasName = [this](const string& name) {
 			auto findName = this->movingHeads.find(name);
 			return findName != this->movingHeads.end();
-		};
+			};
 
 		// Setup the name for new moving head
 		{
@@ -310,28 +310,29 @@ Scene::populateInspector(ofxCvGui::InspectArguments& args)
 		auto inspector = args.inspector;
 		inspector->addEditableValue(this->newMovingHead.name);
 		inspector->addEditableValue(this->newMovingHead.dmxChannelIndex);
-		auto typeSelector = inspector->addMultipleChoice("Type");
-		{
-			auto fixtureFactory = DMX::FixtureFactory::X();
-			for (auto it : fixtureFactory) {
-				typeSelector->addOption(it.first);
-			}
-		}
-		inspector->addButton("Add", [this, hasName, typeSelector]() {
-			try {
-				auto name = this->newMovingHead.name.get();
-				if (hasName(name)) {
-					throw(Exception("Cannot add another moving head with same name '" + name + "'"));
+		inspector->addTitle("Type:", ofxCvGui::Widgets::Title::H2);
+
+		auto fixtureFactory = DMX::FixtureFactory::X();
+		for (auto it : fixtureFactory) {
+			auto typeName = it.first;
+			inspector->addButton(it.first, [this, typeName, hasName]() {
+				try {
+					auto name = this->newMovingHead.name.get();
+					if (hasName(name)) {
+						throw(Exception("Cannot add another moving head with same name '" + name + "'"));
+					}
+					auto movingHead = this->makeMovingHead(typeName);
+					movingHead->channelIndex.set(this->newMovingHead.dmxChannelIndex.get());
+					this->movingHeads.emplace(name, movingHead);
+
+					ofxCvGui::InspectController::X().back();
 				}
+				CATCH_TO_ALERT;
 
-				auto movingHead = this->makeMovingHead(typeSelector->getSelection());
-				movingHead->channelIndex.set(this->newMovingHead.dmxChannelIndex.get());
-				this->movingHeads.emplace(name, movingHead);
+				});
+		}
 
-				ofxCvGui::InspectController::X().back();
-			}
-			CATCH_TO_ALERT;
-			}, OF_KEY_RETURN)->setHeight(100.0f);
+
 		});
 
 	inspector->addSpacer();

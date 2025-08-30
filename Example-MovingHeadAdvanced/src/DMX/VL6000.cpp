@@ -88,30 +88,32 @@ namespace DMX {
 
 			// 22
 			, make_shared<Channel>("Strobe Control", [this]() {
-					return this->parameters.shutter.get() ? 8 : 0;
+					return this->parameters.shutterOpen.get()
+						? 0
+						: 8;
 			})
 
 			// 23
-			, make_shared<Channel>("Lumiare Control")
+			, make_shared<Channel>("Luminaire Control")
 		};
 
 		this->commands.push_back(Command{
 			"Lamp on"
-			, this->getChannelByName("Lumiare Control")
+			, this->getChannelByName("Luminaire Control")
 			, 13
 			, 0
 			, 5
 			});
 		this->commands.push_back(Command{
 			"Lamp off"
-			, this->getChannelByName("Lumiare Control")
+			, this->getChannelByName("Luminaire Control")
 			, 18
 			, 0
 			, 5
 			});
 		this->commands.push_back(Command{
 			"Recalibrate"
-			, this->getChannelByName("Lumiare Control")
+			, this->getChannelByName("Luminaire Control")
 			, 8
 			, 0
 			, 5
