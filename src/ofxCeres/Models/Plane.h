@@ -97,28 +97,55 @@ namespace ofxCeres {
 				return position;
 			}
 
+			template<typename T>
 			glm::tvec3<T>
 				reflect(const glm::tvec3<T>& position) const
 			{
-				auto distance = VectorMath::dot(position - this->center, this->normal);
-				return position - (T) 2 * distance * this->normal;
+				// Ensure unit normal for correct reflection distance
+				const glm::tvec3<T> n = glm::normalize(this->normal);
+				const T signedDistance = glm::dot(position - this->center, n);
+				return position - T(2) * signedDistance * n;
 			}
 
+			template<typename T>
 			Ray<T>
 				reflect(const Ray<T>& ray) const
 			{
-				// Find where ray hits mirror
-				auto positionRayHitsPlane = this->intersect(ray);
+				// Unit normal
+				const glm::tvec3<T> n = glm::normalize(this->normal);
 
-				// Reflect point transmitted through mirror point of ray in mirror
-				auto reflectedTThroughMirror = this->reflect(positionRayHitsPlane + ray.t);
+				// Ray-plane intersection along ray: s + t * d
+				// denom ~ 0 => parallel (no reflection event)
+				const T denom = glm::dot(ray.t, n);
+				const T eps = std::numeric_limits<T>::epsilon() * T(32);
 
-				// Emit the ray in reverse
-				Ray<T> reflectedRay;
-				{
-					reflectedRay.s = positionRayHitsPlane;
-					reflectedRay.setEnd(reflectedTThroughMirror);
+				// Parallel or nearly-parallel => no valid reflection
+				if (glm::abs(denom) <= eps) {
+					return ray; // or return a sentinel/invalid ray if your API supports it
 				}
+
+				// Solve for hit parameter t: dot(center - s, n) / dot(d, n)
+				const T tHit = glm::dot(this->center - ray.s, n) / denom;
+
+				// If intersection is behind the ray start, treat as no reflection
+				if (tHit < T(0)) {
+					return ray; // or a sentinel/invalid ray
+				}
+
+				// Hit point on plane
+				const glm::tvec3<T> hitPoint = ray.s + tHit * ray.t;
+
+				// Reflect direction: d' = d - 2(d·n)n   (n must be unit)
+				const glm::tvec3<T> reflectedDir = ray.t - T(2) * glm::dot(ray.t, n) * n;
+
+				// Build reflected ray starting at the hit point
+				Ray<T> reflectedRay;
+				reflectedRay.s = hitPoint;
+				reflectedRay.t = reflectedDir;       // same magnitude as input; specular reflection preserves |t|
+
+				// If you prefer keeping the original length exactly (in case of tiny numeric drift), you can re-scale:
+				// reflectedRay.setLength(VectorMath::length(ray.t));
+
 				return reflectedRay;
 			}
 
@@ -129,12 +156,12 @@ namespace ofxCeres {
 				glm::tvec3<T> intersectionPoint = this->intersect(incidentRay);
 
 				// Refract the ray at the intersection point
-				refractedTransmission = VectorMath::refract(incidentRay.t
+				auto refractedTransmission = VectorMath::refract(incidentRay.t
 					, -this->normal
 					, refractiveIndexOut / refractiveIndexIn);
 
 				// Create a new ray starting from the intersection point
-				return TRay<T>(intersectionPoint, refractedTransmission);
+				return Ray<T>(intersectionPoint, refractedTransmission);
 			}
 		};
 	}

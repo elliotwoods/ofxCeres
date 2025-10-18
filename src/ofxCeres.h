@@ -3,8 +3,12 @@
 #include "ofxCeres/Models/PolyFit.h"
 #include "ofxCeres/Models/RigidBodyTransform.h"
 
+#include "ofxCeres/Models/Array1D.h"
+#include "ofxCeres/Models/Array2D.h"
+
 #include "ofxCeres/Models/Ray.h"
 #include "ofxCeres/Models/Plane.h"
+#include "ofxCeres/Models/Sphere.h"
 #include "ofxCeres/Models/MovingHead.h"
 #include "ofxCeres/Models/DistortedMovingHead.h"
 #include "ofxCeres/Models/MovingHeadGroup.h"

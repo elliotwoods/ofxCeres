@@ -84,6 +84,15 @@
     <ClInclude Include="..\src\ofxCeres\Models\Plane.h">
       <Filter>src\ofxCeres\Models</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\Sphere.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\Array2D.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxCeres\Models\Array1D.h">
+      <Filter>src\ofxCeres\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxCeres\Models\RigidBodyTransform.cpp">

@@ -123,12 +123,64 @@ namespace ofxCeres {
 				auto s = m * glm::tvec4<T>(this->s, 1.0f);
 				auto t = (glm::tmat3x3<T>) m * this->t;
 
-				return TRay<T>(
+				return Ray<T>(
 					{ s.x, s.y, s.z },
 					{ t.x, t.y, t.z }
 				);
 			}
+
+			// Element-wise converting cast: Grid<U> out = (Grid<U>) in;
+			template<typename T2>
+			explicit operator Ray<T2>() const {
+				Ray<T2> out;
+				out.s = (glm::tvec3<T2>) this->s;
+				out.t = (glm::tvec3<T2>) this->t;
+				return out;
+			}
+
+			// Declarations so we can specialize for T=float below
+			void serialize(nlohmann::json& json);
+			void deserialize(const nlohmann::json& json);
 		};
+
+		// Ray<float> JSON specialization
+		template<>
+		inline void Ray<float>::serialize(nlohmann::json& json)
+		{
+			json = nlohmann::json::object();
+			json["s"] = nlohmann::json::array({ this->s.x, this->s.y, this->s.z });
+			json["t"] = nlohmann::json::array({ this->t.x, this->t.y, this->t.z });
+		}
+
+		template<>
+		inline void Ray<float>::deserialize(const nlohmann::json& json)
+		{
+			if (!json.contains("s") || !json.contains("t")) {
+				throw std::runtime_error("Ray<float>::deserialize: missing keys 's' or 't'");
+			}
+
+			auto readVec3 = [](const nlohmann::json& j) -> glm::vec3 {
+				glm::vec3 v;
+				if (j.is_array()) {
+					if (j.size() != 3) {
+						throw std::runtime_error("Ray<float>::deserialize: vec3 array must have 3 elements");
+					}
+					v.x = j.at(0).get<float>();
+					v.y = j.at(1).get<float>();
+					v.z = j.at(2).get<float>();
+				}
+				else {
+					// Accept object form too: { "x":..., "y":..., "z":... }
+					v.x = j.at("x").get<float>();
+					v.y = j.at("y").get<float>();
+					v.z = j.at("z").get<float>();
+				}
+				return v;
+				};
+
+			this->s = readVec3(json.at("s"));
+			this->t = readVec3(json.at("t"));
+		}
 	}
 }
 
