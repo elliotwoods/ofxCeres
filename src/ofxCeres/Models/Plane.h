@@ -43,10 +43,10 @@ namespace ofxCeres {
 			void
 				setABCD(const glm::tvec4<T>& ABCD)
 			{
-				const& A = ABCD[0];
-				const& B = ABCD[1];
-				const& C = ABCD[2];
-				const& D = ABCD[3];
+				const auto& A = ABCD[0];
+				const auto& B = ABCD[1];
+				const auto& C = ABCD[2];
+				const auto& D = ABCD[3];
 
 				glm::tvec3<T> direction(A, B, C);
 
@@ -97,7 +97,6 @@ namespace ofxCeres {
 				return position;
 			}
 
-			template<typename T>
 			glm::tvec3<T>
 				reflect(const glm::tvec3<T>& position) const
 			{
@@ -107,7 +106,6 @@ namespace ofxCeres {
 				return position - T(2) * signedDistance * n;
 			}
 
-			template<typename T>
 			Ray<T>
 				reflect(const Ray<T>& ray) const
 			{

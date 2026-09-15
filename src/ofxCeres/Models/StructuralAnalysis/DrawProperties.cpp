@@ -59,7 +59,7 @@ namespace ofxCeres {
 				return this->getSceneScale() / this->maxScalar;
 			}
 
-#ifdef HAS_OFXASSETS
+#ifdef HAS_OFXCVGUI
 			//----------
 			ofColor DrawProperties::scalarToColor(float scalar) {
 				auto & scaleImage = ofxAssets::image("scale");

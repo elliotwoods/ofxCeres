@@ -107,7 +107,7 @@ namespace ofxCeres {
 
                 auto& arr = json["data"];
                 arr = nlohmann::json::array();
-                arr.reserve(size_);
+                arr.get_ref<nlohmann::json::array_t&>().reserve(size_);
 
                 for (size_t k = 0; k < size_; ++k) {
                     arr.push_back(elementToJson(data[k]));
