@@ -97,25 +97,27 @@ namespace ofxCeres {
 				return position;
 			}
 
-			glm::tvec3<T>
-				reflect(const glm::tvec3<T>& position) const
+			template<typename T2>
+			glm::tvec3<T2>
+				reflect(const glm::tvec3<T2>& position) const
 			{
 				// Ensure unit normal for correct reflection distance
-				const glm::tvec3<T> n = glm::normalize(this->normal);
-				const T signedDistance = glm::dot(position - this->center, n);
-				return position - T(2) * signedDistance * n;
+				const glm::tvec3<T2> n = glm::normalize(glm::tvec3<T2>(this->normal));
+				const T2 signedDistance = glm::dot(position - glm::tvec3<T2>(this->center), n);
+				return position - T2(2) * signedDistance * n;
 			}
 
-			Ray<T>
-				reflect(const Ray<T>& ray) const
+			template<typename T2>
+			Ray<T2>
+				reflect(const Ray<T2>& ray) const
 			{
 				// Unit normal
-				const glm::tvec3<T> n = glm::normalize(this->normal);
+				const glm::tvec3<T2> n = glm::normalize(glm::tvec3<T2>(this->normal));
 
 				// Ray-plane intersection along ray: s + t * d
 				// denom ~ 0 => parallel (no reflection event)
-				const T denom = glm::dot(ray.t, n);
-				const T eps = std::numeric_limits<T>::epsilon() * T(32);
+				const T2 denom = glm::dot(ray.t, n);
+				const T2 eps = std::numeric_limits<T2>::epsilon() * T2(32);
 
 				// Parallel or nearly-parallel => no valid reflection
 				if (glm::abs(denom) <= eps) {
@@ -123,21 +125,21 @@ namespace ofxCeres {
 				}
 
 				// Solve for hit parameter t: dot(center - s, n) / dot(d, n)
-				const T tHit = glm::dot(this->center - ray.s, n) / denom;
+				const T2 tHit = glm::dot(glm::tvec3<T2>(this->center) - ray.s, n) / denom;
 
 				// If intersection is behind the ray start, treat as no reflection
-				if (tHit < T(0)) {
+				if (tHit < T2(0)) {
 					return ray; // or a sentinel/invalid ray
 				}
 
 				// Hit point on plane
-				const glm::tvec3<T> hitPoint = ray.s + tHit * ray.t;
+				const glm::tvec3<T2> hitPoint = ray.s + tHit * ray.t;
 
 				// Reflect direction: d' = d - 2(d·n)n   (n must be unit)
-				const glm::tvec3<T> reflectedDir = ray.t - T(2) * glm::dot(ray.t, n) * n;
+				const glm::tvec3<T2> reflectedDir = ray.t - T2(2) * glm::dot(ray.t, n) * n;
 
 				// Build reflected ray starting at the hit point
-				Ray<T> reflectedRay;
+				Ray<T2> reflectedRay;
 				reflectedRay.s = hitPoint;
 				reflectedRay.t = reflectedDir;       // same magnitude as input; specular reflection preserves |t|
 
